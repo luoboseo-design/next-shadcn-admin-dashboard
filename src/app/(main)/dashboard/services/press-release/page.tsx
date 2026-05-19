@@ -281,143 +281,173 @@ export default function PressReleasePage() {
               {/* 行业 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">行业</label>
-                <Select
-                  value={selectedIndustry}
-                  onValueChange={setSelectedIndustry}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择行业" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部行业</SelectItem>
-                    {Object.entries(industryLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button
+                    variant={selectedIndustry === "all" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedIndustry("all")}
+                  >
+                    不限
+                  </Button>
+                  {Object.entries(industryLabels).map(([value, label]) => (
+                    <Button
+                      key={value}
+                      variant={selectedIndustry === value ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setSelectedIndustry(value)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               {/* 媒体类型 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">媒体类型</label>
-                <Select
-                  value={selectedMediaType}
-                  onValueChange={setSelectedMediaType}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择类型" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部类型</SelectItem>
-                    {Object.entries(mediaTypeLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button
+                    variant={selectedMediaType === "all" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedMediaType("all")}
+                  >
+                    不限
+                  </Button>
+                  {Object.entries(mediaTypeLabels).map(([value, label]) => (
+                    <Button
+                      key={value}
+                      variant={selectedMediaType === value ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setSelectedMediaType(value)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               {/* 语言 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">语言</label>
-                <Select
-                  value={selectedLanguage}
-                  onValueChange={setSelectedLanguage}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择语言" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部语言</SelectItem>
-                    {Object.entries(languageLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button
+                    variant={selectedLanguage === "all" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedLanguage("all")}
+                  >
+                    不限
+                  </Button>
+                  {Object.entries(languageLabels).map(([value, label]) => (
+                    <Button
+                      key={value}
+                      variant={selectedLanguage === value ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setSelectedLanguage(value)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               {/* 地区 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">地区</label>
-                <Select
-                  value={selectedRegion}
-                  onValueChange={setSelectedRegion}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择地区" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部地区</SelectItem>
-                    {Object.entries(regionLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* DA 范围 */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">DA 权重</label>
-                <Select
-                  value={selectedDaRange}
-                  onValueChange={setSelectedDaRange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择 DA 范围" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {daRanges.map((range) => (
-                      <SelectItem key={range.value} value={range.value}>
-                        {range.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* 价格范围 */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">价格范围</label>
-                <Select
-                  value={selectedPriceRange}
-                  onValueChange={setSelectedPriceRange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择价格范围" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {priceRanges.map((range) => (
-                      <SelectItem key={range.value} value={range.value}>
-                        {range.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button
+                    variant={selectedRegion === "all" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedRegion("all")}
+                  >
+                    不限
+                  </Button>
+                  {Object.entries(regionLabels).map(([value, label]) => (
+                    <Button
+                      key={value}
+                      variant={selectedRegion === value ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setSelectedRegion(value)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               {/* 链接支持 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">链接支持</label>
-                <Select
-                  value={selectedLinkType}
-                  onValueChange={setSelectedLinkType}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择链接支持" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    <SelectItem value="supports">支持链接</SelectItem>
-                    <SelectItem value="no-link">不支持链接</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button
+                    variant={selectedLinkType === "all" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedLinkType("all")}
+                  >
+                    不限
+                  </Button>
+                  <Button
+                    variant={selectedLinkType === "supports" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedLinkType("supports")}
+                  >
+                    支持链接
+                  </Button>
+                  <Button
+                    variant={selectedLinkType === "no-link" ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setSelectedLinkType("no-link")}
+                  >
+                    不支持链接
+                  </Button>
+                </div>
+              </div>
+
+              {/* 其他筛选 - 下拉选择器 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">其他筛选</label>
+                <div className="flex flex-wrap gap-2">
+                  <Select
+                    value={selectedDaRange}
+                    onValueChange={setSelectedDaRange}
+                  >
+                    <SelectTrigger className="w-[100px] h-8 text-xs">
+                      <SelectValue placeholder="DA 权重" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {daRanges.map((range) => (
+                        <SelectItem key={range.value} value={range.value}>
+                          {range.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={selectedPriceRange}
+                    onValueChange={setSelectedPriceRange}
+                  >
+                    <SelectTrigger className="w-[100px] h-8 text-xs">
+                      <SelectValue placeholder="价格范围" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {priceRanges.map((range) => (
+                        <SelectItem key={range.value} value={range.value}>
+                          {range.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -490,97 +520,142 @@ export default function PressReleasePage() {
                   <SheetDescription>设置筛选条件找到合适的媒体</SheetDescription>
                 </SheetHeader>
                 <div className="space-y-4 mt-6">
-                  {/* 移动端筛选器内容 - 与桌面端相同 */}
+                  {/* 移动端筛选器内容 - 横向标签式 */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">行业</label>
-                    <Select
-                      value={selectedIndustry}
-                      onValueChange={setSelectedIndustry}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择行业" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">全部行业</SelectItem>
-                        {Object.entries(industryLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Button
+                        variant={selectedIndustry === "all" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedIndustry("all")}
+                      >
+                        不限
+                      </Button>
+                      {Object.entries(industryLabels).map(([value, label]) => (
+                        <Button
+                          key={value}
+                          variant={selectedIndustry === value ? "default" : "outline"}
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => setSelectedIndustry(value)}
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">媒体类型</label>
-                    <Select
-                      value={selectedMediaType}
-                      onValueChange={setSelectedMediaType}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择类型" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">全部类型</SelectItem>
-                        {Object.entries(mediaTypeLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Button
+                        variant={selectedMediaType === "all" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedMediaType("all")}
+                      >
+                        不限
+                      </Button>
+                      {Object.entries(mediaTypeLabels).map(([value, label]) => (
+                        <Button
+                          key={value}
+                          variant={selectedMediaType === value ? "default" : "outline"}
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => setSelectedMediaType(value)}
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">语言</label>
-                    <Select
-                      value={selectedLanguage}
-                      onValueChange={setSelectedLanguage}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择语言" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">全部语言</SelectItem>
-                        {Object.entries(languageLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">DA 权重</label>
-                    <Select
-                      value={selectedDaRange}
-                      onValueChange={setSelectedDaRange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择 DA 范围" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {daRanges.map((range) => (
-                          <SelectItem key={range.value} value={range.value}>
-                            {range.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Button
+                        variant={selectedLanguage === "all" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedLanguage("all")}
+                      >
+                        不限
+                      </Button>
+                      {Object.entries(languageLabels).map(([value, label]) => (
+                        <Button
+                          key={value}
+                          variant={selectedLanguage === value ? "default" : "outline"}
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => setSelectedLanguage(value)}
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">链接支持</label>
-                    <Select
-                      value={selectedLinkType}
-                      onValueChange={setSelectedLinkType}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择链接支持" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">全部</SelectItem>
-                        <SelectItem value="supports">支持链接</SelectItem>
-                        <SelectItem value="no-link">不支持链接</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Button
+                        variant={selectedLinkType === "all" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedLinkType("all")}
+                      >
+                        不限
+                      </Button>
+                      <Button
+                        variant={selectedLinkType === "supports" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedLinkType("supports")}
+                      >
+                        支持链接
+                      </Button>
+                      <Button
+                        variant={selectedLinkType === "no-link" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedLinkType("no-link")}
+                      >
+                        不支持链接
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">其他筛选</label>
+                    <div className="flex flex-wrap gap-2">
+                      <Select
+                        value={selectedDaRange}
+                        onValueChange={setSelectedDaRange}
+                      >
+                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                          <SelectValue placeholder="DA 权重" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {daRanges.map((range) => (
+                            <SelectItem key={range.value} value={range.value}>
+                              {range.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={selectedPriceRange}
+                        onValueChange={setSelectedPriceRange}
+                      >
+                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                          <SelectValue placeholder="价格范围" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {priceRanges.map((range) => (
+                            <SelectItem key={range.value} value={range.value}>
+                              {range.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   {hasActiveFilters && (
                     <Button
