@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
-  Filter,
   Globe,
   CheckCircle2,
   ExternalLink,
@@ -28,8 +27,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -248,200 +245,222 @@ export default function PressReleasePage() {
         </Card>
       </div>
 
-      {/* 筛选条件 - 横向标签式布局 */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              筛选条件
-            </CardTitle>
+      {/* 筛选条件 - 简洁横向布局 */}
+      <div className="bg-card rounded-lg border divide-y">
+        {/* 行业 */}
+        <div className="flex items-center py-3 px-4">
+          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
+            行业
+          </span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+            <button
+              onClick={() => setSelectedIndustry("all")}
+              className={`text-sm transition-colors ${
+                selectedIndustry === "all"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              不限
+            </button>
+            {Object.entries(industryLabels).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setSelectedIndustry(value)}
+                className={`text-sm transition-colors ${
+                  selectedIndustry === value
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 媒体类型 */}
+        <div className="flex items-center py-3 px-4">
+          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
+            媒体类型
+          </span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+            <button
+              onClick={() => setSelectedMediaType("all")}
+              className={`text-sm transition-colors ${
+                selectedMediaType === "all"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              不限
+            </button>
+            {Object.entries(mediaTypeLabels).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setSelectedMediaType(value)}
+                className={`text-sm transition-colors ${
+                  selectedMediaType === value
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 语言 */}
+        <div className="flex items-center py-3 px-4">
+          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
+            语言
+          </span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+            <button
+              onClick={() => setSelectedLanguage("all")}
+              className={`text-sm transition-colors ${
+                selectedLanguage === "all"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              不限
+            </button>
+            {Object.entries(languageLabels).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setSelectedLanguage(value)}
+                className={`text-sm transition-colors ${
+                  selectedLanguage === value
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 地区 */}
+        <div className="flex items-center py-3 px-4">
+          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
+            地区
+          </span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+            <button
+              onClick={() => setSelectedRegion("all")}
+              className={`text-sm transition-colors ${
+                selectedRegion === "all"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              不限
+            </button>
+            {Object.entries(regionLabels).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setSelectedRegion(value)}
+                className={`text-sm transition-colors ${
+                  selectedRegion === value
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 链接支持 */}
+        <div className="flex items-center py-3 px-4">
+          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
+            链接支持
+          </span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+            <button
+              onClick={() => setSelectedLinkType("all")}
+              className={`text-sm transition-colors ${
+                selectedLinkType === "all"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              不限
+            </button>
+            <button
+              onClick={() => setSelectedLinkType("supports")}
+              className={`text-sm transition-colors ${
+                selectedLinkType === "supports"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              支持链接
+            </button>
+            <button
+              onClick={() => setSelectedLinkType("no-link")}
+              className={`text-sm transition-colors ${
+                selectedLinkType === "no-link"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              不支持链接
+            </button>
+          </div>
+        </div>
+
+        {/* 其他筛选 */}
+        <div className="flex items-center py-3 px-4">
+          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
+            其他筛选
+          </span>
+          <div className="flex flex-wrap items-center gap-3 ml-4">
+            <Select
+              value={selectedDaRange}
+              onValueChange={setSelectedDaRange}
+            >
+              <SelectTrigger className="w-[110px] h-8 text-sm border-dashed">
+                <SelectValue placeholder="DA 权重" />
+              </SelectTrigger>
+              <SelectContent>
+                {daRanges.map((range) => (
+                  <SelectItem key={range.value} value={range.value}>
+                    {range.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={selectedPriceRange}
+              onValueChange={setSelectedPriceRange}
+            >
+              <SelectTrigger className="w-[110px] h-8 text-sm border-dashed">
+                <SelectValue placeholder="价格范围" />
+              </SelectTrigger>
+              <SelectContent>
+                {priceRanges.map((range) => (
+                  <SelectItem key={range.value} value={range.value}>
+                    {range.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={clearFilters}
-                className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-destructive transition-colors"
               >
                 清除筛选
-              </Button>
+              </button>
             )}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* 行业 */}
-          <div className="flex items-start gap-3">
-            <label className="text-sm font-medium w-16 shrink-0 pt-1.5">行业</label>
-            <div className="flex flex-wrap gap-1.5">
-              <Button
-                variant={selectedIndustry === "all" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedIndustry("all")}
-              >
-                不限
-              </Button>
-              {Object.entries(industryLabels).map(([value, label]) => (
-                <Button
-                  key={value}
-                  variant={selectedIndustry === value ? "default" : "outline"}
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => setSelectedIndustry(value)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* 媒体类型 */}
-          <div className="flex items-start gap-3">
-            <label className="text-sm font-medium w-16 shrink-0 pt-1.5">媒体类型</label>
-            <div className="flex flex-wrap gap-1.5">
-              <Button
-                variant={selectedMediaType === "all" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedMediaType("all")}
-              >
-                不限
-              </Button>
-              {Object.entries(mediaTypeLabels).map(([value, label]) => (
-                <Button
-                  key={value}
-                  variant={selectedMediaType === value ? "default" : "outline"}
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => setSelectedMediaType(value)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* 语言 */}
-          <div className="flex items-start gap-3">
-            <label className="text-sm font-medium w-16 shrink-0 pt-1.5">语言</label>
-            <div className="flex flex-wrap gap-1.5">
-              <Button
-                variant={selectedLanguage === "all" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedLanguage("all")}
-              >
-                不限
-              </Button>
-              {Object.entries(languageLabels).map(([value, label]) => (
-                <Button
-                  key={value}
-                  variant={selectedLanguage === value ? "default" : "outline"}
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => setSelectedLanguage(value)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* 地区 */}
-          <div className="flex items-start gap-3">
-            <label className="text-sm font-medium w-16 shrink-0 pt-1.5">地区</label>
-            <div className="flex flex-wrap gap-1.5">
-              <Button
-                variant={selectedRegion === "all" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedRegion("all")}
-              >
-                不限
-              </Button>
-              {Object.entries(regionLabels).map(([value, label]) => (
-                <Button
-                  key={value}
-                  variant={selectedRegion === value ? "default" : "outline"}
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => setSelectedRegion(value)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* 链接支持 */}
-          <div className="flex items-start gap-3">
-            <label className="text-sm font-medium w-16 shrink-0 pt-1.5">链接支持</label>
-            <div className="flex flex-wrap gap-1.5">
-              <Button
-                variant={selectedLinkType === "all" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedLinkType("all")}
-              >
-                不限
-              </Button>
-              <Button
-                variant={selectedLinkType === "supports" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedLinkType("supports")}
-              >
-                支持链接
-              </Button>
-              <Button
-                variant={selectedLinkType === "no-link" ? "default" : "outline"}
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setSelectedLinkType("no-link")}
-              >
-                不支持链接
-              </Button>
-            </div>
-          </div>
-
-          {/* 其他筛选 */}
-          <div className="flex items-start gap-3">
-            <label className="text-sm font-medium w-16 shrink-0 pt-1.5">其他筛选</label>
-            <div className="flex flex-wrap gap-2">
-              <Select
-                value={selectedDaRange}
-                onValueChange={setSelectedDaRange}
-              >
-                <SelectTrigger className="w-[100px] h-8 text-xs">
-                  <SelectValue placeholder="DA 权重" />
-                </SelectTrigger>
-                <SelectContent>
-                  {daRanges.map((range) => (
-                    <SelectItem key={range.value} value={range.value}>
-                      {range.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={selectedPriceRange}
-                onValueChange={setSelectedPriceRange}
-              >
-                <SelectTrigger className="w-[100px] h-8 text-xs">
-                  <SelectValue placeholder="价格范围" />
-                </SelectTrigger>
-                <SelectContent>
-                  {priceRanges.map((range) => (
-                    <SelectItem key={range.value} value={range.value}>
-                      {range.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* 媒体列表 */}
       <div className="space-y-4">
