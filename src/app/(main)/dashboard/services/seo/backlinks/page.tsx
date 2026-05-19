@@ -88,7 +88,6 @@ export default function BacklinksServicePage() {
                   <QuickPackageSelector
                     selectedId={selectedPackageId}
                     onSelect={setSelectedPackageId}
-                    selectedPlatforms={selectedPlatforms}
                     getPriceForPackage={getPriceForPackage}
                   />
                 </CardContent>
@@ -115,12 +114,10 @@ export default function BacklinksServicePage() {
 function QuickPackageSelector({
   selectedId,
   onSelect,
-  selectedPlatforms,
   getPriceForPackage,
 }: {
   selectedId: string;
   onSelect: (id: string) => void;
-  selectedPlatforms: PlatformType[];
   getPriceForPackage: (quantity: number) => number | null;
 }) {
   return (
@@ -128,9 +125,6 @@ function QuickPackageSelector({
       {servicePackages.map((pkg) => {
         const dynamicPrice = getPriceForPackage(pkg.quantity);
         const displayPrice = dynamicPrice ?? pkg.totalPrice;
-        const pricePerLink = dynamicPrice 
-          ? Math.round((displayPrice / pkg.quantity) * 100) / 100
-          : pkg.pricePerLink;
 
         return (
           <button
@@ -152,9 +146,6 @@ function QuickPackageSelector({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
                 {pkg.quantity} 条外链
-                {selectedPlatforms.length > 0 && (
-                  <span className="ml-1">· ${pricePerLink}/条</span>
-                )}
               </span>
               <span className="font-semibold">${displayPrice}</span>
             </div>
