@@ -65,11 +65,6 @@ export const sidebarItems: NavGroup[] = [
         isNew: true,
       },
       {
-        title: "任务中心",
-        url: "/dashboard/tasks",
-        icon: ClipboardList,
-      },
-      {
         title: "服务中心",
         url: "/dashboard/services",
         icon: Sparkles,
@@ -88,6 +83,11 @@ export const sidebarItems: NavGroup[] = [
     id: 2,
     label: "仪表盘",
     items: [
+      {
+        title: "任务中心",
+        url: "/dashboard/tasks",
+        icon: ClipboardList,
+      },
       {
         title: "数据概览",
         url: "/dashboard/default",
