@@ -489,7 +489,7 @@ export default function PressReleasePage() {
                       <TableHead className="hidden md:table-cell">链接</TableHead>
                       <TableHead className="hidden lg:table-cell">发布时间</TableHead>
                       <TableHead className="text-right">价格</TableHead>
-                      <TableHead className="w-[60px] text-right sticky right-0 bg-background">选择</TableHead>
+                      <TableHead className="w-[60px] text-center sticky right-0 bg-background">选择</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -591,7 +591,7 @@ export default function PressReleasePage() {
                         <TableCell className="text-right font-semibold">
                           ${media.price}
                         </TableCell>
-                        <TableCell className="text-right sticky right-0 bg-background">
+                        <TableCell className="text-center sticky right-0 bg-background">
                           <Checkbox
                             checked={selectedMediaIds.includes(media.id)}
                             onCheckedChange={(checked) => {
