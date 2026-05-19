@@ -128,11 +128,11 @@ export default function PressReleasePage() {
         }
       }
 
-      // 链接类型
-      if (selectedLinkType === "dofollow" && !media.dofollow) {
+      // 链接支持
+      if (selectedLinkType === "supports" && !media.supportsLink) {
         return false;
       }
-      if (selectedLinkType === "nofollow" && media.dofollow) {
+      if (selectedLinkType === "no-link" && media.supportsLink) {
         return false;
       }
 
@@ -402,20 +402,20 @@ export default function PressReleasePage() {
                 </Select>
               </div>
 
-              {/* 链接类型 */}
+              {/* 链接支持 */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">链接类型</label>
+                <label className="text-sm font-medium">链接支持</label>
                 <Select
                   value={selectedLinkType}
                   onValueChange={setSelectedLinkType}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="选择链接类型" />
+                    <SelectValue placeholder="选择链接支持" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部</SelectItem>
-                    <SelectItem value="dofollow">支持 Dofollow</SelectItem>
-                    <SelectItem value="nofollow">不支持 Dofollow</SelectItem>
+                    <SelectItem value="supports">支持链接</SelectItem>
+                    <SelectItem value="no-link">不支持链接</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -567,18 +567,18 @@ export default function PressReleasePage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">链接类型</label>
+                    <label className="text-sm font-medium">链接支持</label>
                     <Select
                       value={selectedLinkType}
                       onValueChange={setSelectedLinkType}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="选择链接类型" />
+                        <SelectValue placeholder="选择链接支持" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">全部</SelectItem>
-                        <SelectItem value="dofollow">支持 Dofollow</SelectItem>
-                        <SelectItem value="nofollow">不支持 Dofollow</SelectItem>
+                        <SelectItem value="supports">支持链接</SelectItem>
+                        <SelectItem value="no-link">不支持链接</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -716,15 +716,21 @@ export default function PressReleasePage() {
                           {media.monthlyTraffic}
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
-                          {media.dofollow ? (
-                            <Badge
-                              variant="secondary"
-                              className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                            >
-                              Dofollow
-                            </Badge>
+                          {media.supportsLink ? (
+                            media.dofollow ? (
+                              <Badge
+                                variant="secondary"
+                                className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                              >
+                                Dofollow
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline">Nofollow</Badge>
+                            )
                           ) : (
-                            <Badge variant="outline">Nofollow</Badge>
+                            <Badge variant="outline" className="text-muted-foreground">
+                              不支持
+                            </Badge>
                           )}
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-muted-foreground">
