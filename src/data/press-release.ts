@@ -1,6 +1,27 @@
 // 发稿服务 - 媒体数据
 
-export type MediaIndustry = "tech" | "finance" | "healthcare" | "lifestyle" | "business" | "news" | "entertainment";
+export type MediaIndustry =
+  | "tech"
+  | "entertainment"
+  | "gaming"
+  | "news"
+  | "culture"
+  | "sports"
+  | "marketing"
+  | "food"
+  | "lifestyle"
+  | "agriculture"
+  | "parenting"
+  | "auto"
+  | "fashion"
+  | "travel"
+  | "education"
+  | "healthcare"
+  | "charity"
+  | "industry"
+  | "realestate"
+  | "finance";
+
 export type MediaLanguage = "zh" | "en" | "ja" | "ko" | "de" | "fr" | "es";
 export type MediaRegion = "china" | "usa" | "europe" | "asia" | "global";
 export type MediaType = "famous" | "self-media";
@@ -27,13 +48,26 @@ export interface MediaOutlet {
 }
 
 export const industryLabels: Record<MediaIndustry, string> = {
-  tech: "科技",
-  finance: "金融",
-  healthcare: "医疗健康",
-  lifestyle: "生活方式",
-  business: "商业",
-  news: "综合新闻",
-  entertainment: "娱乐",
+  tech: "IT科技",
+  entertainment: "娱乐休闲",
+  gaming: "游戏网站",
+  news: "新闻资讯",
+  culture: "文化艺术",
+  sports: "体育运动",
+  marketing: "数字营销",
+  food: "食品餐饮",
+  lifestyle: "生活消费",
+  agriculture: "公益三农",
+  parenting: "亲子母婴",
+  auto: "汽车网站",
+  fashion: "女性时尚",
+  travel: "酒店旅游",
+  education: "教育培训",
+  healthcare: "健康医疗",
+  charity: "公益",
+  industry: "工业贸易",
+  realestate: "房产家居",
+  finance: "财经商业",
 };
 
 export const languageLabels: Record<MediaLanguage, string> = {
@@ -398,7 +432,7 @@ export const mediaOutlets: MediaOutlet[] = [
     id: "biz-001",
     name: "Entrepreneur",
     website: "entrepreneur.com",
-    industry: "business",
+    industry: "finance",
     language: "en",
     region: "usa",
     mediaType: "famous",
@@ -417,7 +451,7 @@ export const mediaOutlets: MediaOutlet[] = [
     id: "biz-002",
     name: "Inc.",
     website: "inc.com",
-    industry: "business",
+    industry: "finance",
     language: "en",
     region: "usa",
     mediaType: "famous",
@@ -435,7 +469,7 @@ export const mediaOutlets: MediaOutlet[] = [
     id: "biz-003",
     name: "创业邦",
     website: "cyzone.cn",
-    industry: "business",
+    industry: "finance",
     language: "zh",
     region: "china",
     mediaType: "self-media",
@@ -453,7 +487,7 @@ export const mediaOutlets: MediaOutlet[] = [
     id: "biz-004",
     name: "铅笔道",
     website: "pencilnews.cn",
-    industry: "business",
+    industry: "finance",
     language: "zh",
     region: "china",
     mediaType: "self-media",
@@ -685,7 +719,7 @@ export const mediaOutlets: MediaOutlet[] = [
     supportsLink: false,
     dofollow: false,
     indexed: true,
-    description: "中国专业财经媒体",
+    description: "中国专业财��媒体",
   },
   {
     id: "fin-007",
@@ -745,7 +779,7 @@ export const mediaOutlets: MediaOutlet[] = [
     id: "biz-005",
     name: "亿欧网",
     website: "iyiou.com",
-    industry: "business",
+    industry: "finance",
     language: "zh",
     region: "china",
     mediaType: "self-media",
