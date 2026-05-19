@@ -23,8 +23,8 @@ import {
   Search,
   Share2,
   ShoppingBag,
+  Sparkles,
   SquareArrowUpRight,
-  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -65,37 +65,22 @@ export const sidebarItems: NavGroup[] = [
         isNew: true,
       },
       {
-        title: "SEO 服务",
-        url: "/dashboard/services/seo",
-        icon: Search,
-        subItems: [
-          { title: "外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
-          { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit, comingSoon: true },
-          { title: "排名优化", url: "/dashboard/services/seo/ranking", icon: TrendingUp, comingSoon: true },
-        ],
-      },
-      {
-        title: "GEO 服务",
-        url: "/dashboard/services/geo",
-        icon: Globe,
-        comingSoon: true,
-      },
-      {
-        title: "新媒体服务",
-        url: "/dashboard/services/social",
-        icon: Share2,
-        comingSoon: true,
-      },
-      {
-        title: "获客情报",
-        url: "/dashboard/services/leads",
-        icon: Radar,
-        comingSoon: true,
-      },
-      {
         title: "任务中心",
         url: "/dashboard/tasks",
         icon: ClipboardList,
+      },
+      {
+        title: "服务中心",
+        url: "/dashboard/services",
+        icon: Sparkles,
+        subItems: [
+          { title: "SEO 外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
+          { title: "SEO 客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit, comingSoon: true },
+          { title: "SEO 排名优化", url: "/dashboard/services/seo/ranking", icon: Search, comingSoon: true },
+          { title: "GEO 服务", url: "/dashboard/services/geo", icon: Globe, comingSoon: true },
+          { title: "新媒体服务", url: "/dashboard/services/social", icon: Share2, comingSoon: true },
+          { title: "获客情报", url: "/dashboard/services/leads", icon: Radar, comingSoon: true },
+        ],
       },
     ],
   },
