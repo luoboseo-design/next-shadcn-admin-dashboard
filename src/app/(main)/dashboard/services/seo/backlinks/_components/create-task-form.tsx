@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
+
 import { useRouter } from "next/navigation";
+
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { platformTypeLabels, platformTypeDetails } from "@/data/mock-platforms";
-import type { PlatformType, CreateTaskFormData } from "@/types/marketing";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { platformTypeLabels } from "@/data/mock-platforms";
+import type { CreateTaskFormData, PlatformType } from "@/types/marketing";
 
 interface CreateTaskFormProps {
   selectedPackageId: string;
@@ -38,9 +41,7 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
       newErrors.targetUrl = "请输入目标 URL";
     } else {
       try {
-        const url = formData.targetUrl.startsWith("http")
-          ? formData.targetUrl
-          : `https://${formData.targetUrl}`;
+        const url = formData.targetUrl.startsWith("http") ? formData.targetUrl : `https://${formData.targetUrl}`;
         new URL(url);
       } catch {
         newErrors.targetUrl = "请输入有效的 URL";
@@ -61,7 +62,7 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -74,17 +75,15 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
   };
 
   const handlePlatformTypeChange = (type: PlatformType, checked: boolean) => {
-    const newTypes = checked
-      ? [...formData.platformTypes, type]
-      : formData.platformTypes.filter((t) => t !== type);
-    
+    const newTypes = checked ? [...formData.platformTypes, type] : formData.platformTypes.filter((t) => t !== type);
+
     setFormData((prev) => ({
       ...prev,
       platformTypes: newTypes,
     }));
-    
+
     onPlatformChange?.(newTypes);
-    
+
     if (errors.platformTypes) {
       setErrors((prev) => ({ ...prev, platformTypes: undefined }));
     }
@@ -104,12 +103,8 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
             if (errors.targetUrl) setErrors((prev) => ({ ...prev, targetUrl: undefined }));
           }}
         />
-        {errors.targetUrl && (
-          <p className="text-sm text-destructive">{errors.targetUrl}</p>
-        )}
-        <p className="text-sm text-muted-foreground">
-          输入您希望获得外链的目标网页地址
-        </p>
+        {errors.targetUrl && <p className="text-sm text-destructive">{errors.targetUrl}</p>}
+        <p className="text-sm text-muted-foreground">输入您希望获得外链的目标网页地址</p>
       </div>
 
       {/* 关键词 */}
@@ -125,12 +120,8 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
           }}
           rows={3}
         />
-        {errors.keywords && (
-          <p className="text-sm text-destructive">{errors.keywords}</p>
-        )}
-        <p className="text-sm text-muted-foreground">
-          输入您希望排名的关键词，多个关键词用逗号分隔
-        </p>
+        {errors.keywords && <p className="text-sm text-destructive">{errors.keywords}</p>}
+        <p className="text-sm text-muted-foreground">输入您希望排名的关键词，多个关键词用逗号分隔</p>
       </div>
 
       {/* 锚文本 */}
@@ -140,50 +131,34 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
           id="anchorTexts"
           placeholder="品牌名, 产品名, 关键词"
           value={formData.anchorTexts}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, anchorTexts: e.target.value }))
-          }
+          onChange={(e) => setFormData((prev) => ({ ...prev, anchorTexts: e.target.value }))}
         />
-        <p className="text-sm text-muted-foreground">
-          自定义锚文本，留空则 AI 自动生成
-        </p>
+        <p className="text-sm text-muted-foreground">自定义锚文本，留空则 AI 自动生成</p>
       </div>
 
-      {/* 平台类型 */}
       <div className="space-y-3">
         <Label>平台类型 *</Label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {platformTypes.map((type) => {
-            const info = platformTypeDetails[type];
             return (
-              <div 
-                key={type} 
+              <div
+                key={type}
                 className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors"
               >
                 <Checkbox
                   id={`platform-${type}`}
                   checked={formData.platformTypes.includes(type)}
-                  onCheckedChange={(checked) =>
-                    handlePlatformTypeChange(type, checked as boolean)
-                  }
+                  onCheckedChange={(checked) => handlePlatformTypeChange(type, checked as boolean)}
                 />
-                <Label
-                  htmlFor={`platform-${type}`}
-                  className="text-sm font-normal cursor-pointer flex items-center gap-2"
-                >
+                <Label htmlFor={`platform-${type}`} className="text-sm font-normal cursor-pointer">
                   {platformTypeLabels[type]}
-                  <span className="text-xs text-muted-foreground">${info.pricePerLink}/条</span>
                 </Label>
               </div>
             );
           })}
         </div>
-        {errors.platformTypes && (
-          <p className="text-sm text-destructive">{errors.platformTypes}</p>
-        )}
+        {errors.platformTypes && <p className="text-sm text-destructive">{errors.platformTypes}</p>}
       </div>
-
-
 
       {/* 提交按钮 */}
       <Button type="submit" size="lg" className="w-full gap-2" disabled={isSubmitting}>
