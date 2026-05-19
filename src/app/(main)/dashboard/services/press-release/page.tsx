@@ -73,7 +73,7 @@ export default function PressReleasePage() {
   const [selectedMediaType, setSelectedMediaType] = useState<string>("all");
   const [selectedDaRange, setSelectedDaRange] = useState<string>("all");
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>("all");
-  const [dofollowOnly, setDofollowOnly] = useState(false);
+  const [selectedLinkType, setSelectedLinkType] = useState<string>("all");
   const [selectedMediaIds, setSelectedMediaIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -128,8 +128,11 @@ export default function PressReleasePage() {
         }
       }
 
-      // Dofollow
-      if (dofollowOnly && !media.dofollow) {
+      // 链接类型
+      if (selectedLinkType === "dofollow" && !media.dofollow) {
+        return false;
+      }
+      if (selectedLinkType === "nofollow" && media.dofollow) {
         return false;
       }
 
@@ -143,7 +146,7 @@ export default function PressReleasePage() {
     selectedMediaType,
     selectedDaRange,
     selectedPriceRange,
-    dofollowOnly,
+    selectedLinkType,
   ]);
 
   // 计算总价
@@ -187,7 +190,7 @@ export default function PressReleasePage() {
     setSelectedMediaType("all");
     setSelectedDaRange("all");
     setSelectedPriceRange("all");
-    setDofollowOnly(false);
+    setSelectedLinkType("all");
   };
 
   const handleSubmit = async () => {
@@ -208,7 +211,7 @@ export default function PressReleasePage() {
     selectedMediaType !== "all" ||
     selectedDaRange !== "all" ||
     selectedPriceRange !== "all" ||
-    dofollowOnly;
+    selectedLinkType !== "all";
 
   return (
     <div className="space-y-6">
@@ -399,18 +402,22 @@ export default function PressReleasePage() {
                 </Select>
               </div>
 
-              {/* Dofollow */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="dofollow"
-                  checked={dofollowOnly}
-                  onCheckedChange={(checked) =>
-                    setDofollowOnly(checked as boolean)
-                  }
-                />
-                <label htmlFor="dofollow" className="text-sm cursor-pointer">
-                  仅显示 Dofollow 链接
-                </label>
+              {/* 链接类型 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">链接类型</label>
+                <Select
+                  value={selectedLinkType}
+                  onValueChange={setSelectedLinkType}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择链接类型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部</SelectItem>
+                    <SelectItem value="dofollow">支持 Dofollow</SelectItem>
+                    <SelectItem value="nofollow">不支持 Dofollow</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
@@ -559,20 +566,21 @@ export default function PressReleasePage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="dofollow-mobile"
-                      checked={dofollowOnly}
-                      onCheckedChange={(checked) =>
-                        setDofollowOnly(checked as boolean)
-                      }
-                    />
-                    <label
-                      htmlFor="dofollow-mobile"
-                      className="text-sm cursor-pointer"
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">链接类型</label>
+                    <Select
+                      value={selectedLinkType}
+                      onValueChange={setSelectedLinkType}
                     >
-                      仅显示 Dofollow 链接
-                    </label>
+                      <SelectTrigger>
+                        <SelectValue placeholder="选择链接类型" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        <SelectItem value="dofollow">支持 Dofollow</SelectItem>
+                        <SelectItem value="nofollow">不支持 Dofollow</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {hasActiveFilters && (
                     <Button
