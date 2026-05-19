@@ -16,6 +16,11 @@ const nextConfig = {
         destination: "/dashboard/home",
         permanent: false,
       },
+      {
+        source: "/dashboard/services/backlinks",
+        destination: "/dashboard/services/seo/backlinks",
+        permanent: true,
+      },
     ];
   },
 };
