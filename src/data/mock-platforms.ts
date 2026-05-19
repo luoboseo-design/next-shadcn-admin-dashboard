@@ -94,3 +94,108 @@ export const platformTypeLabels: Record<PlatformType, string> = {
   directory: "目录站",
   wiki: "维基百科",
 };
+
+// 每种平台类型的详细信息和定价
+export interface PlatformTypeInfo {
+  type: PlatformType;
+  label: string;
+  description: string;
+  features: string[];
+  pricePerLink: number;
+  avgDA: number;
+  avgPublishTime: string;
+  totalPlatforms: number;
+}
+
+export const platformTypeDetails: Record<PlatformType, PlatformTypeInfo> = {
+  blog: {
+    type: "blog",
+    label: "博客",
+    description: "高质量博客平台发布原创文章，获取自然流量和权重传递",
+    features: [
+      "DA 50+ 优质博客平台",
+      "原创文章内容",
+      "永久保留链接",
+      "适合内容营销",
+    ],
+    pricePerLink: 12,
+    avgDA: 65,
+    avgPublishTime: "2-4小时",
+    totalPlatforms: 350,
+  },
+  forum: {
+    type: "forum",
+    label: "论坛",
+    description: "在高权重论坛发布专业讨论帖，建立行业影响力",
+    features: [
+      "Reddit/Quora 等高权重论坛",
+      "专业问答形式",
+      "真实用户互动",
+      "适合品牌曝光",
+    ],
+    pricePerLink: 8,
+    avgDA: 75,
+    avgPublishTime: "1-2小时",
+    totalPlatforms: 200,
+  },
+  news: {
+    type: "news",
+    label: "新闻站",
+    description: "通过新闻稿发布获取权威媒体背书，提升品牌可信度",
+    features: [
+      "PR Newswire 等权威平台",
+      "新闻稿形式发布",
+      "媒体广泛转载",
+      "适合企业公关",
+    ],
+    pricePerLink: 25,
+    avgDA: 85,
+    avgPublishTime: "4-8小时",
+    totalPlatforms: 120,
+  },
+  social: {
+    type: "social",
+    label: "社交媒体",
+    description: "在 LinkedIn、Pinterest 等社交平台建立内容矩阵",
+    features: [
+      "LinkedIn Articles 等平台",
+      "社交信号传递",
+      "病毒传播潜力",
+      "适合个人品牌",
+    ],
+    pricePerLink: 10,
+    avgDA: 80,
+    avgPublishTime: "1-2小时",
+    totalPlatforms: 150,
+  },
+  directory: {
+    type: "directory",
+    label: "目录站",
+    description: "企业目录和软件评测平台收录，提升本地 SEO 表现",
+    features: [
+      "Yelp/G2 等目录平台",
+      "结构化企业信息",
+      "本地SEO加成",
+      "适合B2B企业",
+    ],
+    pricePerLink: 15,
+    avgDA: 70,
+    avgPublishTime: "1-3天",
+    totalPlatforms: 130,
+  },
+  wiki: {
+    type: "wiki",
+    label: "维基百科",
+    description: "Wikipedia 等百科类平台引用，获取最高权重链接",
+    features: [
+      "Wikipedia 等顶级平台",
+      "最高权重 DA 100",
+      "严格内容审核",
+      "适合知名品牌",
+    ],
+    pricePerLink: 50,
+    avgDA: 95,
+    avgPublishTime: "3-7天",
+    totalPlatforms: 50,
+  },
+};
