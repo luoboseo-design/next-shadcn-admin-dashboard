@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import Link from "next/link";
 
-import { Check, Clock, ExternalLink, Globe } from "lucide-react";
+import { Check, Clock, ExternalLink, Globe, MessageSquare } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,7 +19,7 @@ interface CreateTaskFormProps {
   onPlatformChange?: (types: PlatformType[]) => void;
 }
 
-const platformTypes: PlatformType[] = ["blog", "forum", "news", "social", "directory", "wiki"];
+const platformTypes: PlatformType[] = ["blog", "forum", "news", "social", "directory", "wiki", "profile", "custom"];
 
 export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTaskFormProps) {
   const [formData, setFormData] = useState<CreateTaskFormData>({
@@ -29,6 +29,7 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
     quantity: 50,
     platformTypes: [],
     packageId: selectedPackageId,
+    customRequirements: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CreateTaskFormData, string>>>({});
 
@@ -38,6 +39,8 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
     setFormData((prev) => ({
       ...prev,
       platformTypes: newTypes,
+      // 如果取消选择定制，清空定制需求
+      customRequirements: !newTypes.includes("custom") ? "" : prev.customRequirements,
     }));
 
     onPlatformChange?.(newTypes);
@@ -46,6 +49,8 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
       setErrors((prev) => ({ ...prev, platformTypes: undefined }));
     }
   };
+
+  const isCustomSelected = formData.platformTypes.includes("custom");
 
   return (
     <div className="space-y-6">
@@ -118,8 +123,31 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
         {errors.platformTypes && <p className="text-sm text-destructive">{errors.platformTypes}</p>}
       </div>
 
-      {/* 单选平台详情 */}
-      {formData.platformTypes.length === 1 && (
+      {/* 定制需求输入框 */}
+      {isCustomSelected && (
+        <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+              <MessageSquare className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <h4 className="font-semibold">定制需求</h4>
+              <p className="text-sm text-muted-foreground">请详细描述您的外链建设需求</p>
+            </div>
+          </div>
+          <Textarea
+            placeholder="请描述您的需求，例如：&#10;- 目标行业或领域&#10;- 期望的平台类型&#10;- 特殊要求（语言、地区、DA要求等）&#10;- 预算范围&#10;- 其他补充说明"
+            value={formData.customRequirements}
+            onChange={(e) => setFormData((prev) => ({ ...prev, customRequirements: e.target.value }))}
+            rows={6}
+            className="bg-white dark:bg-background"
+          />
+          <p className="text-sm text-muted-foreground mt-2">提交后我们的顾问将在 24 小时内与您联系，制定专属方案</p>
+        </div>
+      )}
+
+      {/* 单选平台详情（非定制类型） */}
+      {formData.platformTypes.length === 1 && formData.platformTypes[0] !== "custom" && (
         <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -167,8 +195,8 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
         </div>
       )}
 
-      {/* 多选平台提示 */}
-      {formData.platformTypes.length > 1 && (
+      {/* 多选平台提示（排除只选了定制的情况） */}
+      {formData.platformTypes.length > 1 && !(formData.platformTypes.length === 1 && isCustomSelected) && (
         <div className="p-4 rounded-lg border bg-muted/30">
           <p className="text-sm text-muted-foreground mb-2">已选择 {formData.platformTypes.length} 种平台类型</p>
           <div className="flex flex-wrap gap-2">

@@ -46,7 +46,7 @@ export interface AICitation {
 
 // ==================== 平台相关 ====================
 
-export type PlatformType = "blog" | "forum" | "news" | "social" | "directory" | "wiki";
+export type PlatformType = "blog" | "forum" | "news" | "social" | "directory" | "wiki" | "profile" | "custom";
 
 export interface Platform {
   id: string;
@@ -63,13 +63,13 @@ export interface Platform {
 
 // ==================== 任务相关 ====================
 
-export type TaskStatus = 
-  | "pending"      // 待处理
-  | "analyzing"    // AI 分析中
-  | "publishing"   // 发布中
-  | "awaiting"     // 待验收
-  | "completed"    // 已完成
-  | "failed";      // 失败
+export type TaskStatus =
+  | "pending" // 待处理
+  | "analyzing" // AI 分析中
+  | "publishing" // 发布中
+  | "awaiting" // 待验收
+  | "completed" // 已完成
+  | "failed"; // 失败
 
 export type PublishResultStatus = "success" | "pending" | "failed";
 
@@ -156,6 +156,7 @@ export interface CreateTaskFormData {
   quantity: number;
   platformTypes: PlatformType[];
   packageId: string;
+  customRequirements?: string;
 }
 
 export interface DiagnosisFormData {
