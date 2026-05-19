@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 
+import { Check, Clock, Globe } from "lucide-react";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { platformTypeLabels } from "@/data/mock-platforms";
+import { platformTypeDetails, platformTypeLabels } from "@/data/mock-platforms";
 import type { CreateTaskFormData, PlatformType } from "@/types/marketing";
 
 interface CreateTaskFormProps {
@@ -113,6 +115,60 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
         {errors.platformTypes && <p className="text-sm text-destructive">{errors.platformTypes}</p>}
       </div>
 
+      {/* 单选平台详情 */}
+      {formData.platformTypes.length === 1 && (
+        <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Globe className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h4 className="font-semibold">{platformTypeDetails[formData.platformTypes[0]].label}平台</h4>
+              <p className="text-sm text-muted-foreground">
+                {platformTypeDetails[formData.platformTypes[0]].description}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-3 text-sm">
+            <div className="flex items-center gap-1.5">
+              <Globe className="h-4 w-4 text-blue-500" />
+              <span>DA {platformTypeDetails[formData.platformTypes[0]].avgDA}+</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4 text-amber-500" />
+              <span>{platformTypeDetails[formData.platformTypes[0]].avgPublishTime}</span>
+            </div>
+          </div>
+
+          <ul className="space-y-1.5">
+            {platformTypeDetails[formData.platformTypes[0]].features.map((feature, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm">
+                <Check className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
+            可用平台数：{platformTypeDetails[formData.platformTypes[0]].totalPlatforms} 个
+          </div>
+        </div>
+      )}
+
+      {/* 多选平台提示 */}
+      {formData.platformTypes.length > 1 && (
+        <div className="p-4 rounded-lg border bg-muted/30">
+          <p className="text-sm text-muted-foreground mb-2">已选择 {formData.platformTypes.length} 种平台类型</p>
+          <div className="flex flex-wrap gap-2">
+            {formData.platformTypes.map((type) => (
+              <span key={type} className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-sm">
+                {platformTypeLabels[type]}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
