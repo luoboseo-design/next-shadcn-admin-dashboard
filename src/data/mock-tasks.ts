@@ -7,31 +7,18 @@ export const servicePackages: ServicePackage[] = [
     name: "入门版",
     description: "适合个人博客和小型网站",
     quantity: 10,
-    pricePerLink: 15,
-    totalPrice: 150,
-    features: [
-      "10 条高质量外链",
-      "DA 40+ 平台",
-      "手动审核",
-      "7天内完成",
-      "基础报告",
-    ],
+    pricePerLink: 0.5,
+    totalPrice: 5,
+    features: ["10 条高质量外链", "DA 40+ 平台", "手动审核", "7天内完成", "基础报告"],
   },
   {
     id: "growth",
     name: "成长版",
     description: "适合成长期企业网站",
     quantity: 50,
-    pricePerLink: 12,
-    totalPrice: 600,
-    features: [
-      "50 条高质量外链",
-      "DA 50+ 平台",
-      "AI 智能匹配",
-      "5天内完成",
-      "详细分析报告",
-      "关键词优化建议",
-    ],
+    pricePerLink: 0.4,
+    totalPrice: 20,
+    features: ["50 条高质量外链", "DA 50+ 平台", "AI 智能匹配", "5天内完成", "详细分析报告", "关键词优化建议"],
     recommended: true,
   },
   {
@@ -39,8 +26,8 @@ export const servicePackages: ServicePackage[] = [
     name: "专业版",
     description: "适合中大型企业",
     quantity: 100,
-    pricePerLink: 10,
-    totalPrice: 1000,
+    pricePerLink: 0.5,
+    totalPrice: 50,
     features: [
       "100 条高质量外链",
       "DA 60+ 平台",
@@ -57,8 +44,8 @@ export const servicePackages: ServicePackage[] = [
     name: "企业版",
     description: "大规模SEO推广",
     quantity: 500,
-    pricePerLink: 8,
-    totalPrice: 4000,
+    pricePerLink: 0.24,
+    totalPrice: 120,
     features: [
       "500 条高质量外链",
       "DA 70+ 优质平台",
@@ -92,23 +79,24 @@ function generatePublishResults(count: number, taskId: string): PublishResult[] 
   for (let i = 0; i < count; i++) {
     const platform = platforms[i % platforms.length];
     const status = Math.random() > 0.1 ? "success" : Math.random() > 0.5 ? "pending" : "failed";
-    
+
     results.push({
       id: `result-${taskId}-${i + 1}`,
       platformId: `platform-${i + 1}`,
       platformName: `${platform.name} ${Math.floor(i / 10) + 1}`,
       platformUrl: `https://${platform.url}`,
-      publishUrl: status === "success" 
-        ? `https://${platform.url}/p/${taskId.slice(-6)}-article-${i + 1}`
-        : "",
+      publishUrl: status === "success" ? `https://${platform.url}/p/${taskId.slice(-6)}-article-${i + 1}` : "",
       status,
       title: `专业SEO优化指南 - 第${i + 1}篇`,
       anchorText: "SEO优化",
-      accountInfo: status === "success" ? {
-        username: `user_${taskId.slice(-4)}_${i + 1}`,
-        password: `Pass@${Math.random().toString(36).slice(-8)}`,
-        email: `account${i + 1}@temp-mail.com`,
-      } : undefined,
+      accountInfo:
+        status === "success"
+          ? {
+              username: `user_${taskId.slice(-4)}_${i + 1}`,
+              password: `Pass@${Math.random().toString(36).slice(-8)}`,
+              email: `account${i + 1}@temp-mail.com`,
+            }
+          : undefined,
       publishedAt: status === "success" ? new Date(Date.now() - Math.random() * 86400000 * 3) : undefined,
       errorMessage: status === "failed" ? "平台审核未通过" : undefined,
     });
