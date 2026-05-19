@@ -54,12 +54,14 @@ import {
   industryLabels,
   languageLabels,
   regionLabels,
+  mediaTypeLabels,
   daRanges,
   priceRanges,
   type MediaOutlet,
   type MediaIndustry,
   type MediaLanguage,
   type MediaRegion,
+  type MediaType,
 } from "@/data/press-release";
 
 export default function PressReleasePage() {
@@ -68,6 +70,7 @@ export default function PressReleasePage() {
   const [selectedIndustry, setSelectedIndustry] = useState<string>("all");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
+  const [selectedMediaType, setSelectedMediaType] = useState<string>("all");
   const [selectedDaRange, setSelectedDaRange] = useState<string>("all");
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>("all");
   const [dofollowOnly, setDofollowOnly] = useState(false);
@@ -104,6 +107,11 @@ export default function PressReleasePage() {
         return false;
       }
 
+      // 媒体类型
+      if (selectedMediaType !== "all" && media.mediaType !== selectedMediaType) {
+        return false;
+      }
+
       // DA 范围
       if (selectedDaRange !== "all") {
         const range = daRanges.find((r) => r.value === selectedDaRange);
@@ -132,6 +140,7 @@ export default function PressReleasePage() {
     selectedIndustry,
     selectedLanguage,
     selectedRegion,
+    selectedMediaType,
     selectedDaRange,
     selectedPriceRange,
     dofollowOnly,
@@ -175,6 +184,7 @@ export default function PressReleasePage() {
     setSelectedIndustry("all");
     setSelectedLanguage("all");
     setSelectedRegion("all");
+    setSelectedMediaType("all");
     setSelectedDaRange("all");
     setSelectedPriceRange("all");
     setDofollowOnly(false);
@@ -195,6 +205,7 @@ export default function PressReleasePage() {
     selectedIndustry !== "all" ||
     selectedLanguage !== "all" ||
     selectedRegion !== "all" ||
+    selectedMediaType !== "all" ||
     selectedDaRange !== "all" ||
     selectedPriceRange !== "all" ||
     dofollowOnly;
@@ -277,6 +288,27 @@ export default function PressReleasePage() {
                   <SelectContent>
                     <SelectItem value="all">全部行业</SelectItem>
                     {Object.entries(industryLabels).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 媒体类型 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">媒体类型</label>
+                <Select
+                  value={selectedMediaType}
+                  onValueChange={setSelectedMediaType}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择类型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部类型</SelectItem>
+                    {Object.entries(mediaTypeLabels).map(([value, label]) => (
                       <SelectItem key={value} value={value}>
                         {label}
                       </SelectItem>
@@ -464,6 +496,25 @@ export default function PressReleasePage() {
                       <SelectContent>
                         <SelectItem value="all">全部行业</SelectItem>
                         {Object.entries(industryLabels).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">媒体类型</label>
+                    <Select
+                      value={selectedMediaType}
+                      onValueChange={setSelectedMediaType}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="选择类型" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部类型</SelectItem>
+                        {Object.entries(mediaTypeLabels).map(([value, label]) => (
                           <SelectItem key={value} value={value}>
                             {label}
                           </SelectItem>
