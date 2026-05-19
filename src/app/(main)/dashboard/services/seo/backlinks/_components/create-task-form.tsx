@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 
-import { Check, Clock, Globe } from "lucide-react";
+import Link from "next/link";
 
+import { Check, Clock, ExternalLink, Globe } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -150,8 +153,16 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
             ))}
           </ul>
 
-          <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
-            可用平台数：{platformTypeDetails[formData.platformTypes[0]].totalPlatforms} 个
+          <div className="mt-3 pt-3 border-t flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              可用平台数：{platformTypeDetails[formData.platformTypes[0]].totalPlatforms} 个
+            </span>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/cases/${formData.platformTypes[0]}`} className="gap-1.5">
+                查看案例
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
           </div>
         </div>
       )}
