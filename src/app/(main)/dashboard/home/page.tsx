@@ -32,7 +32,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex flex-col">
       {state === "idle" && <HeroInput onSubmit={handleDiagnosis} />}
       {state === "loading" && <DiagnosisLoading />}
       {state === "complete" && report && <DiagnosisReport report={report} onReset={handleReset} />}
