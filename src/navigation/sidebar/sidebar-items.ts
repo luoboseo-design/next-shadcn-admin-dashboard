@@ -69,7 +69,7 @@ export const sidebarItems: NavGroup[] = [
         icon: Search,
         subItems: [
           { title: "外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
-          { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit, comingSoon: true },
+          { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit },
           { title: "排名优化", url: "/dashboard/services/seo/ranking", icon: Search, comingSoon: true },
         ],
       },
