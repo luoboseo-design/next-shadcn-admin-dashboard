@@ -248,178 +248,150 @@ export default function PressReleasePage() {
       {/* 筛选条件 - 简洁横向布局 */}
       <div className="bg-card rounded-lg border divide-y">
         {/* 行业 */}
-        <div className="flex items-center py-3 px-4">
-          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
-            行业
-          </span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
+          <button
+            onClick={() => setSelectedIndustry("all")}
+            className={`text-sm px-3 py-1 rounded transition-colors ${
+              selectedIndustry === "all"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            不限
+          </button>
+          {Object.entries(industryLabels).map(([value, label]) => (
             <button
-              onClick={() => setSelectedIndustry("all")}
+              key={value}
+              onClick={() => setSelectedIndustry(value)}
               className={`text-sm transition-colors ${
-                selectedIndustry === "all"
+                selectedIndustry === value
                   ? "text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              不限
+              {label}
             </button>
-            {Object.entries(industryLabels).map(([value, label]) => (
-              <button
-                key={value}
-                onClick={() => setSelectedIndustry(value)}
-                className={`text-sm transition-colors ${
-                  selectedIndustry === value
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
         {/* 媒体类型 */}
-        <div className="flex items-center py-3 px-4">
-          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
-            媒体类型
-          </span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
+          <button
+            onClick={() => setSelectedMediaType("all")}
+            className={`text-sm px-3 py-1 rounded transition-colors ${
+              selectedMediaType === "all"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            不限
+          </button>
+          {Object.entries(mediaTypeLabels).map(([value, label]) => (
             <button
-              onClick={() => setSelectedMediaType("all")}
+              key={value}
+              onClick={() => setSelectedMediaType(value)}
               className={`text-sm transition-colors ${
-                selectedMediaType === "all"
+                selectedMediaType === value
                   ? "text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              不限
+              {label}
             </button>
-            {Object.entries(mediaTypeLabels).map(([value, label]) => (
-              <button
-                key={value}
-                onClick={() => setSelectedMediaType(value)}
-                className={`text-sm transition-colors ${
-                  selectedMediaType === value
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
         {/* 语言 */}
-        <div className="flex items-center py-3 px-4">
-          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
-            语言
-          </span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
+          <button
+            onClick={() => setSelectedLanguage("all")}
+            className={`text-sm px-3 py-1 rounded transition-colors ${
+              selectedLanguage === "all"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            不限
+          </button>
+          {Object.entries(languageLabels).map(([value, label]) => (
             <button
-              onClick={() => setSelectedLanguage("all")}
+              key={value}
+              onClick={() => setSelectedLanguage(value)}
               className={`text-sm transition-colors ${
-                selectedLanguage === "all"
+                selectedLanguage === value
                   ? "text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              不限
+              {label}
             </button>
-            {Object.entries(languageLabels).map(([value, label]) => (
-              <button
-                key={value}
-                onClick={() => setSelectedLanguage(value)}
-                className={`text-sm transition-colors ${
-                  selectedLanguage === value
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
         {/* 地区 */}
-        <div className="flex items-center py-3 px-4">
-          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
-            地区
-          </span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
+          <button
+            onClick={() => setSelectedRegion("all")}
+            className={`text-sm px-3 py-1 rounded transition-colors ${
+              selectedRegion === "all"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            不限
+          </button>
+          {Object.entries(regionLabels).map(([value, label]) => (
             <button
-              onClick={() => setSelectedRegion("all")}
+              key={value}
+              onClick={() => setSelectedRegion(value)}
               className={`text-sm transition-colors ${
-                selectedRegion === "all"
+                selectedRegion === value
                   ? "text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              不限
+              {label}
             </button>
-            {Object.entries(regionLabels).map(([value, label]) => (
-              <button
-                key={value}
-                onClick={() => setSelectedRegion(value)}
-                className={`text-sm transition-colors ${
-                  selectedRegion === value
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
         {/* 链接支持 */}
-        <div className="flex items-center py-3 px-4">
-          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
-            链接支持
-          </span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 ml-4">
-            <button
-              onClick={() => setSelectedLinkType("all")}
-              className={`text-sm transition-colors ${
-                selectedLinkType === "all"
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              不限
-            </button>
-            <button
-              onClick={() => setSelectedLinkType("supports")}
-              className={`text-sm transition-colors ${
-                selectedLinkType === "supports"
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              支持链接
-            </button>
-            <button
-              onClick={() => setSelectedLinkType("no-link")}
-              className={`text-sm transition-colors ${
-                selectedLinkType === "no-link"
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              不支持链接
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
+          <button
+            onClick={() => setSelectedLinkType("all")}
+            className={`text-sm px-3 py-1 rounded transition-colors ${
+              selectedLinkType === "all"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            不限
+          </button>
+          <button
+            onClick={() => setSelectedLinkType("supports")}
+            className={`text-sm transition-colors ${
+              selectedLinkType === "supports"
+                ? "text-primary font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            支持链接
+          </button>
+          <button
+            onClick={() => setSelectedLinkType("no-link")}
+            className={`text-sm transition-colors ${
+              selectedLinkType === "no-link"
+                ? "text-primary font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            不支持链接
+          </button>
         </div>
 
-        {/* 其他筛选 */}
-        <div className="flex items-center py-3 px-4">
-          <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded shrink-0">
-            其他筛选
-          </span>
-          <div className="flex flex-wrap items-center gap-3 ml-4">
+        {/* 其他 */}
+        <div className="flex flex-wrap items-center gap-3 py-3 px-4">
+          <span className="text-sm text-muted-foreground">其他</span>
             <Select
               value={selectedDaRange}
               onValueChange={setSelectedDaRange}
