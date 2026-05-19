@@ -1,20 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CreateTaskForm } from "./_components/create-task-form";
 import { PricingCards } from "./_components/pricing-cards";
 import { PlatformStats } from "./_components/platform-stats";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link2, Package, BarChart3, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link2, Package, BarChart3, Check, ArrowRight, Loader2 } from "lucide-react";
 import { servicePackages } from "@/data/mock-tasks";
 import { platformTypeDetails } from "@/data/mock-platforms";
 import { cn } from "@/lib/utils";
 import type { PlatformType } from "@/types/marketing";
 
 export default function BacklinksServicePage() {
+  const router = useRouter();
   const [selectedPackageId, setSelectedPackageId] = useState<string>("growth");
   const [selectedPlatforms, setSelectedPlatforms] = useState<PlatformType[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 计算基于选中平台的价格
   const getPriceForPackage = (baseQuantity: number) => {
@@ -25,6 +29,14 @@ export default function BacklinksServicePage() {
       return sum + platformTypeDetails[type].pricePerLink;
     }, 0) / selectedPlatforms.length;
     return Math.round(avgPrice * baseQuantity);
+  };
+
+  const handleCreateTask = async () => {
+    setIsSubmitting(true);
+    // 模拟提交
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // 跳转到任务中心
+    router.push("/dashboard/tasks");
   };
 
   return (
@@ -77,7 +89,7 @@ export default function BacklinksServicePage() {
               </Card>
             </div>
 
-            {/* 右侧：快速选择套餐 */}
+            {/* 右侧：快速选择套餐 + 创建按钮 */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
@@ -92,6 +104,26 @@ export default function BacklinksServicePage() {
                   />
                 </CardContent>
               </Card>
+
+              {/* 创建任务按钮 */}
+              <Button 
+                size="lg" 
+                className="w-full gap-2" 
+                onClick={handleCreateTask}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    提交中...
+                  </>
+                ) : (
+                  <>
+                    创建任务
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </TabsContent>

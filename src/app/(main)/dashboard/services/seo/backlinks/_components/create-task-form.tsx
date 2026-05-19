@@ -2,11 +2,6 @@
 
 import { useState } from "react";
 
-import { useRouter } from "next/navigation";
-
-import { ArrowRight, Loader2 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,8 +17,6 @@ interface CreateTaskFormProps {
 const platformTypes: PlatformType[] = ["blog", "forum", "news", "social", "directory", "wiki"];
 
 export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTaskFormProps) {
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateTaskFormData>({
     targetUrl: "",
     keywords: "",
@@ -33,46 +26,6 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
     packageId: selectedPackageId,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CreateTaskFormData, string>>>({});
-
-  const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof CreateTaskFormData, string>> = {};
-
-    if (!formData.targetUrl.trim()) {
-      newErrors.targetUrl = "请输入目标 URL";
-    } else {
-      try {
-        const url = formData.targetUrl.startsWith("http") ? formData.targetUrl : `https://${formData.targetUrl}`;
-        new URL(url);
-      } catch {
-        newErrors.targetUrl = "请输入有效的 URL";
-      }
-    }
-
-    if (!formData.keywords.trim()) {
-      newErrors.keywords = "请输入至少一个关键词";
-    }
-
-    if (formData.platformTypes.length === 0) {
-      newErrors.platformTypes = "请至少选择一种平台类型";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-
-    // 模拟提交
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // 跳转到任务中心
-    router.push("/dashboard/tasks");
-  };
 
   const handlePlatformTypeChange = (type: PlatformType, checked: boolean) => {
     const newTypes = checked ? [...formData.platformTypes, type] : formData.platformTypes.filter((t) => t !== type);
@@ -90,7 +43,7 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       {/* 目标 URL */}
       <div className="space-y-2">
         <Label htmlFor="targetUrl">目标 URL *</Label>
@@ -160,20 +113,6 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
         {errors.platformTypes && <p className="text-sm text-destructive">{errors.platformTypes}</p>}
       </div>
 
-      {/* 提交按钮 */}
-      <Button type="submit" size="lg" className="w-full gap-2" disabled={isSubmitting}>
-        {isSubmitting ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            提交中...
-          </>
-        ) : (
-          <>
-            创建任务
-            <ArrowRight className="h-4 w-4" />
-          </>
-        )}
-      </Button>
-    </form>
+    </div>
   );
 }
