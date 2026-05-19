@@ -18,6 +18,7 @@ import {
   type LucideIcon,
   Mail,
   MessageSquare,
+  Newspaper,
   Radar,
   ReceiptText,
   Search,
@@ -84,6 +85,11 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/services/social",
         icon: Share2,
         comingSoon: true,
+      },
+      {
+        title: "发稿服务",
+        url: "/dashboard/services/press-release",
+        icon: Newspaper,
       },
       {
         title: "获客情报",
