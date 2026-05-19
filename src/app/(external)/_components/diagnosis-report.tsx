@@ -1,9 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import Link from "next/link";
+
 import {
   AlertCircle,
   AlertTriangle,
@@ -18,10 +16,14 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import type { DiagnosisReport as DiagnosisReportType } from "@/types/marketing";
-import { severityColors, severityLabels, categoryLabels } from "@/data/mock-diagnosis";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { categoryLabels, severityColors, severityLabels } from "@/data/mock-diagnosis";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import type { DiagnosisReport as DiagnosisReportType } from "@/types/marketing";
 
 interface DiagnosisReportProps {
   report: DiagnosisReportType;
@@ -30,7 +32,7 @@ interface DiagnosisReportProps {
 
 export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
   return (
-    <div className="flex-1 p-4 md:p-6 space-y-6">
+    <div className="flex-1 p-4 md:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
       {/* 顶部概览 */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -48,12 +50,7 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
 
       {/* 评分卡片 */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <ScoreCard
-          title="综合评分"
-          score={report.overallScore}
-          large
-          className="col-span-2 md:col-span-1"
-        />
+        <ScoreCard title="综合评分" score={report.overallScore} large className="col-span-2 md:col-span-1" />
         <ScoreCard title="SEO" score={report.seoScore} />
         <ScoreCard title="AI 引用" score={report.geoScore} />
         <ScoreCard title="技术" score={report.technicalScore} />
@@ -111,19 +108,15 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
                   "p-4 rounded-lg border",
                   citation.isReferenced
                     ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
-                    : "bg-muted/50"
+                    : "bg-muted/50",
                 )}
               >
                 <div className="font-semibold mb-1">{citation.source}</div>
-                <div className="text-sm text-muted-foreground mb-2 truncate">
-                  {citation.query}
-                </div>
+                <div className="text-sm text-muted-foreground mb-2 truncate">{citation.query}</div>
                 {citation.isReferenced ? (
                   <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                     <CheckCircle2 className="h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      {citation.rank ? `排名 #${citation.rank}` : "已被引用"}
-                    </span>
+                    <span className="text-sm font-medium">{citation.rank ? `排名 #${citation.rank}` : "已被引用"}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-muted-foreground">
@@ -148,20 +141,11 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
         <CardContent>
           <div className="space-y-3">
             {report.issues.map((issue) => (
-              <div
-                key={issue.id}
-                className="flex items-start gap-3 p-4 rounded-lg bg-muted/50"
-              >
+              <div key={issue.id} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
                 <div className="mt-0.5">
-                  {issue.severity === "critical" && (
-                    <AlertCircle className="h-5 w-5 text-red-500" />
-                  )}
-                  {issue.severity === "warning" && (
-                    <AlertTriangle className="h-5 w-5 text-amber-500" />
-                  )}
-                  {issue.severity === "info" && (
-                    <Info className="h-5 w-5 text-blue-500" />
-                  )}
+                  {issue.severity === "critical" && <AlertCircle className="h-5 w-5 text-red-500" />}
+                  {issue.severity === "warning" && <AlertTriangle className="h-5 w-5 text-amber-500" />}
+                  {issue.severity === "info" && <Info className="h-5 w-5 text-blue-500" />}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -171,9 +155,7 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
                     </Badge>
                     <Badge variant="outline">{categoryLabels[issue.category]}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {issue.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{issue.description}</p>
                 </div>
               </div>
             ))}
@@ -194,22 +176,15 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
             {report.recommendations.map((rec) => (
               <div
                 key={rec.id}
-                className={cn(
-                  "p-4 rounded-lg border",
-                  rec.priority === "high" && "border-primary bg-primary/5"
-                )}
+                className={cn("p-4 rounded-lg border", rec.priority === "high" && "border-primary bg-primary/5")}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold">{rec.title}</span>
-                  <Badge
-                    variant={rec.priority === "high" ? "default" : "secondary"}
-                  >
+                  <Badge variant={rec.priority === "high" ? "default" : "secondary"}>
                     {rec.priority === "high" ? "强烈推荐" : "推荐"}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {rec.description}
-                </p>
+                <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-green-600 dark:text-green-400">
                     预期效果: {rec.estimatedImpact}
@@ -264,19 +239,8 @@ function ScoreCard({
     <Card className={className}>
       <CardContent className={cn("pt-4", large && "pt-6")}>
         <div className="text-sm text-muted-foreground mb-1">{title}</div>
-        <div
-          className={cn(
-            "font-bold mb-2",
-            large ? "text-4xl" : "text-2xl",
-            getScoreColor(score)
-          )}
-        >
-          {score}
-        </div>
-        <Progress
-          value={score}
-          className={cn("h-1.5", `[&>div]:${getProgressColor(score)}`)}
-        />
+        <div className={cn("font-bold mb-2", large ? "text-4xl" : "text-2xl", getScoreColor(score))}>{score}</div>
+        <Progress value={score} className={cn("h-1.5", `[&>div]:${getProgressColor(score)}`)} />
       </CardContent>
     </Card>
   );

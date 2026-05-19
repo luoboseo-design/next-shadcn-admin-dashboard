@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { Check, Loader2 } from "lucide-react";
+
 import { diagnosisSteps } from "@/data/mock-diagnosis";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +13,7 @@ export function DiagnosisLoading() {
 
   useEffect(() => {
     let totalDelay = 0;
-    
+
     diagnosisSteps.forEach((step, index) => {
       // 开始步骤
       setTimeout(() => {
@@ -47,9 +49,7 @@ export function DiagnosisLoading() {
         {/* 标题 */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold mb-2">AI 正在诊断您的网站</h2>
-          <p className="text-muted-foreground">
-            请稍候，我们正在深度分析您的网站数据
-          </p>
+          <p className="text-muted-foreground">请稍候，我们正在深度分析您的网站数据</p>
         </div>
 
         {/* 步骤列表 */}
@@ -65,7 +65,7 @@ export function DiagnosisLoading() {
                   "flex items-center gap-3 p-3 rounded-lg transition-all duration-300",
                   isCompleted && "bg-green-50 dark:bg-green-950/20",
                   isCurrent && "bg-primary/5 border border-primary/20",
-                  !isCompleted && !isCurrent && "opacity-50"
+                  !isCompleted && !isCurrent && "opacity-50",
                 )}
               >
                 <div
@@ -73,7 +73,7 @@ export function DiagnosisLoading() {
                     "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300",
                     isCompleted && "bg-green-500 text-white",
                     isCurrent && "bg-primary text-primary-foreground",
-                    !isCompleted && !isCurrent && "bg-muted text-muted-foreground"
+                    !isCompleted && !isCurrent && "bg-muted text-muted-foreground",
                   )}
                 >
                   {isCompleted ? (
@@ -88,7 +88,7 @@ export function DiagnosisLoading() {
                   className={cn(
                     "font-medium transition-colors duration-300",
                     isCompleted && "text-green-700 dark:text-green-400",
-                    isCurrent && "text-primary"
+                    isCurrent && "text-primary",
                   )}
                 >
                   {step.label}

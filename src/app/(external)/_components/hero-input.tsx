@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+
+import { ArrowRight, Globe, Search, Sparkles, TrendingUp } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Globe, Sparkles, Search, TrendingUp } from "lucide-react";
 
 interface HeroInputProps {
   onSubmit: (url: string) => void;
@@ -55,8 +57,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
           <span className="text-muted-foreground">发现增长机会</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-          输入您的网站地址，AI 将深度分析 SEO 表现、AI 搜索引擎可见度、业务类型和目标客户，
-          为您提供专业的营销建议
+          输入您的网站地址，AI 将深度分析 SEO 表现、AI 搜索引擎可见度、业务类型和目标客户， 为您提供专业的营销建议
         </p>
       </div>
 
@@ -78,19 +79,13 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
               placeholder="输入您的网站地址，例如：example.com"
               className="flex-1 h-12 text-lg border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
             />
-            <Button
-              type="submit"
-              size="lg"
-              className="h-12 px-6 rounded-lg text-base font-medium gap-2"
-            >
+            <Button type="submit" size="lg" className="h-12 px-6 rounded-lg text-base font-medium gap-2">
               开始诊断
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        {error && (
-          <p className="text-sm text-destructive mt-3 text-center">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive mt-3 text-center">{error}</p>}
       </form>
 
       {/* 功能特点 */}
@@ -115,15 +110,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
   );
 }
 
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
     <div className="flex flex-col items-center text-center p-6 rounded-xl bg-muted/50 border border-border/50">
       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-3">

@@ -58,7 +58,7 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         title: "首页",
-        url: "/dashboard/home",
+        url: "/",
         icon: Home,
         isNew: true,
       },
