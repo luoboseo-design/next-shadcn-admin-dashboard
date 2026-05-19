@@ -780,74 +780,69 @@ export default function PressReleasePage() {
 
       {/* 底部固定操作栏 */}
       {selectedMediaIds.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
-          <div className="container mx-auto max-w-7xl px-4 py-3">
-            {/* 已选媒体名称 */}
-            <div className="flex items-center gap-2 mb-2 overflow-x-auto pb-1">
-              <span className="text-sm text-muted-foreground shrink-0">已选媒体：</span>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {selectedMedia.slice(0, 5).map((media) => (
-                  <Badge key={media.id} variant="secondary" className="shrink-0">
-                    {media.name}
-                  </Badge>
-                ))}
-                {selectedMedia.length > 5 && (
-                  <Badge variant="outline" className="shrink-0">
-                    +{selectedMedia.length - 5} 个
-                  </Badge>
-                )}
+        <div className="sticky bottom-0 bg-background border-t shadow-lg z-40 -mx-4 px-4 py-3 sm:-mx-6 sm:px-6">
+          {/* 已选媒体名称 */}
+          <div className="flex items-center gap-2 mb-2 overflow-x-auto pb-1">
+            <span className="text-sm text-muted-foreground shrink-0">已选媒体：</span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {selectedMedia.slice(0, 5).map((media) => (
+                <Badge key={media.id} variant="secondary" className="shrink-0">
+                  {media.name}
+                </Badge>
+              ))}
+              {selectedMedia.length > 5 && (
+                <Badge variant="outline" className="shrink-0">
+                  +{selectedMedia.length - 5} 个
+                </Badge>
+              )}
+            </div>
+          </div>
+          
+          {/* 操作栏 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                <span className="font-medium">
+                  已选择 {selectedMediaIds.length} 个媒体
+                </span>
+              </div>
+              <div className="hidden sm:block text-muted-foreground">|</div>
+              <div className="hidden sm:block">
+                <span className="text-muted-foreground">总价：</span>
+                <span className="text-xl font-bold text-primary ml-1">
+                  ${totalPrice.toLocaleString()}
+                </span>
               </div>
             </div>
-            
-            {/* 操作栏 */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span className="font-medium">
-                    已选择 {selectedMediaIds.length} 个媒体
-                  </span>
-                </div>
-                <div className="hidden sm:block text-muted-foreground">|</div>
-                <div className="hidden sm:block">
-                  <span className="text-muted-foreground">总价：</span>
-                  <span className="text-xl font-bold text-primary ml-1">
-                    ${totalPrice.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setSelectedMediaIds([])}
-                >
-                  清空
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="gap-2"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      提交中...
-                    </>
-                  ) : (
-                    <>
-                      提交订单
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </div>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedMediaIds([])}
+              >
+                清空
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    提交中...
+                  </>
+                ) : (
+                  <>
+                    提交订单
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </div>
       )}
-
-      {/* 底部占位 */}
-      {selectedMediaIds.length > 0 && <div className="h-28" />}
     </div>
   );
 }
