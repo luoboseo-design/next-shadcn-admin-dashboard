@@ -591,19 +591,21 @@ export default function PressReleasePage() {
                         <TableCell className="text-right font-semibold">
                           ${media.price}
                         </TableCell>
-                        <TableCell className="text-center sticky right-0 bg-background">
-                          <Checkbox
-                            checked={selectedMediaIds.includes(media.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedMediaIds((prev) => [...prev, media.id]);
-                              } else {
-                                setSelectedMediaIds((prev) =>
-                                  prev.filter((id) => id !== media.id)
-                                );
-                              }
-                            }}
-                          />
+                        <TableCell className="sticky right-0 bg-background">
+                          <div className="flex justify-center">
+                            <Checkbox
+                              checked={selectedMediaIds.includes(media.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedMediaIds((prev) => [...prev, media.id]);
+                                } else {
+                                  setSelectedMediaIds((prev) =>
+                                    prev.filter((id) => id !== media.id)
+                                  );
+                                }
+                              }}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
