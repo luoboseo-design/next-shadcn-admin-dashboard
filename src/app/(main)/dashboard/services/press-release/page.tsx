@@ -392,45 +392,44 @@ export default function PressReleasePage() {
         {/* 其他 */}
         <div className="flex flex-wrap items-center gap-3 py-3 px-4">
           <span className="text-sm text-muted-foreground">其他</span>
-            <Select
-              value={selectedDaRange}
-              onValueChange={setSelectedDaRange}
+          <Select
+            value={selectedDaRange}
+            onValueChange={setSelectedDaRange}
+          >
+            <SelectTrigger className="w-[110px] h-8 text-sm border-dashed">
+              <SelectValue placeholder="DA 权重" />
+            </SelectTrigger>
+            <SelectContent>
+              {daRanges.map((range) => (
+                <SelectItem key={range.value} value={range.value}>
+                  {range.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={selectedPriceRange}
+            onValueChange={setSelectedPriceRange}
+          >
+            <SelectTrigger className="w-[110px] h-8 text-sm border-dashed">
+              <SelectValue placeholder="价格范围" />
+            </SelectTrigger>
+            <SelectContent>
+              {priceRanges.map((range) => (
+                <SelectItem key={range.value} value={range.value}>
+                  {range.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="text-sm text-muted-foreground hover:text-destructive transition-colors"
             >
-              <SelectTrigger className="w-[110px] h-8 text-sm border-dashed">
-                <SelectValue placeholder="DA 权重" />
-              </SelectTrigger>
-              <SelectContent>
-                {daRanges.map((range) => (
-                  <SelectItem key={range.value} value={range.value}>
-                    {range.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={selectedPriceRange}
-              onValueChange={setSelectedPriceRange}
-            >
-              <SelectTrigger className="w-[110px] h-8 text-sm border-dashed">
-                <SelectValue placeholder="价格范围" />
-              </SelectTrigger>
-              <SelectContent>
-                {priceRanges.map((range) => (
-                  <SelectItem key={range.value} value={range.value}>
-                    {range.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-sm text-muted-foreground hover:text-destructive transition-colors"
-              >
-                清除筛选
-              </button>
-            )}
-          </div>
+              清除筛选
+            </button>
+          )}
         </div>
       </div>
 
