@@ -3,24 +3,29 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Search,
-  Plus,
-  Minus,
-  ShoppingCart,
-  ArrowRight,
-  Loader2,
-  X,
-  MessageCircle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Share2,
+  MessageSquare,
   Heart,
   Users,
   FileText,
+  Check,
+  ArrowRight,
+  Loader2,
+  Plus,
+  Minus,
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-
 import {
   socialServices,
   platformLabels,
@@ -30,485 +35,393 @@ import {
   type ServiceType,
   type SocialService,
 } from "@/data/social-media";
+import { cn } from "@/lib/utils";
 
 // 服务类型图标
-const serviceTypeIcons: Record<ServiceType, React.ReactNode> = {
-  post: <FileText className="h-4 w-4" />,
-  comment: <MessageCircle className="h-4 w-4" />,
-  like: <Heart className="h-4 w-4" />,
-  follower: <Users className="h-4 w-4" />,
+const serviceTypeIcons: Record<ServiceType, React.ElementType> = {
+  post: FileText,
+  comment: MessageSquare,
+  like: Heart,
+  follower: Users,
 };
 
-// 购物车项
-interface CartItem {
-  serviceId: string;
-  quantity: number;
-}
+// 平台样式
+const platformStyles: Record<SocialPlatform, { bg: string; label: string }> = {
+  reddit: { bg: "bg-orange-500", label: "R" },
+  instagram: { bg: "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500", label: "IG" },
+  x: { bg: "bg-black", label: "X" },
+};
 
-export default function SocialMediaPage() {
+export default function SocialMediaServicePage() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
-  const [selectedServiceType, setSelectedServiceType] = useState<string>("all");
-  const [selectedQuality, setSelectedQuality] = useState<string>("all");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform>("reddit");
+  const [selectedServiceType, setSelectedServiceType] = useState<ServiceType>("post");
+  const [selectedService, setSelectedService] = useState<SocialService | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [targetUrl, setTargetUrl] = useState("");
+  const [requirements, setRequirements] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 筛选服务
-  const filteredServices = useMemo(() => {
-    return socialServices.filter((service) => {
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        if (
-          !service.name.toLowerCase().includes(query) &&
-          !service.description.toLowerCase().includes(query)
-        ) {
-          return false;
-        }
-      }
-      if (selectedPlatform !== "all" && service.platform !== selectedPlatform) {
-        return false;
-      }
-      if (selectedServiceType !== "all" && service.serviceType !== selectedServiceType) {
-        return false;
-      }
-      if (selectedQuality !== "all" && service.quality !== selectedQuality) {
-        return false;
-      }
-      return true;
-    });
-  }, [searchQuery, selectedPlatform, selectedServiceType, selectedQuality]);
+  // 根据平台和服务类型过滤套餐
+  const availableServices = useMemo(() => {
+    return socialServices.filter(
+      (s) => s.platform === selectedPlatform && s.serviceType === selectedServiceType
+    );
+  }, [selectedPlatform, selectedServiceType]);
 
-  // 按平台分组
-  const groupedServices = useMemo(() => {
-    const groups: Record<SocialPlatform, SocialService[]> = {
-      reddit: [],
-      instagram: [],
-      x: [],
-    };
-    filteredServices.forEach((service) => {
-      groups[service.platform].push(service);
-    });
-    return groups;
-  }, [filteredServices]);
-
-  // 统计数据
-  const stats = useMemo(() => {
-    return {
-      totalServices: socialServices.length,
-      platforms: Object.keys(platformLabels).length,
-      cartItems: cart.reduce((sum, item) => sum + item.quantity, 0),
-      cartTotal: cart.reduce((sum, item) => {
-        const service = socialServices.find((s) => s.id === item.serviceId);
-        return sum + (service ? service.price * item.quantity : 0);
-      }, 0),
-    };
-  }, [cart]);
-
-  // 获取数量
-  const getQuantity = (serviceId: string, minQuantity: number) => {
-    return quantities[serviceId] || minQuantity;
+  // 当平台或服务类型改变时，重置选中的套餐
+  const handlePlatformChange = (platform: SocialPlatform) => {
+    setSelectedPlatform(platform);
+    setSelectedService(null);
   };
 
-  // 更新数量
-  const updateQuantity = (serviceId: string, value: number, min: number, max: number) => {
-    const newValue = Math.max(min, Math.min(max, value));
-    setQuantities((prev) => ({ ...prev, [serviceId]: newValue }));
+  const handleServiceTypeChange = (type: ServiceType) => {
+    setSelectedServiceType(type);
+    setSelectedService(null);
   };
 
-  // 添加到购物车
-  const addToCart = (service: SocialService) => {
-    const quantity = getQuantity(service.id, service.minQuantity);
-    setCart((prev) => {
-      const existing = prev.find((item) => item.serviceId === service.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.serviceId === service.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { serviceId: service.id, quantity }];
-    });
+  // 选择套餐
+  const handleSelectService = (service: SocialService) => {
+    setSelectedService(service);
+    setQuantity(service.minQuantity);
   };
 
-  // 从购物车移除
-  const removeFromCart = (serviceId: string) => {
-    setCart((prev) => prev.filter((item) => item.serviceId !== serviceId));
-  };
-
-  // 清空筛选
-  const clearFilters = () => {
-    setSelectedPlatform("all");
-    setSelectedServiceType("all");
-    setSelectedQuality("all");
-    setSearchQuery("");
-  };
-
-  const hasActiveFilters =
-    selectedPlatform !== "all" ||
-    selectedServiceType !== "all" ||
-    selectedQuality !== "all" ||
-    searchQuery !== "";
+  // 计算总价
+  const totalPrice = selectedService ? selectedService.price * quantity : 0;
 
   // 提交订单
-  const handleSubmitOrder = async () => {
-    if (cart.length === 0) return;
+  const handleSubmit = async () => {
+    if (!selectedService) return;
     setIsSubmitting(true);
-    // 模拟提交
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    router.push("/dashboard/orders/create?type=social");
-  };
-
-  // 获取平台样式
-  const getPlatformStyle = (platform: SocialPlatform) => {
-    switch (platform) {
-      case "reddit":
-        return "bg-orange-500 text-white";
-      case "instagram":
-        return "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white";
-      case "x":
-        return "bg-black text-white";
-      default:
-        return "bg-muted";
-    }
-  };
-
-  // 获取质量标签样式
-  const getQualityStyle = (quality: string) => {
-    switch (quality) {
-      case "elite":
-        return "bg-amber-100 text-amber-800 border-amber-200";
-      case "premium":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
+    router.push("/dashboard/tasks");
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-bold">社交媒体</h1>
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+          <Share2 className="h-7 w-7 text-primary" />
+          社交媒体服务
+        </h1>
         <p className="text-muted-foreground mt-1">
-          提升社交媒体影响力，增加品牌曝光和用户互动
+          提升社交媒体影响力，获得更多曝光和互动
         </p>
       </div>
 
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-3xl font-bold">{stats.totalServices}</div>
-            <p className="text-sm text-muted-foreground">服务套餐</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-3xl font-bold">{stats.platforms}</div>
-            <p className="text-sm text-muted-foreground">覆盖平台</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-3xl font-bold">4</div>
-            <p className="text-sm text-muted-foreground">服务类型</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-3xl font-bold">24h</div>
-            <p className="text-sm text-muted-foreground">最快交付</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* 筛选条件 */}
-      <div className="bg-card rounded-lg border divide-y">
-        {/* 平台 */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
-          <button
-            onClick={() => setSelectedPlatform("all")}
-            className={`text-sm px-3 py-1 rounded transition-colors ${
-              selectedPlatform === "all"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            全部平台
-          </button>
-          {Object.entries(platformLabels).map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setSelectedPlatform(value)}
-              className={`text-sm transition-colors ${
-                selectedPlatform === value
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* 服务类型 */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
-          <button
-            onClick={() => setSelectedServiceType("all")}
-            className={`text-sm px-3 py-1 rounded transition-colors ${
-              selectedServiceType === "all"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            全部类型
-          </button>
-          {Object.entries(serviceTypeLabels).map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setSelectedServiceType(value)}
-              className={`text-sm transition-colors ${
-                selectedServiceType === value
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* 质量等级 */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-3 px-4">
-          <button
-            onClick={() => setSelectedQuality("all")}
-            className={`text-sm px-3 py-1 rounded transition-colors ${
-              selectedQuality === "all"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            全部等级
-          </button>
-          {Object.entries(qualityLabels).map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setSelectedQuality(value)}
-              className={`text-sm transition-colors ${
-                selectedQuality === value
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* 其他 + 搜索 */}
-        <div className="flex flex-wrap items-center justify-between gap-3 py-3 px-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm px-3 py-1 rounded bg-primary text-primary-foreground">其他</span>
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-sm text-muted-foreground hover:text-destructive transition-colors"
-              >
-                清除筛选
-              </button>
-            )}
-          </div>
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="搜索服务名称或描述..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-8"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 服务列表 */}
-      <div className="space-y-8">
-        {(["reddit", "instagram", "x"] as SocialPlatform[]).map((platform) => {
-          const services = groupedServices[platform];
-          if (services.length === 0) return null;
-
-          return (
-            <div key={platform} className="space-y-4">
-              {/* 平台标题 */}
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded text-sm font-medium ${getPlatformStyle(platform)}`}>
-                  {platformLabels[platform]}
-                </span>
-                <span className="text-sm text-muted-foreground">{services.length} 个服务</span>
-              </div>
-
-              {/* 服务卡片网格 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {services.map((service) => (
-                  <Card key={service.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                    <CardContent className="p-4 space-y-3">
-                      {/* 头部 */}
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">
-                            {serviceTypeIcons[service.serviceType]}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {serviceTypeLabels[service.serviceType]}
-                          </span>
-                        </div>
-                        <Badge variant="outline" className={getQualityStyle(service.quality)}>
-                          {qualityLabels[service.quality]}
-                        </Badge>
-                      </div>
-
-                      {/* 名称和描述 */}
-                      <div>
-                        <h3 className="font-medium text-sm">{service.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          {service.description}
-                        </p>
-                      </div>
-
-                      {/* 特性 */}
-                      <div className="flex flex-wrap gap-1">
-                        {service.features.slice(0, 3).map((feature, idx) => (
-                          <span
-                            key={idx}
-                            className="text-xs bg-muted px-1.5 py-0.5 rounded"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* 价格和交付 */}
-                      <div className="flex items-center justify-between text-sm">
-                        <div>
-                          <span className="text-lg font-bold text-primary">${service.price}</span>
-                          <span className="text-muted-foreground">/{service.unit}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">{service.turnaround}</span>
-                      </div>
-
-                      {/* 数量和添加 */}
-                      <div className="flex items-center gap-2 pt-2 border-t">
-                        <div className="flex items-center border rounded">
-                          <button
-                            onClick={() =>
-                              updateQuantity(
-                                service.id,
-                                getQuantity(service.id, service.minQuantity) - service.minQuantity,
-                                service.minQuantity,
-                                service.maxQuantity
-                              )
-                            }
-                            className="p-1 hover:bg-muted"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <input
-                            type="number"
-                            value={getQuantity(service.id, service.minQuantity)}
-                            onChange={(e) =>
-                              updateQuantity(
-                                service.id,
-                                parseInt(e.target.value) || service.minQuantity,
-                                service.minQuantity,
-                                service.maxQuantity
-                              )
-                            }
-                            className="w-12 text-center text-sm border-x py-1 bg-transparent"
-                          />
-                          <button
-                            onClick={() =>
-                              updateQuantity(
-                                service.id,
-                                getQuantity(service.id, service.minQuantity) + service.minQuantity,
-                                service.minQuantity,
-                                service.maxQuantity
-                              )
-                            }
-                            className="p-1 hover:bg-muted"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
-                        <Button
-                          size="sm"
-                          className="flex-1 h-8"
-                          onClick={() => addToCart(service)}
-                        >
-                          <ShoppingCart className="h-3 w-3 mr-1" />
-                          加入
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+      {/* 主要内容：左右布局 */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* 左侧：创建任务表单 */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* 选择平台 */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">选择平台</CardTitle>
+              <CardDescription>选择您要推广的社交媒体平台</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-3">
+                {(Object.keys(platformLabels) as SocialPlatform[]).map((platform) => (
+                  <button
+                    key={platform}
+                    onClick={() => handlePlatformChange(platform)}
+                    className={cn(
+                      "flex items-center gap-3 px-5 py-3 rounded-lg border-2 transition-all",
+                      selectedPlatform === platform
+                        ? "border-primary bg-primary/5"
+                        : "border-transparent bg-muted/50 hover:bg-muted"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white",
+                        platformStyles[platform].bg
+                      )}
+                    >
+                      {platformStyles[platform].label}
+                    </div>
+                    <span className="font-medium">{platformLabels[platform]}</span>
+                    {selectedPlatform === platform && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
+                  </button>
                 ))}
               </div>
-            </div>
-          );
-        })}
+            </CardContent>
+          </Card>
 
-        {filteredServices.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">没有找到符合条件的服务</p>
-            <Button variant="link" onClick={clearFilters}>
-              清除筛选条件
-            </Button>
-          </div>
-        )}
-      </div>
+          {/* 选择服务类型 */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">选择服务类型</CardTitle>
+              <CardDescription>选择您需要的服务类型</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(Object.keys(serviceTypeLabels) as ServiceType[]).map((type) => {
+                  const Icon = serviceTypeIcons[type];
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => handleServiceTypeChange(type)}
+                      className={cn(
+                        "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
+                        selectedServiceType === type
+                          ? "border-primary bg-primary/5"
+                          : "border-transparent bg-muted/50 hover:bg-muted"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center",
+                          selectedServiceType === type
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-background"
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-sm">{serviceTypeLabels[type]}</span>
+                      {selectedServiceType === type && (
+                        <Check className="h-4 w-4 text-primary" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* 购物车浮动栏 */}
-      {cart.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-          <Card className="shadow-lg border-primary">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5 text-primary" />
-                  <span className="font-medium">{cart.length} 个服务</span>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  共 {stats.cartItems} 项
-                </div>
-                <div className="font-bold text-lg">
-                  ${stats.cartTotal.toLocaleString()}
-                </div>
-                <Button onClick={handleSubmitOrder} disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      提交中...
-                    </>
-                  ) : (
-                    <>
-                      提交订单
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-                <button
-                  onClick={() => setCart([])}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+          {/* 任务详情表单 */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">任务详情</CardTitle>
+              <CardDescription>填写您的任务需求</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>目标链接</Label>
+                <Input
+                  placeholder={
+                    selectedServiceType === "follower"
+                      ? "输入您的账号主页链接..."
+                      : "输入目标帖子/推文链接..."
+                  }
+                  value={targetUrl}
+                  onChange={(e) => setTargetUrl(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {selectedServiceType === "post"
+                    ? "可选：如果是代发帖子，此项可留空"
+                    : "请提供需要操作的链接地址"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>特殊要求（可选）</Label>
+                <Textarea
+                  placeholder="描述您的特殊需求，如内容方向、目标受众、发布时间等..."
+                  value={requirements}
+                  onChange={(e) => setRequirements(e.target.value)}
+                  rows={4}
+                />
               </div>
             </CardContent>
           </Card>
         </div>
-      )}
+
+        {/* 右侧：套餐选择 + 订单汇总 */}
+        <div className="space-y-6">
+          {/* 套餐列表 */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">选择套餐</CardTitle>
+              <CardDescription>
+                {platformLabels[selectedPlatform]} · {serviceTypeLabels[selectedServiceType]}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {availableServices.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  暂无该类型服务
+                </div>
+              ) : (
+                availableServices.map((service) => (
+                  <button
+                    key={service.id}
+                    onClick={() => handleSelectService(service)}
+                    className={cn(
+                      "w-full p-4 rounded-lg border-2 text-left transition-all",
+                      selectedService?.id === service.id
+                        ? "border-primary bg-primary/5"
+                        : "border-muted hover:border-muted-foreground/30"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{service.name}</span>
+                          {selectedService?.id === service.id && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {service.description}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "shrink-0",
+                          service.quality === "elite" &&
+                            "bg-amber-100 text-amber-700 border-amber-200",
+                          service.quality === "premium" &&
+                            "bg-blue-100 text-blue-700 border-blue-200"
+                        )}
+                      >
+                        {qualityLabels[service.quality]}
+                      </Badge>
+                    </div>
+
+                    {/* 特性标签 */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {service.features.slice(0, 3).map((feature, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* 价格和交付时间 */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-lg font-bold">${service.price}</span>
+                        <span className="text-sm text-muted-foreground">
+                          /{service.unit}
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {service.turnaround}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 订单汇总 */}
+          {selectedService && (
+            <Card className="border-primary">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">订单汇总</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* 已选套餐 */}
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <div className="font-medium">{selectedService.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    ${selectedService.price}/{selectedService.unit} · {selectedService.turnaround}
+                  </div>
+                </div>
+
+                {/* 数量选择 */}
+                <div className="space-y-2">
+                  <Label>数量（{selectedService.unit}）</Label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-10 w-10"
+                      onClick={() =>
+                        setQuantity(Math.max(selectedService.minQuantity, quantity - 1))
+                      }
+                      disabled={quantity <= selectedService.minQuantity}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      type="number"
+                      value={quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || selectedService.minQuantity;
+                        setQuantity(
+                          Math.min(
+                            Math.max(val, selectedService.minQuantity),
+                            selectedService.maxQuantity
+                          )
+                        );
+                      }}
+                      className="text-center"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-10 w-10"
+                      onClick={() =>
+                        setQuantity(Math.min(selectedService.maxQuantity, quantity + 1))
+                      }
+                      disabled={quantity >= selectedService.maxQuantity}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    范围：{selectedService.minQuantity} - {selectedService.maxQuantity}{" "}
+                    {selectedService.unit}
+                  </p>
+                </div>
+
+                {/* 价格计算 */}
+                <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">单价</span>
+                    <span>
+                      ${selectedService.price}/{selectedService.unit}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">数量</span>
+                    <span>
+                      {quantity} {selectedService.unit}
+                    </span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-primary/20">
+                    <span className="font-semibold">总计</span>
+                    <span className="text-xl font-bold text-primary">
+                      ${totalPrice.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 提交按钮 */}
+          <Button
+            size="lg"
+            className="w-full gap-2"
+            onClick={handleSubmit}
+            disabled={!selectedService || isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                提交中...
+              </>
+            ) : (
+              <>
+                创建任务
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
