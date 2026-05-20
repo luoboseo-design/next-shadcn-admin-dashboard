@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CoverageRadarChart } from "@/components/coverage-radar-chart";
 import {
   Globe,
   Search,
@@ -463,22 +464,9 @@ export default function GeoOptimizationPage() {
                         ))}
                       </div>
 
-                      {/* 右侧：覆盖分析指标 */}
-                      <div className="space-y-3">
-                        {generateRadarData(keywords.filter(k => k.trim())).map((item, index) => (
-                          <div key={index} className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span className="text-muted-foreground">{item.dimension}</span>
-                              <span className="font-medium">{Math.round(item.value)}%</span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-primary rounded-full transition-all duration-500"
-                                style={{ width: `${item.value}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                      {/* 右侧：雷达图 */}
+                      <div className="h-[220px]">
+                        <CoverageRadarChart data={generateRadarData(keywords.filter(k => k.trim()))} />
                       </div>
                     </div>
 
