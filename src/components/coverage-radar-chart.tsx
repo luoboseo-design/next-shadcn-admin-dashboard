@@ -2,11 +2,10 @@
 
 import dynamic from "next/dynamic";
 
-// 动态导入 Radar 组件，禁用 SSR
-const Radar = dynamic(
-  () => import("@ant-design/plots").then((mod) => mod.Radar),
-  { ssr: false }
-);
+import type { EChartsOption } from "echarts";
+
+// 动态导入 ReactECharts 组件，禁用 SSR
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 interface RadarDataItem {
   dimension: string;
@@ -18,73 +17,118 @@ interface CoverageRadarChartProps {
 }
 
 export function CoverageRadarChart({ data }: CoverageRadarChartProps) {
-  // 转换数据格式为 ant-design/plots 需要的格式
-  const chartData = data.flatMap((item) => [
-    { item: item.dimension, type: "优化前", score: Math.max(item.value - 40, 10) },
-    { item: item.dimension, type: "优化后", score: item.value },
-  ]);
+  // 生成优化前的数据（比优化后低30-50）
+  const beforeData = data.map((item) => Math.max(item.value - 35 - Math.random() * 15, 15));
+  const afterData = data.map((item) => item.value);
 
-  const config = {
-    data: chartData,
-    xField: "item",
-    yField: "score",
-    colorField: "type",
-    shapeField: "smooth",
-    area: {
-      style: {
-        fillOpacity: 0.5,
-      },
-    },
-    scale: {
-      x: { padding: 0.5, align: 0 },
-      y: { tickCount: 5, domainMax: 100 },
-    },
-    axis: {
-      x: {
-        grid: true,
-        gridLineWidth: 1,
-        tick: false,
-        gridLineDash: [0, 0],
-        line: false,
-        labelFontSize: 12,
-        labelFontWeight: 500,
-        labelFill: "#374151",
-      },
-      y: {
-        zIndex: 1,
-        title: false,
-        gridConnect: "line",
-        gridLineWidth: 1,
-        gridLineDash: [0, 0],
-        gridStroke: "#e5e7eb",
-        label: false,
-      },
-    },
-    style: {
-      lineWidth: 2.5,
-    },
-    point: {
-      shapeField: "point",
-      sizeField: 4,
-    },
-    color: ["#cbd5e1", "#10b981"],
+  const option: EChartsOption = {
+    color: ["rgba(99, 102, 241, 0.8)", "rgba(16, 185, 129, 0.9)"],
     legend: {
-      position: "top-left",
-      itemName: {
-        style: {
-          fontSize: 12,
-          fontWeight: 500,
-        },
+      show: true,
+      bottom: 0,
+      left: "center",
+      itemWidth: 14,
+      itemHeight: 8,
+      itemGap: 24,
+      textStyle: {
+        fontSize: 12,
+        color: "#6b7280",
       },
-      marker: {
-        style: {
-          r: 6,
-        },
-      },
-      itemSpacing: 16,
+      data: ["优化前", "优化后"],
     },
-    animate: { enter: { type: "fadeIn" } },
+    radar: {
+      indicator: data.map((item) => ({
+        text: item.dimension,
+        max: 100,
+      })),
+      center: ["50%", "45%"],
+      radius: "65%",
+      startAngle: 90,
+      splitNumber: 4,
+      shape: "circle",
+      axisName: {
+        color: "#374151",
+        fontSize: 11,
+        fontWeight: 500,
+      },
+      splitArea: {
+        show: true,
+        areaStyle: {
+          color: [
+            "rgba(99, 102, 241, 0.02)",
+            "rgba(99, 102, 241, 0.05)",
+            "rgba(99, 102, 241, 0.08)",
+            "rgba(99, 102, 241, 0.12)",
+          ],
+        },
+      },
+      axisLine: {
+        lineStyle: {
+          color: "rgba(148, 163, 184, 0.3)",
+        },
+      },
+      splitLine: {
+        lineStyle: {
+          color: "rgba(148, 163, 184, 0.4)",
+        },
+      },
+    },
+    series: [
+      {
+        type: "radar",
+        emphasis: {
+          lineStyle: {
+            width: 3,
+          },
+        },
+        data: [
+          {
+            value: beforeData,
+            name: "优化前",
+            symbol: "circle",
+            symbolSize: 5,
+            lineStyle: {
+              width: 2,
+              type: "dashed",
+            },
+            areaStyle: {
+              color: "rgba(148, 163, 184, 0.15)",
+            },
+            itemStyle: {
+              color: "#94a3b8",
+            },
+          },
+          {
+            value: afterData,
+            name: "优化后",
+            symbol: "circle",
+            symbolSize: 6,
+            lineStyle: {
+              width: 2.5,
+            },
+            areaStyle: {
+              color: {
+                type: "radial",
+                x: 0.5,
+                y: 0.5,
+                r: 0.5,
+                colorStops: [
+                  { offset: 0, color: "rgba(16, 185, 129, 0.05)" },
+                  { offset: 0.7, color: "rgba(16, 185, 129, 0.25)" },
+                  { offset: 1, color: "rgba(16, 185, 129, 0.45)" },
+                ],
+              },
+            },
+            itemStyle: {
+              color: "#10b981",
+              borderColor: "#fff",
+              borderWidth: 1,
+            },
+          },
+        ],
+      },
+    ],
   };
 
-  return <Radar {...config} />;
+  return <ReactECharts option={option} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />;
 }
