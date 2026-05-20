@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -76,6 +76,34 @@ export default function GeoOptimizationPage() {
   // 通用
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [diagnosisApplied, setDiagnosisApplied] = useState(false);
+
+  // 读取诊断结果并自动填充
+  useEffect(() => {
+    const stored = localStorage.getItem('geo_diagnosis_result');
+    if (stored && !diagnosisApplied) {
+      try {
+        const result = JSON.parse(stored);
+        if (result.keywords?.length > 0) {
+          setKeywords(result.keywords);
+        }
+        if (result.queries?.length > 0) {
+          setSelectedQueries(result.queries);
+        }
+        if (result.platforms?.length > 0) {
+          setSelectedPlatforms(result.platforms);
+        }
+        if (result.domain) {
+          setWebsiteUrl(result.domain);
+        }
+        setDiagnosisApplied(true);
+        // 清除存储，防止重复应用
+        localStorage.removeItem('geo_diagnosis_result');
+      } catch (e) {
+        console.error('Failed to parse diagnosis result:', e);
+      }
+    }
+  }, [diagnosisApplied]);
 
   // 切换平台选择
   const togglePlatform = (platform: AiPlatform) => {
@@ -245,9 +273,9 @@ export default function GeoOptimizationPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/dashboard" className="gap-2">
+          <Link href="/dashboard/services/geo/diagnose" className="gap-2">
             <Sparkles className="h-4 w-4" />
-            免费诊断
+            智能诊断
           </Link>
         </Button>
       </div>
