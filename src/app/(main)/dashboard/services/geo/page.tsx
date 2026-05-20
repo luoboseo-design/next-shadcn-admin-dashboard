@@ -30,6 +30,7 @@ import {
   Sparkles,
   MessageSquare,
   ChevronRight,
+  Award,
 } from "lucide-react";
 import {
   aiPlatforms,
@@ -677,7 +678,7 @@ export default function GeoOptimizationPage() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-semibold">{service.name}</span>
                               {service.popular && (
-                                <Badge variant="secondary" className="text-xs">热门</Badge>
+                                <Badge variant="secondary" className="text-xs">热���</Badge>
                               )}
                             </div>
                             <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
