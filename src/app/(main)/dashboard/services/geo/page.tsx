@@ -62,6 +62,7 @@ export default function GeoOptimizationPage() {
   
   // 关键词相关
   const [keywords, setKeywords] = useState<string[]>([""]);
+  const [selectedQueries, setSelectedQueries] = useState<string[]>([]);
   
   // 页面相关
   const [websiteUrl, setWebsiteUrl] = useState("");
@@ -160,13 +161,33 @@ export default function GeoOptimizationPage() {
     if (!keyword.trim()) return [];
     const k = keyword.trim();
     return [
-      `${k}哪个好`,
-      `${k}推荐`,
-      `最好的${k}`,
-      `${k}排行榜`,
-      `${k}怎么选`,
-      `${k}对比`,
+      `${k}哪个好？有什么推荐？`,
+      `${k}怎么选？有哪些选择标准？`,
+      `最好的${k}是什么？`,
+      `${k}排行榜前十名有哪些？`,
+      `${k}有哪些值得推荐的？`,
+      `${k}对比分析，哪个更适合？`,
     ];
+  };
+
+  // 切换问题选择
+  const toggleQuerySelection = (query: string) => {
+    setSelectedQueries(prev =>
+      prev.includes(query)
+        ? prev.filter(q => q !== query)
+        : [...prev, query]
+    );
+  };
+
+  // 全选/取消全选某关键词下的问题
+  const toggleAllQueriesForKeyword = (keyword: string) => {
+    const queries = generateRelatedQueries(keyword);
+    const allSelected = queries.every(q => selectedQueries.includes(q));
+    if (allSelected) {
+      setSelectedQueries(prev => prev.filter(q => !queries.includes(q)));
+    } else {
+      setSelectedQueries(prev => [...new Set([...prev, ...queries])]);
+    }
   };
 
   // 生成雷达图数据
@@ -440,39 +461,82 @@ export default function GeoOptimizationPage() {
                       可能覆盖的范围
                     </CardTitle>
                     <CardDescription>
-                      基于你的关键词，AI 平台用户可能会搜索以下相关问题
+                      基于你的关键词，AI 平台用户可能会搜索以下相关问题，勾选你想要覆盖的问题
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* 左侧：相关问题列表 */}
-                      <div className="space-y-4">
-                        {keywords.filter(k => k.trim()).map((keyword, keywordIndex) => (
-                          <div key={keywordIndex} className="space-y-2">
-                            <div className="text-sm font-medium text-foreground">{keyword}</div>
-                            <div className="flex flex-wrap gap-2">
-                              {generateRelatedQueries(keyword).map((query, queryIndex) => (
-                                <span
-                                  key={queryIndex}
-                                  className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground"
-                                >
-                                  {query}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                      {/* 左侧：关键词列表 */}
+                      <div className="lg:col-span-2 space-y-2 lg:border-r lg:pr-6">
+                        <div className="text-sm font-medium text-muted-foreground mb-3">主题关键词</div>
+                        {keywords.filter(k => k.trim()).map((keyword, keywordIndex) => {
+                          const queries = generateRelatedQueries(keyword);
+                          const selectedCount = queries.filter(q => selectedQueries.includes(q)).length;
+                          return (
+                            <button
+                              key={keywordIndex}
+                              onClick={() => toggleAllQueriesForKeyword(keyword)}
+                              className={cn(
+                                "w-full text-left p-3 rounded-lg border transition-all",
+                                selectedCount > 0
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-muted-foreground/30"
+                              )}
+                            >
+                              <div className="font-medium text-sm">{keyword}</div>
+                              <div className="text-xs text-muted-foreground mt-1">
+                                已选择 {selectedCount} / {queries.length} 个问题
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
 
-                      {/* 右侧：雷达图 */}
-                      <div className="h-[280px] min-w-[280px]">
-                        <CoverageRadarChart data={generateRadarData(keywords.filter(k => k.trim()))} />
+                      {/* 右侧：问答列表 */}
+                      <div className="lg:col-span-3 space-y-3">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="text-sm font-medium text-muted-foreground">相关问答提示</div>
+                          <span className="text-xs text-muted-foreground">
+                            已选 {selectedQueries.length} 个
+                          </span>
+                        </div>
+                        <div className="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+                          {keywords.filter(k => k.trim()).flatMap((keyword) => 
+                            generateRelatedQueries(keyword).map((query, queryIndex) => (
+                              <label
+                                key={`${keyword}-${queryIndex}`}
+                                className={cn(
+                                  "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                                  selectedQueries.includes(query)
+                                    ? "border-primary bg-primary/5"
+                                    : "border-border hover:border-muted-foreground/30"
+                                )}
+                              >
+                                <Checkbox
+                                  checked={selectedQueries.includes(query)}
+                                  onCheckedChange={() => toggleQuerySelection(query)}
+                                  className="mt-0.5"
+                                />
+                                <span className="text-sm leading-relaxed">{query}</span>
+                              </label>
+                            ))
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground mt-4 pt-3 border-t">
-                      优化后，当用户在 AI 平台搜索以上问题时，你的品牌/产品将更有可能被推荐
-                    </p>
+                    {/* 底部：雷达图 */}
+                    <div className="mt-6 pt-6 border-t">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-sm font-medium">覆盖效果预估</div>
+                        <div className="text-xs text-muted-foreground">
+                          优化后，当用户搜索以上问题时，你的品牌将更有可能被推荐
+                        </div>
+                      </div>
+                      <div className="h-[260px] max-w-[400px] mx-auto">
+                        <CoverageRadarChart data={generateRadarData(keywords.filter(k => k.trim()))} />
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               )}
