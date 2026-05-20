@@ -145,7 +145,7 @@ export default function GeoOptimizationPage() {
                   <CardDescription>根据诊断结果选择需要的优化服务</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     {(Object.keys(categoryLabels) as OptimizationCategory[]).map((category) => (
                       <button
                         key={category}
