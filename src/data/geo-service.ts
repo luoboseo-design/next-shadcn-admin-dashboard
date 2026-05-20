@@ -2,10 +2,10 @@
 
 export type ServiceType = "keyword" | "page" | "authority";
 
-export type AiPlatform = 
-  | "chatgpt" 
-  | "perplexity" 
-  | "gemini" 
+export type AiPlatform =
+  | "chatgpt"
+  | "perplexity"
+  | "gemini"
   | "metaai"
   | "deepseek"
   | "doubao"
@@ -50,13 +50,13 @@ export const serviceTypeDescriptions: Record<ServiceType, string> = {
 
 // AI 平台分类标签
 export const platformCategoryLabels: Record<PlatformCategory, string> = {
-  en: "海外平台",
-  zh: "国内平台",
+  en: "英文平台",
+  zh: "中文平台",
 };
 
 // AI 平台列表
 export const aiPlatforms: AiPlatformInfo[] = [
-  // 海外平台
+  // 英文平台
   {
     id: "chatgpt",
     name: "ChatGPT",
@@ -81,7 +81,7 @@ export const aiPlatforms: AiPlatformInfo[] = [
     description: "Meta 出品，整合社交平台",
     category: "en",
   },
-  // 国内平台
+  // 中文平台
   {
     id: "deepseek",
     name: "DeepSeek",
