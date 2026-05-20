@@ -81,7 +81,7 @@ export const sidebarItems: NavGroup[] = [
         comingSoon: true,
       },
       {
-        title: "新媒体服务",
+        title: "社交媒体",
         url: "/dashboard/services/social",
         icon: Share2,
         comingSoon: true,
