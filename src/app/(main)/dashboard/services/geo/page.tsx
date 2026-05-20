@@ -570,7 +570,7 @@ export default function GeoOptimizationPage() {
 
         {/* 右侧：价格卡片 */}
         <div className="relative">
-          <div className="sticky top-6 space-y-6">
+          <div className="sticky top-6 space-y-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
             {/* 关键词优化价格 */}
             {serviceType === "keyword" && (
               <Card>
@@ -723,7 +723,7 @@ export default function GeoOptimizationPage() {
             </Card>
           )}
 
-          {/* 权威建设价格 */}
+          {/* 权�����建设价格 */}
           {serviceType === "authority" && currentAuthorityService && (
             <Card>
               <CardHeader className="pb-4">
@@ -808,7 +808,7 @@ export default function GeoOptimizationPage() {
               </>
             )}
           </Button>
-          </div>
+        </div>
         </div>
       </div>
     </div>
