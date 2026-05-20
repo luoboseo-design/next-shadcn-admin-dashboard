@@ -43,6 +43,14 @@ import {
   type AiPlatform,
 } from "@/data/geo-service";
 import { cn } from "@/lib/utils";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+} from "recharts";
 
 const serviceTypeIcons: Record<ServiceType, React.ReactNode> = {
   keyword: <Search className="h-5 w-5" />,
@@ -165,6 +173,25 @@ export default function GeoOptimizationPage() {
       `${k}排行榜`,
       `${k}怎么选`,
       `${k}对比`,
+    ];
+  };
+
+  // 生成雷达图数据
+  const generateRadarData = (validKeywords: string[]) => {
+    const keywordCount = validKeywords.length;
+    const platformCount = selectedPlatforms.length;
+    
+    // 根据关键词数量和平台数量计算各维度得分
+    const baseScore = Math.min(keywordCount * 15, 60);
+    const platformBonus = Math.min(platformCount * 8, 40);
+    
+    return [
+      { dimension: "搜索覆盖", value: Math.min(baseScore + platformBonus + Math.random() * 10, 95) },
+      { dimension: "意图匹配", value: Math.min(baseScore + 20 + Math.random() * 15, 90) },
+      { dimension: "竞争优势", value: Math.min(baseScore + 10 + Math.random() * 20, 85) },
+      { dimension: "长尾覆盖", value: Math.min(keywordCount * 20 + Math.random() * 15, 92) },
+      { dimension: "品牌曝光", value: Math.min(baseScore + platformBonus + 5 + Math.random() * 10, 88) },
+      { dimension: "转化潜力", value: Math.min(baseScore + 15 + Math.random() * 12, 82) },
     ];
   };
 
@@ -424,23 +451,57 @@ export default function GeoOptimizationPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {keywords.filter(k => k.trim()).map((keyword, keywordIndex) => (
-                        <div key={keywordIndex} className="space-y-2">
-                          <div className="text-sm font-medium text-foreground">{keyword}</div>
-                          <div className="flex flex-wrap gap-2">
-                            {generateRelatedQueries(keyword).map((query, queryIndex) => (
-                              <span
-                                key={queryIndex}
-                                className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground"
-                              >
-                                {query}
-                              </span>
-                            ))}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* 左侧：相关问题列表 */}
+                      <div className="space-y-4">
+                        {keywords.filter(k => k.trim()).map((keyword, keywordIndex) => (
+                          <div key={keywordIndex} className="space-y-2">
+                            <div className="text-sm font-medium text-foreground">{keyword}</div>
+                            <div className="flex flex-wrap gap-2">
+                              {generateRelatedQueries(keyword).map((query, queryIndex) => (
+                                <span
+                                  key={queryIndex}
+                                  className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground"
+                                >
+                                  {query}
+                                </span>
+                              ))}
+                            </div>
                           </div>
+                        ))}
+                      </div>
+
+                      {/* 右侧：雷达图 - 覆盖可能性分析 */}
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="w-full h-[200px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart data={generateRadarData(keywords.filter(k => k.trim()))}>
+                              <PolarGrid stroke="hsl(var(--border))" />
+                              <PolarAngleAxis 
+                                dataKey="dimension" 
+                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                              />
+                              <PolarRadiusAxis 
+                                angle={30} 
+                                domain={[0, 100]} 
+                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                              />
+                              <Radar
+                                name="覆盖可能性"
+                                dataKey="value"
+                                stroke="hsl(var(--primary))"
+                                fill="hsl(var(--primary))"
+                                fillOpacity={0.3}
+                              />
+                            </RadarChart>
+                          </ResponsiveContainer>
                         </div>
-                      ))}
+                        <p className="text-xs text-muted-foreground text-center mt-2">
+                          关键词覆盖维度分析
+                        </p>
+                      </div>
                     </div>
+
                     <p className="text-xs text-muted-foreground mt-4 pt-3 border-t">
                       优化后，当用户在 AI 平台搜索以上问题时，你的品牌/产品将更有可能被推荐
                     </p>
