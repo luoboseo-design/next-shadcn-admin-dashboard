@@ -544,20 +544,20 @@ export default function GeoOptimizationPage() {
                       </div>
 
                       {/* 右侧：问答列表 */}
-                      <div className="lg:col-span-3 space-y-3">
-                        <div className="flex items-center justify-between mb-3">
+                      <div className="lg:col-span-3">
+                        <div className="flex items-center justify-between mb-2">
                           <div className="text-sm font-medium text-muted-foreground">相关问答提示</div>
                           <span className="text-xs text-muted-foreground">
                             已选 {selectedQueries.length} 个
                           </span>
                         </div>
-                        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-2">
+                        <div className="space-y-1 max-h-[280px] overflow-y-auto pr-1">
                           {keywords.filter(k => k.trim()).flatMap((keyword) => 
                             generateRelatedQueries(keyword).map((query, queryIndex) => (
                               <label
                                 key={`${keyword}-${queryIndex}`}
                                 className={cn(
-                                  "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                                  "flex items-center gap-2 py-2 px-2.5 rounded border cursor-pointer transition-all text-sm",
                                   selectedQueries.includes(query)
                                     ? "border-primary bg-primary/5"
                                     : "border-border hover:border-muted-foreground/30"
@@ -566,9 +566,9 @@ export default function GeoOptimizationPage() {
                                 <Checkbox
                                   checked={selectedQueries.includes(query)}
                                   onCheckedChange={() => toggleQuerySelection(query)}
-                                  className="mt-0.5"
+                                  className="h-4 w-4"
                                 />
-                                <span className="text-sm leading-relaxed">{query}</span>
+                                <span>{query}</span>
                               </label>
                             ))
                           )}
