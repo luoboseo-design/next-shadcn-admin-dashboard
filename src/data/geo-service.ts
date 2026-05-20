@@ -18,7 +18,10 @@ export interface KeywordPackage {
   pricePerKeyword: number;
   discount: number; // 折扣百分比
   description: string;
+  features: string[];
+  turnaround: string;
   popular?: boolean;
+  quality?: "standard" | "premium";
 }
 
 export interface PagePackage {
@@ -29,7 +32,9 @@ export interface PagePackage {
   discount: number;
   description: string;
   features: string[];
+  turnaround: string;
   popular?: boolean;
+  quality?: "standard" | "premium";
 }
 
 export interface AuthorityService {
@@ -109,6 +114,9 @@ export const keywordPackages: KeywordPackage[] = [
     pricePerKeyword: 299,
     discount: 0,
     description: "适合测试效果",
+    features: ["单个关键词", "排名追踪报告"],
+    turnaround: "5-7天",
+    quality: "standard",
   },
   {
     id: "starter",
@@ -116,7 +124,10 @@ export const keywordPackages: KeywordPackage[] = [
     keywords: 5,
     pricePerKeyword: 249,
     discount: 17,
-    description: "适合小型企业",
+    description: "适合小型企业快速起步",
+    features: ["5个关键词", "排名追踪", "优化建议"],
+    turnaround: "7-10天",
+    quality: "standard",
   },
   {
     id: "growth",
@@ -125,7 +136,10 @@ export const keywordPackages: KeywordPackage[] = [
     pricePerKeyword: 199,
     discount: 33,
     description: "最受欢迎的选择",
+    features: ["10个关键词", "排名追踪", "竞品分析"],
+    turnaround: "10-15天",
     popular: true,
+    quality: "premium",
   },
   {
     id: "professional",
@@ -133,7 +147,10 @@ export const keywordPackages: KeywordPackage[] = [
     keywords: 30,
     pricePerKeyword: 149,
     discount: 50,
-    description: "适合中型企业",
+    description: "适合中型企业系统优化",
+    features: ["30个关键词", "深度分析", "专属顾问"],
+    turnaround: "15-20天",
+    quality: "premium",
   },
   {
     id: "enterprise",
@@ -142,6 +159,9 @@ export const keywordPackages: KeywordPackage[] = [
     pricePerKeyword: 99,
     discount: 67,
     description: "大规模优化首选",
+    features: ["100个关键词", "全栈服务", "VIP支持"],
+    turnaround: "20-30天",
+    quality: "premium",
   },
 ];
 
@@ -153,8 +173,10 @@ export const pagePackages: PagePackage[] = [
     pages: 1,
     pricePerPage: 599,
     discount: 0,
-    description: "适合核心落地页",
-    features: ["内容结构优化", "Schema 标记", "AI 友好格式重写"],
+    description: "适合核心落地页优化",
+    features: ["结构优化", "Schema标记", "AI友好重写"],
+    turnaround: "3-5天",
+    quality: "standard",
   },
   {
     id: "basic",
@@ -162,8 +184,10 @@ export const pagePackages: PagePackage[] = [
     pages: 5,
     pricePerPage: 499,
     discount: 17,
-    description: "适合小型网站",
-    features: ["内容结构优化", "Schema 标记", "AI 友好格式重写", "内链优化建议"],
+    description: "适合小型网站整体优化",
+    features: ["5页优化", "内链建议", "技术支持"],
+    turnaround: "5-7天",
+    quality: "standard",
   },
   {
     id: "standard",
@@ -172,8 +196,10 @@ export const pagePackages: PagePackage[] = [
     pricePerPage: 399,
     discount: 33,
     description: "最受欢迎的选择",
-    features: ["内容结构优化", "Schema 标记", "AI 友好格式重写", "内链优化建议", "FAQ 内容创建"],
+    features: ["10页优化", "FAQ创建", "llms.txt"],
+    turnaround: "7-10天",
     popular: true,
+    quality: "premium",
   },
   {
     id: "professional",
@@ -181,8 +207,10 @@ export const pagePackages: PagePackage[] = [
     pages: 30,
     pricePerPage: 299,
     discount: 50,
-    description: "适合中大型网站",
-    features: ["内容结构优化", "Schema 标记", "AI 友好格式重写", "内链优化建议", "FAQ 内容创建", "llms.txt 配置"],
+    description: "适合中大型网站深度优化",
+    features: ["30页优化", "全站策略", "专属顾问"],
+    turnaround: "15-20天",
+    quality: "premium",
   },
 ];
 

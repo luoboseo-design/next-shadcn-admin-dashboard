@@ -28,8 +28,6 @@ import {
   Plus,
   X,
   ChevronRight,
-  AlertCircle,
-  Percent,
 } from "lucide-react";
 import {
   aiPlatforms,
@@ -487,12 +485,14 @@ export default function GeoOptimizationPage() {
         <div className="space-y-6">
           {/* 关键词套餐选择 */}
           {serviceType === "keyword" && (
-            <Card className="sticky top-6">
-              <CardHeader className="pb-3">
+            <Card>
+              <CardHeader className="pb-4">
                 <CardTitle className="text-base">选择套餐</CardTitle>
-                <CardDescription>套餐越大，单价越低</CardDescription>
+                <CardDescription>
+                  关键词优化 · 套餐越大单价越低
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 {keywordPackages.map((pkg) => (
                   <button
                     key={pkg.id}
@@ -503,42 +503,61 @@ export default function GeoOptimizationPage() {
                       }
                     }}
                     className={cn(
-                      "w-full text-left p-3 rounded-lg border transition-all",
+                      "w-full p-4 rounded-lg border-2 text-left transition-all",
                       selectedKeywordPackage === pkg.id
                         ? "border-primary bg-primary/5"
-                        : "border-border hover:border-muted-foreground/30"
+                        : "border-muted hover:border-muted-foreground/30"
                     )}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className={cn(
-                          "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                          selectedKeywordPackage === pkg.id ? "border-primary" : "border-muted-foreground/30"
-                        )}>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{pkg.name}</span>
                           {selectedKeywordPackage === pkg.id && (
-                            <div className="w-2 h-2 rounded-full bg-primary" />
+                            <Check className="h-4 w-4 text-primary" />
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-medium text-sm">{pkg.name}</span>
-                            {pkg.popular && (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">热门</Badge>
-                            )}
-                            {pkg.discount > 0 && (
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5">
-                                <Percent className="h-2.5 w-2.5" />
-                                {pkg.discount}%
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground">{pkg.keywords} 个关键词</p>
-                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {pkg.description}
+                        </p>
                       </div>
-                      <div className="text-right shrink-0">
-                        <div className="font-bold text-primary text-sm">¥{pkg.pricePerKeyword}</div>
-                        <div className="text-[10px] text-muted-foreground">/词/平台</div>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "shrink-0",
+                          pkg.quality === "premium" &&
+                            "bg-blue-100 text-blue-700 border-blue-200",
+                          pkg.popular &&
+                            "bg-amber-100 text-amber-700 border-amber-200"
+                        )}
+                      >
+                        {pkg.popular ? "热门" : pkg.quality === "premium" ? "优质" : "标准"}
+                      </Badge>
+                    </div>
+
+                    {/* 特性标签 */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {pkg.features.map((feature, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* 价格和交付时间 */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-lg font-bold">¥{pkg.pricePerKeyword}</span>
+                        <span className="text-sm text-muted-foreground">
+                          /词/平台
+                        </span>
                       </div>
+                      <span className="text-xs text-muted-foreground">
+                        {pkg.turnaround}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -548,53 +567,74 @@ export default function GeoOptimizationPage() {
 
           {/* 页面套餐选择 */}
           {serviceType === "page" && (
-            <Card className="sticky top-6">
-              <CardHeader className="pb-3">
+            <Card>
+              <CardHeader className="pb-4">
                 <CardTitle className="text-base">选择套餐</CardTitle>
-                <CardDescription>套餐越大，单价越低</CardDescription>
+                <CardDescription>
+                  页面优化 · 套餐越大单价越低
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 {pagePackages.map((pkg) => (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPagePackage(pkg.id)}
                     className={cn(
-                      "w-full text-left p-3 rounded-lg border transition-all",
+                      "w-full p-4 rounded-lg border-2 text-left transition-all",
                       selectedPagePackage === pkg.id
                         ? "border-primary bg-primary/5"
-                        : "border-border hover:border-muted-foreground/30"
+                        : "border-muted hover:border-muted-foreground/30"
                     )}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className={cn(
-                          "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                          selectedPagePackage === pkg.id ? "border-primary" : "border-muted-foreground/30"
-                        )}>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{pkg.name}</span>
                           {selectedPagePackage === pkg.id && (
-                            <div className="w-2 h-2 rounded-full bg-primary" />
+                            <Check className="h-4 w-4 text-primary" />
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-medium text-sm">{pkg.name}</span>
-                            {pkg.popular && (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">热门</Badge>
-                            )}
-                            {pkg.discount > 0 && (
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5">
-                                <Percent className="h-2.5 w-2.5" />
-                                {pkg.discount}%
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground">{pkg.pages} 个页面</p>
-                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {pkg.description}
+                        </p>
                       </div>
-                      <div className="text-right shrink-0">
-                        <div className="font-bold text-primary text-sm">¥{pkg.pricePerPage}</div>
-                        <div className="text-[10px] text-muted-foreground">/页</div>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "shrink-0",
+                          pkg.quality === "premium" &&
+                            "bg-blue-100 text-blue-700 border-blue-200",
+                          pkg.popular &&
+                            "bg-amber-100 text-amber-700 border-amber-200"
+                        )}
+                      >
+                        {pkg.popular ? "热门" : pkg.quality === "premium" ? "优质" : "标准"}
+                      </Badge>
+                    </div>
+
+                    {/* 特性标签 */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {pkg.features.map((feature, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* 价格和交付时间 */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-lg font-bold">¥{pkg.pricePerPage}</span>
+                        <span className="text-sm text-muted-foreground">
+                          /页
+                        </span>
                       </div>
+                      <span className="text-xs text-muted-foreground">
+                        {pkg.turnaround}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -602,8 +642,8 @@ export default function GeoOptimizationPage() {
             </Card>
           )}
 
-          {/* 订单汇总 */}
-          {isFormValid ? (
+          {/* 订单汇总 - 只有表单有效时显示 */}
+          {isFormValid && (
             <>
               <Card className="border-primary sticky top-6">
                 <CardHeader className="pb-3">
@@ -680,29 +720,6 @@ export default function GeoOptimizationPage() {
                       </span>
                     </div>
                   </div>
-
-                  <Button
-                    size="lg"
-                    className="w-full gap-2"
-                    onClick={handleSubmit}
-                    disabled={!isFormValid || isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        提交中...
-                      </>
-                    ) : (
-                      <>
-                        立即下单
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-
-                  <p className="text-xs text-center text-muted-foreground">
-                    下单后 1 个工作日内开始执行
-                  </p>
                 </CardContent>
               </Card>
 
@@ -726,18 +743,27 @@ export default function GeoOptimizationPage() {
                 </CardContent>
               </Card>
             </>
-          ) : (
-            <Card className="border-dashed">
-              <CardContent className="py-12 text-center">
-                <AlertCircle className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  {serviceType === "keyword" && "请选择 AI 平台并输入关键词"}
-                  {serviceType === "page" && "请输入网站地址"}
-                  {serviceType === "authority" && "请选择服务并输入网站地址"}
-                </p>
-              </CardContent>
-            </Card>
           )}
+
+          {/* 创建任务按钮 - 始终显示 */}
+          <Button
+            size="lg"
+            className="w-full gap-2"
+            onClick={handleSubmit}
+            disabled={!isFormValid || isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                提交中...
+              </>
+            ) : (
+              <>
+                创建任务
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </Button>
         </div>
       </div>
     </div>
