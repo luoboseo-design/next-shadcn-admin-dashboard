@@ -102,3 +102,35 @@ export const pagePricing = {
 export function calculatePagePrice(pageCount: number): number {
   return pageCount * pagePricing.pricePerPage;
 }
+
+// 权威建设服务
+export const authorityServices: AuthorityService[] = [
+  {
+    id: "entity",
+    name: "实体一致性优化",
+    description: "统一品牌在各平台的信息，提升 AI 识别准确度",
+    features: ["NAP 一致性检查", "品牌信息统一", "知识图谱优化", "维基百科/百科词条"],
+    price: 2999,
+    unit: "次",
+    turnaround: "7-14天",
+  },
+  {
+    id: "citation",
+    name: "引用来源建设",
+    description: "在权威媒体和平台建设品牌引用，增加 AI 信任度",
+    features: ["权威媒体发布", "行业平台曝光", "引用链接建设", "内容分发"],
+    price: 4999,
+    unit: "次",
+    turnaround: "14-21天",
+    popular: true,
+  },
+  {
+    id: "about",
+    name: "关于页面优化",
+    description: "优化官网关于页面，让 AI 更好地理解品牌",
+    features: ["结构化数据标记", "品牌故事优化", "团队信息展示", "联系方式优化"],
+    price: 1999,
+    unit: "次",
+    turnaround: "3-5天",
+  },
+];
