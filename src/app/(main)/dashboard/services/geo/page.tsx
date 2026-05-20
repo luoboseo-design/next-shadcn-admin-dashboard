@@ -31,8 +31,8 @@ import {
 } from "lucide-react";
 import {
   aiPlatforms,
-  keywordPackages,
-  pagePackages,
+  keywordPricing,
+  pagePricing,
   authorityServices,
   serviceTypeLabels,
   serviceTypeDescriptions,
@@ -59,13 +59,11 @@ export default function GeoOptimizationPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<AiPlatform[]>([]);
   
   // 关键词相关
-  const [selectedKeywordPackage, setSelectedKeywordPackage] = useState<string>("growth");
   const [keywords, setKeywords] = useState<string[]>([""]);
   
   // 页面相关
-  const [selectedPagePackage, setSelectedPagePackage] = useState<string>("standard");
   const [websiteUrl, setWebsiteUrl] = useState("");
-  const [pageUrls, setPageUrls] = useState("");
+  const [pageUrls, setPageUrls] = useState<string[]>([""]);
   
   // 权威建设
   const [selectedAuthorityService, setSelectedAuthorityService] = useState<string>("");
@@ -85,8 +83,7 @@ export default function GeoOptimizationPage() {
 
   // 添加关键词输入框
   const addKeywordInput = () => {
-    const pkg = keywordPackages.find(p => p.id === selectedKeywordPackage);
-    if (pkg && keywords.length < pkg.keywords) {
+    if (keywords.length < 100) { // 最多100个关键词
       setKeywords([...keywords, ""]);
     }
   };
@@ -105,35 +102,60 @@ export default function GeoOptimizationPage() {
     setKeywords(newKeywords);
   };
 
+  // 添加页面URL输入框
+  const addPageUrlInput = () => {
+    if (pageUrls.length < 100) {
+      setPageUrls([...pageUrls, ""]);
+    }
+  };
+
+  // 移除页面URL输入框
+  const removePageUrlInput = (index: number) => {
+    if (pageUrls.length > 1) {
+      setPageUrls(pageUrls.filter((_, i) => i !== index));
+    }
+  };
+
+  // 更新页面URL
+  const updatePageUrl = (index: number, value: string) => {
+    const newPageUrls = [...pageUrls];
+    newPageUrls[index] = value;
+    setPageUrls(newPageUrls);
+  };
+
+  // 计算有效关键词数量
+  const validKeywordCount = keywords.filter(k => k.trim()).length;
+  
+  // 计算有效页面数量
+  const validPageCount = pageUrls.filter(u => u.trim()).length;
+
   // 计算价格
   const totalPrice = useMemo(() => {
     if (serviceType === "keyword") {
-      return calculateKeywordPrice(selectedKeywordPackage, Math.max(1, selectedPlatforms.length));
+      return calculateKeywordPrice(Math.max(1, validKeywordCount), Math.max(1, selectedPlatforms.length));
     } else if (serviceType === "page") {
-      return calculatePagePrice(selectedPagePackage);
+      return calculatePagePrice(Math.max(1, validPageCount));
     } else if (serviceType === "authority") {
       const service = authorityServices.find(s => s.id === selectedAuthorityService);
       return service?.price || 0;
     }
     return 0;
-  }, [serviceType, selectedKeywordPackage, selectedPagePackage, selectedAuthorityService, selectedPlatforms]);
+  }, [serviceType, validKeywordCount, validPageCount, selectedAuthorityService, selectedPlatforms]);
 
-  // 获取当前选中的套餐信息
-  const currentKeywordPackage = keywordPackages.find(p => p.id === selectedKeywordPackage);
-  const currentPagePackage = pagePackages.find(p => p.id === selectedPagePackage);
+  // 获取当前选中的权威服务
   const currentAuthorityService = authorityServices.find(s => s.id === selectedAuthorityService);
 
   // 检查表单是否完整
   const isFormValid = useMemo(() => {
     if (serviceType === "keyword") {
-      return selectedPlatforms.length > 0 && keywords.some(k => k.trim());
+      return selectedPlatforms.length > 0 && validKeywordCount > 0;
     } else if (serviceType === "page") {
-      return websiteUrl.trim() !== "";
+      return websiteUrl.trim() !== "" && validPageCount > 0;
     } else if (serviceType === "authority") {
       return selectedAuthorityService !== "" && websiteUrl.trim() !== "";
     }
     return false;
-  }, [serviceType, selectedPlatforms, keywords, websiteUrl, selectedAuthorityService]);
+  }, [serviceType, selectedPlatforms, validKeywordCount, websiteUrl, validPageCount, selectedAuthorityService]);
 
   // 提交任务
   const handleSubmit = async () => {
@@ -294,7 +316,7 @@ export default function GeoOptimizationPage() {
                     输入要优化的关键词
                   </CardTitle>
                   <CardDescription>
-                    最多可输入 {currentKeywordPackage?.keywords || 0} 个关键词
+                    输入你想要在 AI 平台排名靠前的关键词
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -319,17 +341,15 @@ export default function GeoOptimizationPage() {
                       )}
                     </div>
                   ))}
-                  {currentKeywordPackage && keywords.length < currentKeywordPackage.keywords && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={addKeywordInput}
-                      className="gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      添加关键词
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addKeywordInput}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    添加关键词
+                  </Button>
                 </CardContent>
               </Card>
             </>
@@ -356,16 +376,39 @@ export default function GeoOptimizationPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>需要优化的页面 URL（可选）</Label>
-                    <Textarea
-                      placeholder={`每行一个 URL，最多 ${currentPagePackage?.pages || 0} 个页面，例如：\nhttps://example.com/about\nhttps://example.com/products`}
-                      value={pageUrls}
-                      onChange={(e) => setPageUrls(e.target.value)}
-                      rows={4}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      留空则由我们根据诊断报告确定优先级页面
-                    </p>
+                    <Label>需要优化的页面 URL <span className="text-destructive">*</span></Label>
+                    <div className="space-y-3">
+                      {pageUrls.map((url, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground w-6">{index + 1}.</span>
+                          <Input
+                            placeholder="https://example.com/about"
+                            value={url}
+                            onChange={(e) => updatePageUrl(index, e.target.value)}
+                            className="flex-1"
+                          />
+                          {pageUrls.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removePageUrlInput(index)}
+                              className="shrink-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addPageUrlInput}
+                        className="gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        添加页面
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -481,271 +524,195 @@ export default function GeoOptimizationPage() {
           </Card>
         </div>
 
-        {/* 右侧：套餐选择 + 订单汇总 */}
+        {/* 右侧：价格卡片 */}
         <div className="space-y-6">
-          {/* 关键词套餐选择 */}
+          {/* 关键词优化价格 */}
           {serviceType === "keyword" && (
-            <Card>
+            <Card className="sticky top-6">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base">选择套餐</CardTitle>
+                <CardTitle className="text-base">关键词优化</CardTitle>
                 <CardDescription>
-                  关键词优化 · 套餐越大单价越低
+                  ¥{keywordPricing.pricePerKeyword}/词/平台
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {keywordPackages.map((pkg) => (
-                  <button
-                    key={pkg.id}
-                    onClick={() => {
-                      setSelectedKeywordPackage(pkg.id);
-                      if (keywords.length > pkg.keywords) {
-                        setKeywords(keywords.slice(0, pkg.keywords));
-                      }
-                    }}
-                    className={cn(
-                      "w-full p-4 rounded-lg border-2 text-left transition-all",
-                      selectedKeywordPackage === pkg.id
-                        ? "border-primary bg-primary/5"
-                        : "border-muted hover:border-muted-foreground/30"
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">{pkg.name}</span>
-                          {selectedKeywordPackage === pkg.id && (
-                            <Check className="h-4 w-4 text-primary" />
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {pkg.description}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "shrink-0",
-                          pkg.quality === "premium" &&
-                            "bg-blue-100 text-blue-700 border-blue-200",
-                          pkg.popular &&
-                            "bg-amber-100 text-amber-700 border-amber-200"
-                        )}
-                      >
-                        {pkg.popular ? "热门" : pkg.quality === "premium" ? "优质" : "标准"}
-                      </Badge>
-                    </div>
+              <CardContent className="space-y-4">
+                {/* 特性标签 */}
+                <div className="flex flex-wrap gap-2">
+                  {keywordPricing.features.map((feature, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
 
-                    {/* 特性标签 */}
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {pkg.features.map((feature, idx) => (
-                        <span
-                          key={idx}
-                          className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
+                {/* 价格明细 */}
+                <div className="space-y-2 text-sm pt-2 border-t">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">关键词数量</span>
+                    <span>{validKeywordCount || 0} 个</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">目标平台</span>
+                    <span>{selectedPlatforms.length || 0} 个</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">单价</span>
+                    <span>¥{keywordPricing.pricePerKeyword}/词/平台</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">交付周期</span>
+                    <span>{keywordPricing.turnaround}</span>
+                  </div>
+                </div>
 
-                    {/* 价格和交付时间 */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold">¥{pkg.pricePerKeyword}</span>
-                        <span className="text-sm text-muted-foreground">
-                          /词/平台
-                        </span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {pkg.turnaround}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                {/* 总价 */}
+                <div className="pt-3 border-t">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">总计</span>
+                    <span className="text-2xl font-bold text-primary">
+                      ¥{totalPrice.toLocaleString()}
+                    </span>
+                  </div>
+                  {validKeywordCount > 0 && selectedPlatforms.length > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1 text-right">
+                      {validKeywordCount} 词 × {selectedPlatforms.length} 平台 × ¥{keywordPricing.pricePerKeyword}
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* 页面套餐选择 */}
+          {/* 页面优化价格 */}
           {serviceType === "page" && (
-            <Card>
+            <Card className="sticky top-6">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base">选择套餐</CardTitle>
+                <CardTitle className="text-base">页面优化</CardTitle>
                 <CardDescription>
-                  页面优化 · 套餐越大单价越低
+                  ¥{pagePricing.pricePerPage}/页
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {pagePackages.map((pkg) => (
-                  <button
-                    key={pkg.id}
-                    onClick={() => setSelectedPagePackage(pkg.id)}
-                    className={cn(
-                      "w-full p-4 rounded-lg border-2 text-left transition-all",
-                      selectedPagePackage === pkg.id
-                        ? "border-primary bg-primary/5"
-                        : "border-muted hover:border-muted-foreground/30"
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">{pkg.name}</span>
-                          {selectedPagePackage === pkg.id && (
-                            <Check className="h-4 w-4 text-primary" />
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {pkg.description}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "shrink-0",
-                          pkg.quality === "premium" &&
-                            "bg-blue-100 text-blue-700 border-blue-200",
-                          pkg.popular &&
-                            "bg-amber-100 text-amber-700 border-amber-200"
-                        )}
-                      >
-                        {pkg.popular ? "热门" : pkg.quality === "premium" ? "优质" : "标准"}
-                      </Badge>
-                    </div>
+              <CardContent className="space-y-4">
+                {/* 特性标签 */}
+                <div className="flex flex-wrap gap-2">
+                  {pagePricing.features.map((feature, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
 
-                    {/* 特性标签 */}
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {pkg.features.map((feature, idx) => (
-                        <span
-                          key={idx}
-                          className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
+                {/* 价格明细 */}
+                <div className="space-y-2 text-sm pt-2 border-t">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">页面数量</span>
+                    <span>{validPageCount || 0} 个</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">单价</span>
+                    <span>¥{pagePricing.pricePerPage}/页</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">交付周期</span>
+                    <span>{pagePricing.turnaround}</span>
+                  </div>
+                </div>
 
-                    {/* 价格和交付时间 */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold">¥{pkg.pricePerPage}</span>
-                        <span className="text-sm text-muted-foreground">
-                          /页
-                        </span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {pkg.turnaround}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                {/* 总价 */}
+                <div className="pt-3 border-t">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">总计</span>
+                    <span className="text-2xl font-bold text-primary">
+                      ¥{totalPrice.toLocaleString()}
+                    </span>
+                  </div>
+                  {validPageCount > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1 text-right">
+                      {validPageCount} 页 × ¥{pagePricing.pricePerPage}
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* 订单汇总 - 只有表单有效时显示 */}
-          {isFormValid && (
-            <>
-              <Card className="border-primary sticky top-6">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">订单汇总</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">服务类型</span>
-                      <span>{serviceTypeLabels[serviceType]}</span>
-                    </div>
-                    
-                    {serviceType === "keyword" && (
-                      <>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">目标平台</span>
-                          <span>{selectedPlatforms.length} 个</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">套餐</span>
-                          <span>{currentKeywordPackage?.name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">关键词数量</span>
-                          <span>{currentKeywordPackage?.keywords} 个</span>
-                        </div>
-                        {(currentKeywordPackage?.discount || 0) > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <span>套餐优惠</span>
-                            <span>-{currentKeywordPackage?.discount}%</span>
-                          </div>
-                        )}
-                      </>
-                    )}
-                    
-                    {serviceType === "page" && (
-                      <>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">套餐</span>
-                          <span>{currentPagePackage?.name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">页面数量</span>
-                          <span>{currentPagePackage?.pages} 页</span>
-                        </div>
-                        {(currentPagePackage?.discount || 0) > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <span>套餐优惠</span>
-                            <span>-{currentPagePackage?.discount}%</span>
-                          </div>
-                        )}
-                      </>
-                    )}
-                    
-                    {serviceType === "authority" && currentAuthorityService && (
-                      <>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">服务项目</span>
-                          <span className="text-right max-w-[150px]">{currentAuthorityService.name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">交付周期</span>
-                          <span>{currentAuthorityService.turnaround}</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  
-                  <div className="pt-3 border-t">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">总计</span>
-                      <span className="text-2xl font-bold text-primary">
-                        ¥{totalPrice.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* 权威建设价格 */}
+          {serviceType === "authority" && currentAuthorityService && (
+            <Card className="sticky top-6">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">{currentAuthorityService.name}</CardTitle>
+                <CardDescription>
+                  {currentAuthorityService.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* 特性标签 */}
+                <div className="flex flex-wrap gap-2">
+                  {currentAuthorityService.features.slice(0, 3).map((feature, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
 
-              {/* 服务保障 */}
-              <Card>
-                <CardContent className="pt-4">
-                  <div className="space-y-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-500" />
-                      <span>效果不达标可退款</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-500" />
-                      <span>专业团队人工执行</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-500" />
-                      <span>排名效果可追踪</span>
-                    </div>
+                {/* 价格明细 */}
+                <div className="space-y-2 text-sm pt-2 border-t">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">服务</span>
+                    <span>{currentAuthorityService.name}</span>
                   </div>
-                </CardContent>
-              </Card>
-            </>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">交付周期</span>
+                    <span>{currentAuthorityService.turnaround}</span>
+                  </div>
+                </div>
+
+                {/* 总价 */}
+                <div className="pt-3 border-t">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">总计</span>
+                    <span className="text-2xl font-bold text-primary">
+                      ¥{currentAuthorityService.price.toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 text-right">
+                    /{currentAuthorityService.unit}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
-          {/* 创建任务按钮 - 始终显示 */}
+          {/* 服务保障 */}
+          <Card>
+            <CardContent className="pt-4">
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>效果不达标可退款</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>专业团队人工执行</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>排名效果可追踪</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 创建任务按钮 */}
           <Button
             size="lg"
             className="w-full gap-2"
