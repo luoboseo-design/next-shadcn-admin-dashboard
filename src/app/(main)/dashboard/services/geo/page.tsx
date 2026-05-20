@@ -288,77 +288,11 @@ export default function GeoOptimizationPage() {
                 </CardContent>
               </Card>
 
-              {/* Step 3: 选择套餐 */}
+              {/* Step 3: 输入关键词 */}
               <Card>
                 <CardHeader className="pb-4">
                   <CardTitle className="text-base flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
-                    选择关键词套餐
-                  </CardTitle>
-                  <CardDescription>套餐越大，单价越低</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {keywordPackages.map((pkg) => (
-                    <button
-                      key={pkg.id}
-                      onClick={() => {
-                        setSelectedKeywordPackage(pkg.id);
-                        // 调整关键词数组长度
-                        if (keywords.length > pkg.keywords) {
-                          setKeywords(keywords.slice(0, pkg.keywords));
-                        }
-                      }}
-                      className={cn(
-                        "w-full text-left p-4 rounded-lg border-2 transition-all",
-                        selectedKeywordPackage === pkg.id
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-muted-foreground/30"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-5 h-5 rounded-full border-2 flex items-center justify-center",
-                            selectedKeywordPackage === pkg.id ? "border-primary" : "border-muted-foreground/30"
-                          )}>
-                            {selectedKeywordPackage === pkg.id && (
-                              <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold">{pkg.name}</span>
-                              {pkg.popular && (
-                                <Badge variant="secondary" className="text-xs">热门</Badge>
-                              )}
-                              {pkg.discount > 0 && (
-                                <Badge variant="outline" className="text-xs gap-1">
-                                  <Percent className="h-3 w-3" />
-                                  省 {pkg.discount}%
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground">{pkg.description}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-primary">¥{pkg.pricePerKeyword}</div>
-                          <div className="text-xs text-muted-foreground">/词/平台</div>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-sm text-muted-foreground pl-8">
-                        包含 {pkg.keywords} 个关键词
-                      </div>
-                    </button>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Step 4: 输入关键词 */}
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
                     输入要优化的关键词
                   </CardTitle>
                   <CardDescription>
@@ -410,72 +344,6 @@ export default function GeoOptimizationPage() {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-base flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
-                    选择页面套餐
-                  </CardTitle>
-                  <CardDescription>套餐越大，单价越低</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {pagePackages.map((pkg) => (
-                    <button
-                      key={pkg.id}
-                      onClick={() => setSelectedPagePackage(pkg.id)}
-                      className={cn(
-                        "w-full text-left p-4 rounded-lg border-2 transition-all",
-                        selectedPagePackage === pkg.id
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-muted-foreground/30"
-                      )}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
-                          <div className={cn(
-                            "w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5",
-                            selectedPagePackage === pkg.id ? "border-primary" : "border-muted-foreground/30"
-                          )}>
-                            {selectedPagePackage === pkg.id && (
-                              <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-semibold">{pkg.name}</span>
-                              {pkg.popular && (
-                                <Badge variant="secondary" className="text-xs">热门</Badge>
-                              )}
-                              {pkg.discount > 0 && (
-                                <Badge variant="outline" className="text-xs gap-1">
-                                  <Percent className="h-3 w-3" />
-                                  省 {pkg.discount}%
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground">{pkg.description}</p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {pkg.features.map((feature, idx) => (
-                                <span key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">
-                                  {feature}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <div className="font-bold text-primary">¥{pkg.pricePerPage}</div>
-                          <div className="text-xs text-muted-foreground">/页</div>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-sm text-muted-foreground pl-8">
-                        包含 {pkg.pages} 个页面优化，总价 ¥{pkg.pages * pkg.pricePerPage}
-                      </div>
-                    </button>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
                     填写网站信息
                   </CardTitle>
                   <CardDescription>告诉我们你的网站和需要优化的页面</CardDescription>
@@ -615,8 +483,126 @@ export default function GeoOptimizationPage() {
           </Card>
         </div>
 
-        {/* 右侧：订单汇总 */}
+        {/* 右侧：套餐选择 + 订单汇总 */}
         <div className="space-y-6">
+          {/* 关键词套餐选择 */}
+          {serviceType === "keyword" && (
+            <Card className="sticky top-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">选择套餐</CardTitle>
+                <CardDescription>套餐越大，单价越低</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {keywordPackages.map((pkg) => (
+                  <button
+                    key={pkg.id}
+                    onClick={() => {
+                      setSelectedKeywordPackage(pkg.id);
+                      if (keywords.length > pkg.keywords) {
+                        setKeywords(keywords.slice(0, pkg.keywords));
+                      }
+                    }}
+                    className={cn(
+                      "w-full text-left p-3 rounded-lg border transition-all",
+                      selectedKeywordPackage === pkg.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-muted-foreground/30"
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={cn(
+                          "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                          selectedKeywordPackage === pkg.id ? "border-primary" : "border-muted-foreground/30"
+                        )}>
+                          {selectedKeywordPackage === pkg.id && (
+                            <div className="w-2 h-2 rounded-full bg-primary" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-medium text-sm">{pkg.name}</span>
+                            {pkg.popular && (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">热门</Badge>
+                            )}
+                            {pkg.discount > 0 && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5">
+                                <Percent className="h-2.5 w-2.5" />
+                                {pkg.discount}%
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">{pkg.keywords} 个关键词</p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="font-bold text-primary text-sm">¥{pkg.pricePerKeyword}</div>
+                        <div className="text-[10px] text-muted-foreground">/词/平台</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 页面套餐选择 */}
+          {serviceType === "page" && (
+            <Card className="sticky top-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">选择套餐</CardTitle>
+                <CardDescription>套餐越大，单价越低</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {pagePackages.map((pkg) => (
+                  <button
+                    key={pkg.id}
+                    onClick={() => setSelectedPagePackage(pkg.id)}
+                    className={cn(
+                      "w-full text-left p-3 rounded-lg border transition-all",
+                      selectedPagePackage === pkg.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-muted-foreground/30"
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={cn(
+                          "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                          selectedPagePackage === pkg.id ? "border-primary" : "border-muted-foreground/30"
+                        )}>
+                          {selectedPagePackage === pkg.id && (
+                            <div className="w-2 h-2 rounded-full bg-primary" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-medium text-sm">{pkg.name}</span>
+                            {pkg.popular && (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">热门</Badge>
+                            )}
+                            {pkg.discount > 0 && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5">
+                                <Percent className="h-2.5 w-2.5" />
+                                {pkg.discount}%
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">{pkg.pages} 个页面</p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="font-bold text-primary text-sm">¥{pkg.pricePerPage}</div>
+                        <div className="text-[10px] text-muted-foreground">/页</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 订单汇总 */}
           {isFormValid ? (
             <>
               <Card className="border-primary sticky top-6">
