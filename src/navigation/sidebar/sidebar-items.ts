@@ -78,7 +78,6 @@ export const sidebarItems: NavGroup[] = [
         title: "GEO 服务",
         url: "/dashboard/services/geo",
         icon: Globe,
-        comingSoon: true,
       },
       {
         title: "社交媒体",
