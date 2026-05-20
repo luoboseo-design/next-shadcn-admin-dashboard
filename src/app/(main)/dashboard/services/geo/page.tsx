@@ -36,6 +36,7 @@ import {
   authorityServices,
   serviceTypeLabels,
   serviceTypeDescriptions,
+  platformCategoryLabels,
   calculateKeywordPrice,
   calculatePagePrice,
   type ServiceType,
@@ -273,34 +274,69 @@ export default function GeoOptimizationPage() {
                   </CardTitle>
                   <CardDescription>选择你想要优化排名的 AI 平台（可多选）</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {aiPlatforms.map((platform) => (
-                      <button
-                        key={platform.id}
-                        onClick={() => togglePlatform(platform.id)}
-                        className={cn(
-                          "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left",
-                          selectedPlatforms.includes(platform.id)
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-muted-foreground/30"
-                        )}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <Checkbox 
-                            checked={selectedPlatforms.includes(platform.id)}
-                            className="pointer-events-none"
-                          />
-                          <span className="font-medium text-sm">{platform.name}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
-                          {platform.description}
-                        </p>
-                      </button>
-                    ))}
+                <CardContent className="space-y-6">
+                  {/* 海外平台 */}
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-muted-foreground">{platformCategoryLabels.en}</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {aiPlatforms.filter(p => p.category === "en").map((platform) => (
+                        <button
+                          key={platform.id}
+                          onClick={() => togglePlatform(platform.id)}
+                          className={cn(
+                            "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left",
+                            selectedPlatforms.includes(platform.id)
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <div className="flex items-center gap-2 w-full">
+                            <Checkbox 
+                              checked={selectedPlatforms.includes(platform.id)}
+                              className="pointer-events-none"
+                            />
+                            <span className="font-medium text-sm">{platform.name}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
+                            {platform.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* 国内平台 */}
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-muted-foreground">{platformCategoryLabels.zh}</div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {aiPlatforms.filter(p => p.category === "zh").map((platform) => (
+                        <button
+                          key={platform.id}
+                          onClick={() => togglePlatform(platform.id)}
+                          className={cn(
+                            "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left",
+                            selectedPlatforms.includes(platform.id)
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <div className="flex items-center gap-2 w-full">
+                            <Checkbox 
+                              checked={selectedPlatforms.includes(platform.id)}
+                              className="pointer-events-none"
+                            />
+                            <span className="font-medium text-sm">{platform.name}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
+                            {platform.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {selectedPlatforms.length > 0 && (
-                    <p className="text-sm text-muted-foreground mt-4">
+                    <p className="text-sm text-muted-foreground">
                       已选择 <span className="font-medium text-foreground">{selectedPlatforms.length}</span> 个平台，
                       每增加一个平台，关键词价格 x 平台数量
                     </p>

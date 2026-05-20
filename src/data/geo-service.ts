@@ -2,12 +2,25 @@
 
 export type ServiceType = "keyword" | "page" | "authority";
 
-export type AiPlatform = "chatgpt" | "perplexity" | "gemini" | "claude" | "deepseek" | "doubao" | "kimi" | "metaai";
+export type AiPlatform = 
+  | "chatgpt" 
+  | "perplexity" 
+  | "gemini" 
+  | "metaai"
+  | "deepseek"
+  | "doubao"
+  | "tongyi"
+  | "wenxin"
+  | "yuanbao"
+  | "nami";
+
+export type PlatformCategory = "en" | "zh";
 
 export interface AiPlatformInfo {
   id: AiPlatform;
   name: string;
   description: string;
+  category: PlatformCategory;
   icon?: string;
 }
 
@@ -35,47 +48,75 @@ export const serviceTypeDescriptions: Record<ServiceType, string> = {
   authority: "建设品牌权威性，提升 AI 对你品牌的信任度",
 };
 
+// AI 平台分类标签
+export const platformCategoryLabels: Record<PlatformCategory, string> = {
+  en: "海外平台",
+  zh: "国内平台",
+};
+
 // AI 平台列表
 export const aiPlatforms: AiPlatformInfo[] = [
+  // 海外平台
   {
     id: "chatgpt",
     name: "ChatGPT",
     description: "OpenAI 旗舰产品，全球用户量最大",
+    category: "en",
   },
   {
     id: "perplexity",
     name: "Perplexity",
     description: "AI 搜索引擎，实时联网搜索",
+    category: "en",
   },
   {
     id: "gemini",
-    name: "Google Gemini",
+    name: "Gemini",
     description: "Google AI，与搜索深度整合",
-  },
-  {
-    id: "claude",
-    name: "Claude",
-    description: "Anthropic 出品，擅长长文分析",
-  },
-  {
-    id: "deepseek",
-    name: "DeepSeek",
-    description: "国产大模型，性能强劲",
-  },
-  {
-    id: "doubao",
-    name: "豆包",
-    description: "字节跳动 AI，国内用户量大",
-  },
-  {
-    id: "kimi",
-    name: "Kimi",
-    description: "月之暗面出品，擅长长文处理",
+    category: "en",
   },
   {
     id: "metaai",
     name: "Meta AI",
-    description: "Meta 出品，整合 Facebook/Instagram",
+    description: "Meta 出品，整合社交平台",
+    category: "en",
+  },
+  // 国内平台
+  {
+    id: "deepseek",
+    name: "DeepSeek",
+    description: "深度求索，性能强劲",
+    category: "zh",
+  },
+  {
+    id: "doubao",
+    name: "豆包",
+    description: "字节跳动 AI，用户量大",
+    category: "zh",
+  },
+  {
+    id: "tongyi",
+    name: "通义千问",
+    description: "阿里云 AI，企业级应用",
+    category: "zh",
+  },
+  {
+    id: "wenxin",
+    name: "文心一言",
+    description: "百度 AI，中文理解强",
+    category: "zh",
+  },
+  {
+    id: "yuanbao",
+    name: "元宝",
+    description: "腾讯 AI，整合微信生态",
+    category: "zh",
+  },
+  {
+    id: "nami",
+    name: "纳米AI",
+    description: "360 AI，安全领域专长",
+    category: "zh",
   },
 ];
 
