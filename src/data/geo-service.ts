@@ -1,6 +1,6 @@
 // GEO 优化服务 - 数据定义
 
-export type OptimizationCategory = "content" | "technical" | "authority" | "monitoring";
+export type OptimizationCategory = "content" | "technical" | "authority";
 export type AiPlatform = "chatgpt" | "gemini" | "perplexity" | "claude" | "copilot";
 
 export interface OptimizationService {
@@ -37,21 +37,18 @@ export const categoryLabels: Record<OptimizationCategory, string> = {
   content: "内容优化",
   technical: "技术优化",
   authority: "权威建设",
-  monitoring: "持续监控",
 };
 
 export const categoryDescriptions: Record<OptimizationCategory, string> = {
   content: "优化内容结构和可读性，让 AI 更容易理解和引用",
   technical: "Schema 标记、结构化数据等技术层面的优化",
   authority: "提升品牌权威性，增加被 AI 引用的可信度",
-  monitoring: "持续追踪优化效果和竞争对手动态",
 };
 
 export const categoryIcons: Record<OptimizationCategory, string> = {
   content: "FileEdit",
   technical: "Code",
   authority: "Award",
-  monitoring: "Activity",
 };
 
 export const aiPlatformLabels: Record<AiPlatform, string> = {

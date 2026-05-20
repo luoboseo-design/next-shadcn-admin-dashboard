@@ -21,7 +21,6 @@ import {
   FileEdit,
   Code,
   Award,
-  Activity,
   Check,
   ArrowRight,
   Loader2,
@@ -46,7 +45,6 @@ const categoryIcons: Record<OptimizationCategory, React.ReactNode> = {
   content: <FileEdit className="h-5 w-5" />,
   technical: <Code className="h-5 w-5" />,
   authority: <Award className="h-5 w-5" />,
-  monitoring: <Activity className="h-5 w-5" />,
 };
 
 export default function GeoOptimizationPage() {
