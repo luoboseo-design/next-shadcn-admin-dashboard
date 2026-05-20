@@ -154,6 +154,20 @@ export default function GeoOptimizationPage() {
   // 获取当前选中的权威服务
   const currentAuthorityService = authorityServices.find(s => s.id === selectedAuthorityService);
 
+  // 根据关键词生成相关问题
+  const generateRelatedQueries = (keyword: string): string[] => {
+    if (!keyword.trim()) return [];
+    const k = keyword.trim();
+    return [
+      `${k}哪个好`,
+      `${k}推荐`,
+      `最好的${k}`,
+      `${k}排行榜`,
+      `${k}怎么选`,
+      `${k}对比`,
+    ];
+  };
+
   // 检查表单是否完整
   const isFormValid = useMemo(() => {
     if (serviceType === "keyword") {
@@ -396,6 +410,43 @@ export default function GeoOptimizationPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* 可能覆盖的范围 - 根据关键词显示相关问题 */}
+              {validKeywordCount > 0 && (
+                <Card className="border-dashed">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      可能覆盖的范围
+                    </CardTitle>
+                    <CardDescription>
+                      基于你的关键词，AI 平台用户可能会搜索以下相关问题
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {keywords.filter(k => k.trim()).map((keyword, keywordIndex) => (
+                        <div key={keywordIndex} className="space-y-2">
+                          <div className="text-sm font-medium text-foreground">{keyword}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {generateRelatedQueries(keyword).map((query, queryIndex) => (
+                              <span
+                                key={queryIndex}
+                                className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground"
+                              >
+                                {query}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-4 pt-3 border-t">
+                      优化后，当用户在 AI 平台搜索以上问题时，你的品牌/产品将更有可能被推荐
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
 
