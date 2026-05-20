@@ -1,20 +1,22 @@
-// GEO 服务 - 数据定义
+// GEO 优化服务 - 数据定义
 
-export type GeoServiceType = "audit" | "optimization" | "monitoring";
+export type OptimizationCategory = "content" | "technical" | "authority" | "monitoring";
 export type AiPlatform = "chatgpt" | "gemini" | "perplexity" | "claude" | "copilot";
 
-export interface GeoService {
+export interface OptimizationService {
   id: string;
-  type: GeoServiceType;
+  category: OptimizationCategory;
   name: string;
   description: string;
   features: string[];
+  deliverables: string[];
   price: number;
   unit: string;
+  turnaround: string;
   popular?: boolean;
 }
 
-export interface GeoPackage {
+export interface SubscriptionPlan {
   id: string;
   name: string;
   description: string;
@@ -22,30 +24,34 @@ export interface GeoPackage {
   period: string;
   features: string[];
   limits: {
-    auditsPerMonth: number;
+    aiPlatforms: number;
     promptsTracked: number;
     contentOptimizations: number;
     competitorTracking: number;
+    reportFrequency: string;
   };
   popular?: boolean;
 }
 
-export const serviceTypeLabels: Record<GeoServiceType, string> = {
-  audit: "AI 可见性诊断",
-  optimization: "内容优化",
+export const categoryLabels: Record<OptimizationCategory, string> = {
+  content: "内容优化",
+  technical: "技术优化",
+  authority: "权威建设",
   monitoring: "持续监控",
 };
 
-export const serviceTypeIcons: Record<GeoServiceType, string> = {
-  audit: "Search",
-  optimization: "FileEdit",
-  monitoring: "Activity",
+export const categoryDescriptions: Record<OptimizationCategory, string> = {
+  content: "优化内容结构和可读性，让 AI 更容易理解和引用",
+  technical: "Schema 标记、结构化数据等技术层面的优化",
+  authority: "提升品牌权威性，增加被 AI 引用的可信度",
+  monitoring: "持续追踪优化效果和竞争对手动态",
 };
 
-export const serviceTypeDescriptions: Record<GeoServiceType, string> = {
-  audit: "检测品牌在主流 AI 引擎中的可见度和引用情况",
-  optimization: "优化内容结构，提升 AI 引用概率",
-  monitoring: "持续追踪品牌在 AI 回答中的表现",
+export const categoryIcons: Record<OptimizationCategory, string> = {
+  content: "FileEdit",
+  technical: "Code",
+  authority: "Award",
+  monitoring: "Activity",
 };
 
 export const aiPlatformLabels: Record<AiPlatform, string> = {
@@ -56,240 +62,292 @@ export const aiPlatformLabels: Record<AiPlatform, string> = {
   copilot: "Microsoft Copilot",
 };
 
-export const aiPlatformLogos: Record<AiPlatform, string> = {
-  chatgpt: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
-  gemini: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg",
-  perplexity: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg",
-  claude: "https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg",
-  copilot: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Microsoft_365_Copilot_Icon.svg",
-};
-
-// 单次服务
-export const geoServices: GeoService[] = [
-  // AI 可见性诊断
-  {
-    id: "audit-basic",
-    type: "audit",
-    name: "基础诊断",
-    description: "单次 AI 可见性扫描，覆盖主流 AI 平台",
-    features: [
-      "扫描 5 个 AI 平台",
-      "100 个相关提示词测试",
-      "品牌提及率分析",
-      "基础报告",
-    ],
-    price: 0,
-    unit: "次",
-  },
-  {
-    id: "audit-advanced",
-    type: "audit",
-    name: "深度诊断",
-    description: "全面分析品牌 AI 可见性，含竞品对比",
-    features: [
-      "扫描 5 个 AI 平台",
-      "500 个相关提示词测试",
-      "竞争对手对比分析",
-      "详细报告 + 优化建议",
-      "提示词机会挖掘",
-    ],
-    price: 799,
-    unit: "次",
-    popular: true,
-  },
-  {
-    id: "audit-enterprise",
-    type: "audit",
-    name: "企业级诊断",
-    description: "定制化 AI 可见性审计，适合大型品牌",
-    features: [
-      "扫描所有主流 AI 平台",
-      "无限提示词测试",
-      "多竞争对手深度分析",
-      "定制报告 + 策略咨询",
-      "专属客户经理",
-    ],
-    price: 2999,
-    unit: "次",
-  },
-
+// 优化服务列表
+export const optimizationServices: OptimizationService[] = [
   // 内容优化
   {
-    id: "optimize-single",
-    type: "optimization",
-    name: "单页优化",
-    description: "优化单个页面的 AI 可见性",
+    id: "content-rewrite",
+    category: "content",
+    name: "AI 友好内容重写",
+    description: "将现有内容重构为 AI 引擎更容易理解和引用的格式",
     features: [
-      "页面 AI 友好度分析",
-      "结构化数据优化",
-      "内容重构建议",
-      "Schema 标记添加",
+      "问答格式优化",
+      "清晰的标题层级",
+      "关键实体突出",
+      "可扫描的列表结构",
+      "避免营销废话",
     ],
-    price: 199,
+    deliverables: [
+      "优化后的内容文档",
+      "修改建议清单",
+      "前后对比分析",
+    ],
+    price: 399,
     unit: "页",
+    turnaround: "3 个工作日",
+    popular: true,
   },
   {
-    id: "optimize-content",
-    type: "optimization",
-    name: "内容生成",
-    description: "AI 优化的原创内容创作",
+    id: "content-creation",
+    category: "content",
+    name: "GEO 优化内容创作",
+    description: "从零创作针对 AI 引用优化的高质量内容",
     features: [
+      "关键词和意图研究",
+      "竞品内容分析",
       "AI 引用优化写作",
-      "关键实体覆盖",
-      "问答格式优化",
+      "实体一致性保证",
       "引用来源标注",
     ],
-    price: 499,
+    deliverables: [
+      "原创优化内容",
+      "关键词覆盖报告",
+      "发布建议指南",
+    ],
+    price: 699,
     unit: "篇",
-    popular: true,
+    turnaround: "5 个工作日",
   },
   {
-    id: "optimize-site",
-    type: "optimization",
-    name: "整站优化",
-    description: "全站 AI 可见性优化方案",
+    id: "faq-optimization",
+    category: "content",
+    name: "FAQ 内容优化",
+    description: "创建或优化 FAQ 页面，直接匹配 AI 搜索意图",
     features: [
-      "全站 AI 友好度审计",
-      "10 个核心页面优化",
-      "技术 SEO + GEO 整合",
-      "30 天优化执行",
+      "热门问题挖掘",
+      "直接回答格式",
+      "FAQ Schema 标记",
+      "相关问题链接",
     ],
-    price: 4999,
-    unit: "站",
+    deliverables: [
+      "优化后的 FAQ 内容",
+      "Schema 代码",
+      "问题优先级排序",
+    ],
+    price: 299,
+    unit: "组",
+    turnaround: "2 个工作日",
   },
 
-  // 持续监控
+  // 技术优化
   {
-    id: "monitor-basic",
-    type: "monitoring",
-    name: "基础监控",
-    description: "每周追踪品牌 AI 可见性变化",
+    id: "schema-implementation",
+    category: "technical",
+    name: "Schema 标记实施",
+    description: "添加结构化数据标记，帮助 AI 理解页面内容",
     features: [
-      "每周扫描 1 次",
-      "追踪 50 个提示词",
-      "邮件报告",
-      "基础趋势图表",
+      "Organization Schema",
+      "Article/Product Schema",
+      "FAQ Schema",
+      "BreadcrumbList Schema",
+      "验证和测试",
     ],
-    price: 199,
-    unit: "月",
-  },
-  {
-    id: "monitor-pro",
-    type: "monitoring",
-    name: "专业监控",
-    description: "每日追踪，含竞品监控",
-    features: [
-      "每日扫描",
-      "追踪 200 个提示词",
-      "3 个竞争对手追踪",
-      "实时告警",
-      "详细仪表盘",
+    deliverables: [
+      "完整 Schema 代码",
+      "实施指南文档",
+      "验证测试报告",
     ],
-    price: 599,
-    unit: "月",
+    price: 499,
+    unit: "站",
+    turnaround: "3 个工作日",
     popular: true,
   },
   {
-    id: "monitor-enterprise",
-    type: "monitoring",
-    name: "企业监控",
-    description: "企业级 AI 可见性监控方案",
+    id: "llms-txt",
+    category: "technical",
+    name: "llms.txt 配置",
+    description: "创建和配置 llms.txt 文件，指导 AI 爬虫抓取",
     features: [
-      "实时扫描",
-      "无限提示词追踪",
-      "无限竞争对手",
-      "API 数据接入",
-      "定制仪表盘",
-      "专属支持",
+      "llms.txt 文件生成",
+      "内容优先级设置",
+      "AI 爬虫访问优化",
+      "robots.txt 协调",
+    ],
+    deliverables: [
+      "llms.txt 文件",
+      "配置说明文档",
+      "部署指南",
+    ],
+    price: 199,
+    unit: "站",
+    turnaround: "1 个工作日",
+  },
+  {
+    id: "site-audit-fix",
+    category: "technical",
+    name: "技术问题修复",
+    description: "修复影响 AI 可见性的技术问题",
+    features: [
+      "爬虫可访问性检查",
+      "页面加载速度优化",
+      "移动端适配检查",
+      "内链结构优化",
+    ],
+    deliverables: [
+      "问题修复报告",
+      "优化后的技术配置",
+      "性能对比数据",
+    ],
+    price: 799,
+    unit: "站",
+    turnaround: "5 个工作日",
+  },
+
+  // 权威建设
+  {
+    id: "entity-consistency",
+    category: "authority",
+    name: "实体一致性优化",
+    description: "确保品牌名称和关键实体在全网保持一致",
+    features: [
+      "品牌名称一致性检查",
+      "产品名称规范化",
+      "跨平台实体统一",
+      "Wikipedia/知识图谱对齐",
+    ],
+    deliverables: [
+      "实体一致性报告",
+      "修改建议清单",
+      "执行检查表",
+    ],
+    price: 599,
+    unit: "次",
+    turnaround: "3 个工作日",
+  },
+  {
+    id: "citation-building",
+    category: "authority",
+    name: "引用来源建设",
+    description: "在 AI 信任的第三方平台建立品牌存在",
+    features: [
+      "权威平台分析",
+      "内容投放策略",
+      "评测和提及获取",
+      "行业目录优化",
+    ],
+    deliverables: [
+      "平台策略文档",
+      "内容投放计划",
+      "执行进度追踪",
     ],
     price: 1999,
     unit: "月",
+    turnaround: "持续执行",
+    popular: true,
+  },
+  {
+    id: "about-page",
+    category: "authority",
+    name: "关于页面优化",
+    description: "优化品牌关于页面，增强 AI 对品牌的信任度",
+    features: [
+      "品牌故事重构",
+      "团队信息展示",
+      "资质和奖项突出",
+      "联系方式完善",
+    ],
+    deliverables: [
+      "优化后的关于页面",
+      "品牌叙事文档",
+      "Schema 标记代码",
+    ],
+    price: 399,
+    unit: "页",
+    turnaround: "3 个工作日",
   },
 ];
 
 // 订阅套餐
-export const geoPackages: GeoPackage[] = [
+export const subscriptionPlans: SubscriptionPlan[] = [
   {
     id: "starter",
     name: "入门版",
-    description: "适合个人品牌和小型网站",
-    price: 299,
+    description: "适合刚开始关注 AI 可见性的品牌",
+    price: 499,
     period: "月",
     features: [
-      "每月 1 次 AI 可见性诊断",
+      "2 个 AI 平台监控",
       "追踪 50 个提示词",
-      "2 篇内容优化",
-      "基础报告",
+      "每月 2 篇内容优化",
+      "双周报告",
+      "邮件支持",
     ],
     limits: {
-      auditsPerMonth: 1,
+      aiPlatforms: 2,
       promptsTracked: 50,
       contentOptimizations: 2,
       competitorTracking: 0,
+      reportFrequency: "双周",
     },
   },
   {
     id: "growth",
     name: "成长版",
-    description: "适合成长期企业和电商网站",
-    price: 799,
+    description: "适合积极提升 AI 曝光的成长期企业",
+    price: 1299,
     period: "月",
     features: [
-      "每月 2 次 AI 可见性诊断",
+      "4 个 AI 平台监控",
       "追踪 200 个提示词",
-      "5 篇内容优化",
+      "每月 5 篇内容优化",
       "3 个竞争对手追踪",
-      "每周报告",
+      "每周报告 + 策略建议",
+      "优先支持",
     ],
     limits: {
-      auditsPerMonth: 2,
+      aiPlatforms: 4,
       promptsTracked: 200,
       contentOptimizations: 5,
       competitorTracking: 3,
+      reportFrequency: "每周",
     },
     popular: true,
   },
   {
     id: "professional",
     name: "专业版",
-    description: "适合中型企业和品牌商",
-    price: 1999,
+    description: "适合需要全面 AI 可见性管理的中型企业",
+    price: 2999,
     period: "月",
     features: [
-      "每月 5 次 AI 可见性诊断",
+      "全部 AI 平台监控",
       "追踪 500 个提示词",
-      "15 篇内容优化",
+      "每月 15 篇内容优化",
       "10 个竞争对手追踪",
-      "每日报告",
-      "API 接入",
+      "每日报告 + 实时告警",
+      "月度策略会议",
+      "API 数据接入",
     ],
     limits: {
-      auditsPerMonth: 5,
+      aiPlatforms: 6,
       promptsTracked: 500,
       contentOptimizations: 15,
       competitorTracking: 10,
+      reportFrequency: "每日",
     },
   },
   {
     id: "enterprise",
     name: "企业版",
-    description: "适合大型企业和集团品牌",
-    price: 4999,
+    description: "适合大型企业的定制化 GEO 解决方案",
+    price: 0, // 定制报价
     period: "月",
     features: [
-      "无限 AI 可见性诊断",
+      "无限 AI 平台监控",
       "无限提示词追踪",
       "无限内容优化",
       "无限竞争对手追踪",
-      "实时监控告警",
-      "专属客户经理",
+      "实时监控仪表盘",
+      "专属客户成功经理",
       "定制开发支持",
+      "SLA 保障",
     ],
     limits: {
-      auditsPerMonth: -1, // 无限
+      aiPlatforms: -1,
       promptsTracked: -1,
       contentOptimizations: -1,
       competitorTracking: -1,
+      reportFrequency: "实时",
     },
   },
 ];
