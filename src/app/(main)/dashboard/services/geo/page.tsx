@@ -130,10 +130,18 @@ export default function GeoOptimizationPage() {
   // 计算有效页面数量
   const validPageCount = pageUrls.filter(u => u.trim()).length;
 
+  // 计算选中的英文和中文平台数量
+  const enPlatformCount = selectedPlatforms.filter(p => 
+    aiPlatforms.find(ap => ap.id === p)?.category === "en"
+  ).length;
+  const zhPlatformCount = selectedPlatforms.filter(p => 
+    aiPlatforms.find(ap => ap.id === p)?.category === "zh"
+  ).length;
+
   // 计算价格
   const totalPrice = useMemo(() => {
     if (serviceType === "keyword") {
-      return calculateKeywordPrice(Math.max(1, validKeywordCount), Math.max(1, selectedPlatforms.length));
+      return calculateKeywordPrice(Math.max(1, validKeywordCount), enPlatformCount, zhPlatformCount);
     } else if (serviceType === "page") {
       return calculatePagePrice(Math.max(1, validPageCount));
     } else if (serviceType === "authority") {
@@ -141,7 +149,7 @@ export default function GeoOptimizationPage() {
       return service?.price || 0;
     }
     return 0;
-  }, [serviceType, validKeywordCount, validPageCount, selectedAuthorityService, selectedPlatforms]);
+  }, [serviceType, validKeywordCount, validPageCount, selectedAuthorityService, enPlatformCount, zhPlatformCount]);
 
   // 获取当前选中的权威服务
   const currentAuthorityService = authorityServices.find(s => s.id === selectedAuthorityService);
@@ -398,7 +406,7 @@ export default function GeoOptimizationPage() {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-base flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
-                    填写网站信息
+                    填写网站���息
                   </CardTitle>
                   <CardDescription>告诉我们你的网站和需要优化的页面</CardDescription>
                 </CardHeader>
@@ -568,7 +576,7 @@ export default function GeoOptimizationPage() {
               <CardHeader className="pb-4">
                 <CardTitle className="text-base">关键词优化</CardTitle>
                 <CardDescription>
-                  ¥{keywordPricing.pricePerKeyword}/词/平台
+                  英文平台 ${keywordPricing.en.pricePerKeyword}/词 · 中文平台 ${keywordPricing.zh.pricePerKeyword}/词
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -590,17 +598,21 @@ export default function GeoOptimizationPage() {
                     <span className="text-muted-foreground">关键词数量</span>
                     <span>{validKeywordCount || 0} 个</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">目标平台</span>
-                    <span>{selectedPlatforms.length || 0} 个</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">单价</span>
-                    <span>¥{keywordPricing.pricePerKeyword}/词/平台</span>
-                  </div>
+                  {enPlatformCount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">英文平台</span>
+                      <span>{enPlatformCount} 个 × ${keywordPricing.en.pricePerKeyword}</span>
+                    </div>
+                  )}
+                  {zhPlatformCount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">中文平台</span>
+                      <span>{zhPlatformCount} 个 × ${keywordPricing.zh.pricePerKeyword}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">交付周期</span>
-                    <span>{keywordPricing.turnaround}</span>
+                    <span>{enPlatformCount > 0 ? keywordPricing.en.turnaround : keywordPricing.zh.turnaround}</span>
                   </div>
                 </div>
 
@@ -609,12 +621,12 @@ export default function GeoOptimizationPage() {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">总计</span>
                     <span className="text-2xl font-bold text-primary">
-                      ¥{totalPrice.toLocaleString()}
+                      ${totalPrice.toLocaleString()}
                     </span>
                   </div>
                   {validKeywordCount > 0 && selectedPlatforms.length > 0 && (
                     <p className="text-xs text-muted-foreground mt-1 text-right">
-                      {validKeywordCount} 词 × {selectedPlatforms.length} 平台 × ¥{keywordPricing.pricePerKeyword}
+                      {validKeywordCount} 词 × ({enPlatformCount > 0 ? `${enPlatformCount} 英文` : ''}{enPlatformCount > 0 && zhPlatformCount > 0 ? ' + ' : ''}{zhPlatformCount > 0 ? `${zhPlatformCount} 中文` : ''})
                     </p>
                   )}
                 </div>
@@ -644,7 +656,7 @@ export default function GeoOptimizationPage() {
               <CardHeader className="pb-4">
                 <CardTitle className="text-base">页面优化</CardTitle>
                 <CardDescription>
-                  ¥{pagePricing.pricePerPage}/页
+                  ${pagePricing.pricePerPage}/页
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -668,7 +680,7 @@ export default function GeoOptimizationPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">单价</span>
-                    <span>¥{pagePricing.pricePerPage}/页</span>
+                    <span>${pagePricing.pricePerPage}/页</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">交付周期</span>
@@ -681,12 +693,12 @@ export default function GeoOptimizationPage() {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">总计</span>
                     <span className="text-2xl font-bold text-primary">
-                      ¥{totalPrice.toLocaleString()}
+                      ${totalPrice.toLocaleString()}
                     </span>
                   </div>
                   {validPageCount > 0 && (
                     <p className="text-xs text-muted-foreground mt-1 text-right">
-                      {validPageCount} 页 × ¥{pagePricing.pricePerPage}
+                      {validPageCount} 页 × ${pagePricing.pricePerPage}
                     </p>
                   )}
                 </div>
@@ -749,7 +761,7 @@ export default function GeoOptimizationPage() {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">总计</span>
                     <span className="text-2xl font-bold text-primary">
-                      ¥{currentAuthorityService.price.toLocaleString()}
+                      ${currentAuthorityService.price.toLocaleString()}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 text-right">
