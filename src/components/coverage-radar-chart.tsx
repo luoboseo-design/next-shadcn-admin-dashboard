@@ -20,7 +20,7 @@ interface CoverageRadarChartProps {
 export function CoverageRadarChart({ data }: CoverageRadarChartProps) {
   // 转换数据格式为 ant-design/plots 需要的格式
   const chartData = data.flatMap((item) => [
-    { item: item.dimension, type: "优化前", score: Math.max(item.value - 35, 15) },
+    { item: item.dimension, type: "优化前", score: Math.max(item.value - 40, 10) },
     { item: item.dimension, type: "优化后", score: item.value },
   ]);
 
@@ -32,7 +32,7 @@ export function CoverageRadarChart({ data }: CoverageRadarChartProps) {
     shapeField: "smooth",
     area: {
       style: {
-        fillOpacity: 0.4,
+        fillOpacity: 0.5,
       },
     },
     scale: {
@@ -46,7 +46,9 @@ export function CoverageRadarChart({ data }: CoverageRadarChartProps) {
         tick: false,
         gridLineDash: [0, 0],
         line: false,
-        labelFontSize: 11,
+        labelFontSize: 12,
+        labelFontWeight: 500,
+        labelFill: "#374151",
       },
       y: {
         zIndex: 1,
@@ -54,25 +56,34 @@ export function CoverageRadarChart({ data }: CoverageRadarChartProps) {
         gridConnect: "line",
         gridLineWidth: 1,
         gridLineDash: [0, 0],
+        gridStroke: "#e5e7eb",
         label: false,
       },
     },
     style: {
-      lineWidth: 2,
+      lineWidth: 2.5,
     },
     point: {
       shapeField: "point",
-      sizeField: 3,
+      sizeField: 4,
     },
-    color: ["#d1d5db", "#2563eb"],
+    color: ["#cbd5e1", "#10b981"],
     legend: {
-      position: "bottom",
+      position: "top-left",
       itemName: {
         style: {
-          fontSize: 11,
+          fontSize: 12,
+          fontWeight: 500,
         },
       },
+      marker: {
+        style: {
+          r: 6,
+        },
+      },
+      itemSpacing: 16,
     },
+    animate: { enter: { type: "fadeIn" } },
   };
 
   return <Radar {...config} />;

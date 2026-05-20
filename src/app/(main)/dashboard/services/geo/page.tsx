@@ -465,7 +465,7 @@ export default function GeoOptimizationPage() {
                       </div>
 
                       {/* 右侧：雷达图 */}
-                      <div className="h-[220px]">
+                      <div className="h-[280px] min-w-[280px]">
                         <CoverageRadarChart data={generateRadarData(keywords.filter(k => k.trim()))} />
                       </div>
                     </div>
