@@ -582,6 +582,22 @@ export default function GeoOptimizationPage() {
                     </p>
                   )}
                 </div>
+
+                {/* 服务保障 */}
+                <div className="space-y-2 text-sm pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>效果不达标可退款</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>专业团队人工执行</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>排名效果可追踪</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -638,6 +654,22 @@ export default function GeoOptimizationPage() {
                     </p>
                   )}
                 </div>
+
+                {/* 服务保障 */}
+                <div className="space-y-2 text-sm pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>效果不达标可退款</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>专业团队人工执行</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>排名效果可追踪</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -688,29 +720,25 @@ export default function GeoOptimizationPage() {
                     /{currentAuthorityService.unit}
                   </p>
                 </div>
+
+                {/* 服务保障 */}
+                <div className="space-y-2 text-sm pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>效果不达标可退款</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>专业团队人工执行</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>排名效果可追踪</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
-
-          {/* 服务保障 */}
-          <Card>
-            <CardContent className="pt-4">
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>效果不达标可退款</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>专业团队人工执行</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>排名效果可追踪</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* 创建任务按钮 */}
           <Button
