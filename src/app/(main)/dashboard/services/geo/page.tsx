@@ -43,14 +43,6 @@ import {
   type AiPlatform,
 } from "@/data/geo-service";
 import { cn } from "@/lib/utils";
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
-} from "recharts";
 
 const serviceTypeIcons: Record<ServiceType, React.ReactNode> = {
   keyword: <Search className="h-5 w-5" />,
@@ -471,34 +463,22 @@ export default function GeoOptimizationPage() {
                         ))}
                       </div>
 
-                      {/* 右侧：雷达图 - 覆盖可能性分析 */}
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="w-full h-[200px]">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart data={generateRadarData(keywords.filter(k => k.trim()))}>
-                              <PolarGrid stroke="hsl(var(--border))" />
-                              <PolarAngleAxis 
-                                dataKey="dimension" 
-                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                      {/* 右侧：覆盖分析指标 */}
+                      <div className="space-y-3">
+                        {generateRadarData(keywords.filter(k => k.trim())).map((item, index) => (
+                          <div key={index} className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">{item.dimension}</span>
+                              <span className="font-medium">{Math.round(item.value)}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary rounded-full transition-all duration-500"
+                                style={{ width: `${item.value}%` }}
                               />
-                              <PolarRadiusAxis 
-                                angle={30} 
-                                domain={[0, 100]} 
-                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
-                              />
-                              <Radar
-                                name="覆盖可能性"
-                                dataKey="value"
-                                stroke="hsl(var(--primary))"
-                                fill="hsl(var(--primary))"
-                                fillOpacity={0.3}
-                              />
-                            </RadarChart>
-                          </ResponsiveContainer>
-                        </div>
-                        <p className="text-xs text-muted-foreground text-center mt-2">
-                          关键词覆盖维度分析
-                        </p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -693,7 +673,7 @@ export default function GeoOptimizationPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* 特性标签 */}
+                {/* 特性��签 */}
                 <div className="flex flex-wrap gap-2">
                   {keywordPricing.features.map((feature, idx) => (
                     <span
