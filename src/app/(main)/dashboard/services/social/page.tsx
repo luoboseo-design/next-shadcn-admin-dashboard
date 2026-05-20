@@ -25,6 +25,8 @@ import {
   Loader2,
   Plus,
   Minus,
+  Sparkles,
+  Upload,
 } from "lucide-react";
 import {
   socialServices,
@@ -56,6 +58,7 @@ export default function SocialMediaServicePage() {
   const router = useRouter();
   const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform>("reddit");
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType>("post");
+  const [contentMode, setContentMode] = useState<"ai" | "custom">("ai");
   const [selectedService, setSelectedService] = useState<SocialService | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const [targetUrl, setTargetUrl] = useState("");
@@ -193,6 +196,71 @@ export default function SocialMediaServicePage() {
             </CardContent>
           </Card>
 
+          {/* 内容创作模式 - 仅发帖时显示 */}
+          {selectedServiceType === "post" && (
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">内容创作模式</CardTitle>
+                <CardDescription>选择帖子内容的创作方式</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setContentMode("ai")}
+                    className={cn(
+                      "relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all text-left",
+                      contentMode === "ai"
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-muted-foreground/30"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center",
+                        contentMode === "ai" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      )}>
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">AI 智能生成</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      提供主题和关键词，AI 自动生成高质量的帖子内容
+                    </p>
+                    {contentMode === "ai" && (
+                      <Check className="absolute top-3 right-3 h-4 w-4 text-primary" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setContentMode("custom")}
+                    className={cn(
+                      "relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all text-left",
+                      contentMode === "custom"
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-muted-foreground/30"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center",
+                        contentMode === "custom" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      )}>
+                        <Upload className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium">自行提供内容</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      您提供已写好的内容，我们负责审核并发布到目标平台
+                    </p>
+                    {contentMode === "custom" && (
+                      <Check className="absolute top-3 right-3 h-4 w-4 text-primary" />
+                    )}
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* 任务详情表单 */}
           <Card>
             <CardHeader className="pb-4">
@@ -200,33 +268,90 @@ export default function SocialMediaServicePage() {
               <CardDescription>填写您的任务需求</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>目标链接</Label>
-                <Input
-                  placeholder={
-                    selectedServiceType === "follower"
-                      ? "输入您的账号主页链接..."
-                      : "输入目标帖子/推文链接..."
-                  }
-                  value={targetUrl}
-                  onChange={(e) => setTargetUrl(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {selectedServiceType === "post"
-                    ? "可选：如果是代发帖子，此项可留空"
-                    : "请提供需要操作的链接地址"}
-                </p>
-              </div>
+              {/* 发帖服务 - AI模式显示主题和关键词 */}
+              {selectedServiceType === "post" && contentMode === "ai" && (
+                <>
+                  <div className="space-y-2">
+                    <Label>主题/话题 <span className="text-destructive">*</span></Label>
+                    <Input
+                      placeholder="如：科技产品评测、健身技巧分享..."
+                      value={targetUrl}
+                      onChange={(e) => setTargetUrl(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>关键词（可选）</Label>
+                    <Input
+                      placeholder="多个关键词用逗号分隔..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>内容方向说明（可选）</Label>
+                    <Textarea
+                      placeholder="描述您希望的内容风格、目标受众、核心观点等..."
+                      value={requirements}
+                      onChange={(e) => setRequirements(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                </>
+              )}
 
-              <div className="space-y-2">
-                <Label>特殊要求（可选）</Label>
-                <Textarea
-                  placeholder="描述您的特殊需求，如内容方向、目标受众、发布时间等..."
-                  value={requirements}
-                  onChange={(e) => setRequirements(e.target.value)}
-                  rows={4}
-                />
-              </div>
+              {/* 发帖服务 - 自定义模式显示内容输入 */}
+              {selectedServiceType === "post" && contentMode === "custom" && (
+                <>
+                  <div className="space-y-2">
+                    <Label>帖子内容 <span className="text-destructive">*</span></Label>
+                    <Textarea
+                      placeholder="输入您要发布的帖子内容..."
+                      value={requirements}
+                      onChange={(e) => setRequirements(e.target.value)}
+                      rows={6}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      请确保内容符合平台规范，我们会进行审核后发布
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>目标 Subreddit / 话题（可选）</Label>
+                    <Input
+                      placeholder="如：r/technology、#科技..."
+                      value={targetUrl}
+                      onChange={(e) => setTargetUrl(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* 非发帖服务 - 显示目标链接 */}
+              {selectedServiceType !== "post" && (
+                <>
+                  <div className="space-y-2">
+                    <Label>
+                      {selectedServiceType === "follower" ? "账号主页链接" : "目标链接"} 
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      placeholder={
+                        selectedServiceType === "follower"
+                          ? "输入您的账号主页链接..."
+                          : "输入目标帖子/推文链接..."
+                      }
+                      value={targetUrl}
+                      onChange={(e) => setTargetUrl(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>特殊要求（可选）</Label>
+                    <Textarea
+                      placeholder="描述您的特殊需求..."
+                      value={requirements}
+                      onChange={(e) => setRequirements(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
