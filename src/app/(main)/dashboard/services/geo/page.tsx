@@ -19,15 +19,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CoverageRadarChart } from "@/components/coverage-radar-chart";
 import {
   Globe,
-  Search,
   FileText,
-  Award,
-  Check,
-  ArrowRight,
-  Loader2,
-  Sparkles,
+  Shield,
+  Search,
   Plus,
   X,
+  Check,
+  Loader2,
+  ArrowRight,
+  Sparkles,
+  MessageSquare,
   ChevronRight,
 } from "lucide-react";
 import {
@@ -452,16 +453,65 @@ export default function GeoOptimizationPage() {
                 </CardContent>
               </Card>
 
-              {/* 可能覆盖的范围 - 根据关键词显示相关问题 */}
+              {/* 长尾关键词覆盖 */}
               {validKeywordCount > 0 && (
                 <Card className="border-dashed">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-primary" />
-                      可能覆盖的范围
+                      长尾关键词覆盖
                     </CardTitle>
                     <CardDescription>
-                      基于你的关键词，AI 平台用户可能会搜索以下相关问题，勾选你想要覆盖的问题
+                      基于你的关键词，以下是可能被覆盖的长尾搜索词
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* 左侧：长尾关键词标签 */}
+                      <div className="space-y-4">
+                        {keywords.filter(k => k.trim()).map((keyword, keywordIndex) => (
+                          <div key={keywordIndex} className="space-y-2">
+                            <div className="text-sm font-medium text-foreground">{keyword}</div>
+                            <div className="flex flex-wrap gap-2">
+                              {[
+                                `${keyword}哪个好`,
+                                `${keyword}推荐`,
+                                `最好的${keyword}`,
+                                `${keyword}排行榜`,
+                                `${keyword}怎么选`,
+                                `${keyword}对比`,
+                              ].map((tag, tagIndex) => (
+                                <span
+                                  key={tagIndex}
+                                  className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* 右侧：雷达图 */}
+                      <div className="h-[260px] flex items-center justify-center">
+                        <CoverageRadarChart data={generateRadarData(keywords.filter(k => k.trim()))} />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* 常见问答覆盖 */}
+              {validKeywordCount > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                      常见问答覆盖
+                    </CardTitle>
+                    <CardDescription>
+                      选择你想要覆盖的用户常见问题，优化后你的品牌将更有可能出现在这些问题的回答中
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -500,7 +550,7 @@ export default function GeoOptimizationPage() {
                             已选 {selectedQueries.length} 个
                           </span>
                         </div>
-                        <div className="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+                        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-2">
                           {keywords.filter(k => k.trim()).flatMap((keyword) => 
                             generateRelatedQueries(keyword).map((query, queryIndex) => (
                               <label
@@ -522,19 +572,6 @@ export default function GeoOptimizationPage() {
                             ))
                           )}
                         </div>
-                      </div>
-                    </div>
-
-                    {/* 底部：雷达图 */}
-                    <div className="mt-6 pt-6 border-t">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="text-sm font-medium">覆盖效果预估</div>
-                        <div className="text-xs text-muted-foreground">
-                          优化后，当用户搜索以上问题时，你的品牌将更有可能被推荐
-                        </div>
-                      </div>
-                      <div className="h-[260px] max-w-[400px] mx-auto">
-                        <CoverageRadarChart data={generateRadarData(keywords.filter(k => k.trim()))} />
                       </div>
                     </div>
                   </CardContent>
