@@ -66,8 +66,7 @@ export interface Platform {
 export type TaskStatus =
   | "pending" // 待处理
   | "running" // 运行中
-  | "completed" // 已完成
-  | "accepted"; // 已验收
+  | "completed"; // 已完成
 
 export type PublishResultStatus = "success" | "pending" | "failed";
 
@@ -120,7 +119,6 @@ export interface BacklinkTask {
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
-  acceptedAt?: Date;
 }
 
 export interface TaskPricing {

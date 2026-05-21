@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getTaskById, taskStatusLabels, taskStatusColors } from "@/data/mock-tasks";
 import { PublishResultsTable } from "../_components/publish-results-table";
-import { AcceptanceDialog } from "../_components/acceptance-dialog";
 import { cn } from "@/lib/utils";
 
 export default function TaskDetailPage() {
@@ -81,7 +80,6 @@ export default function TaskDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {task.status === "completed" && <AcceptanceDialog task={task} />}
           <Button asChild>
             <Link href="/dashboard/services/seo">
               <Plus className="h-4 w-4 mr-2" />
@@ -178,13 +176,6 @@ export default function TaskDetailPage() {
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
                 <span className="text-muted-foreground">完成:</span>
                 <span>{new Date(task.completedAt).toLocaleDateString("zh-CN")}</span>
-              </div>
-            )}
-            {task.acceptedAt && (
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground">验收:</span>
-                <span>{new Date(task.acceptedAt).toLocaleDateString("zh-CN")}</span>
               </div>
             )}
           </div>
