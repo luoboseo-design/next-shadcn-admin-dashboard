@@ -128,18 +128,6 @@ export interface GuestPostPackage {
 
 export const guestPostPackages: GuestPostPackage[] = [
   {
-    id: "starter",
-    name: "入门版",
-    description: "适合初次尝试客座文章",
-    articleCount: 1,
-    features: [
-      "1 篇客座文章",
-      "基础平台选择",
-      "7 天交付",
-      "1 个反向链接",
-    ],
-  },
-  {
     id: "growth",
     name: "成长版",
     description: "适合持续内容营销",

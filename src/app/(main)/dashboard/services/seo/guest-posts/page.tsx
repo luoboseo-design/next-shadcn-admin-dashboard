@@ -94,7 +94,7 @@ export default function GuestPostsServicePage() {
                 <CardHeader>
                   <CardTitle>选择套餐</CardTitle>
                   <CardDescription>
-                    {drTierLabels[selectedDRTier]} · ${drTierDetails[selectedDRTier].pricePerArticle}/篇
+                    {drTierLabels[selectedDRTier]}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

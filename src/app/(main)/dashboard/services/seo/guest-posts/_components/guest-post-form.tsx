@@ -80,8 +80,7 @@ export function GuestPostForm({ selectedPackageId, onDRTierChange }: GuestPostFo
               >
                 <RadioGroupItem value={tier} className="sr-only" />
                 <span className="font-bold text-lg">{info.label}</span>
-                <span className="text-xl font-bold text-primary mt-1">${info.pricePerArticle}</span>
-                <span className="text-xs text-muted-foreground">/篇</span>
+                <span className="text-xs text-muted-foreground mt-1">{info.deliveryDays}</span>
                 {isSelected && (
                   <Check className="absolute right-3 top-3 h-4 w-4 text-primary" />
                 )}
