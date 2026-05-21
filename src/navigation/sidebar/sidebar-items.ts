@@ -126,6 +126,12 @@ export const sidebarItems: NavGroup[] = [
         isNew: true,
       },
       {
+        title: "发稿任务",
+        url: "/dashboard/news-monitor",
+        icon: Newspaper,
+        isNew: true,
+      },
+      {
         title: "数据概览",
         url: "/dashboard/default",
         icon: LayoutDashboard,
