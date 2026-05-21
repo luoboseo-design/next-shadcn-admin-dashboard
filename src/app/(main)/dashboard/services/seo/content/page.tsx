@@ -229,93 +229,99 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
       <div className="flex">
         {/* 左侧编辑区 */}
         <div className="flex-1 p-6 border-r min-h-[calc(100vh-57px)]">
-          {/* 品牌名称和关键词 - 放在最上面 */}
-          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm text-muted-foreground mb-2 block">品牌名称</Label>
-              <Input
-                placeholder="输入品牌名称"
-                value={brandName}
-                onChange={(e) => setBrandName(e.target.value)}
-                className="h-9"
-              />
-            </div>
-            <div>
-              <Label className="text-sm text-muted-foreground mb-2 block">目标关键词</Label>
-              <div className="flex flex-wrap items-center gap-2">
-                {keywords.map((kw) => (
-                  <Badge key={kw} variant="secondary" className="gap-1 pr-1">
-                    {kw}
-                    <button
-                      onClick={() => removeKeyword(kw)}
-                      className="ml-1 hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-                <div className="flex items-center gap-1">
-                  <Input
-                    placeholder="添加关键词"
-                    value={newKeyword}
-                    onChange={(e) => setNewKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addKeyword()}
-                    className="h-7 w-28 text-sm"
-                  />
-                  <Button variant="ghost" size="sm" className="h-7 px-2" onClick={addKeyword}>
-                    <Plus className="h-4 w-4" />
-                  </Button>
+          {/* 品牌名称、关键词和AI生成按钮 */}
+          <div className="mb-8 p-5 bg-muted/30 rounded-xl border">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">品牌名称</Label>
+                <Input
+                  placeholder="例如：LinkFlow"
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
+                  className="h-10 bg-background"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label className="text-sm font-medium mb-2 block">目标关键词</Label>
+                <div className="flex flex-wrap items-center gap-2 min-h-10">
+                  {keywords.map((kw) => (
+                    <Badge key={kw} variant="secondary" className="gap-1 pr-1 h-7">
+                      {kw}
+                      <button
+                        onClick={() => removeKeyword(kw)}
+                        className="ml-1 hover:bg-muted rounded-full p-0.5"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                  <div className="flex items-center gap-1">
+                    <Input
+                      placeholder="输入关键词"
+                      value={newKeyword}
+                      onChange={(e) => setNewKeyword(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && addKeyword()}
+                      className="h-7 w-32 text-sm bg-background"
+                    />
+                    <Button variant="ghost" size="sm" className="h-7 px-2" onClick={addKeyword}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* AI 生成按钮 */}
-          <div className="mb-6">
-            <Button 
-              onClick={handleGenerateContent} 
-              disabled={keywords.length === 0 || isGenerating}
-              className="w-full"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  AI 正在生成...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="h-4 w-4 mr-2" />
-                  AI 生成内容
-                </>
-              )}
-            </Button>
-            {keywords.length === 0 && (
-              <p className="text-xs text-muted-foreground mt-2 text-center">请先添加关键词</p>
-            )}
+            <div className="mt-4 pt-4 border-t flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {keywords.length === 0 
+                  ? "添加关键词后，AI 将自动生成优化内容" 
+                  : `已添加 ${keywords.length} 个关键词`}
+              </p>
+              <Button 
+                onClick={handleGenerateContent} 
+                disabled={keywords.length === 0 || isGenerating}
+                size="sm"
+                className="gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    生成中...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-4 w-4" />
+                    AI 智能生成
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* 标题输入 - 带下拉建议 */}
-          <div className="mb-6 relative">
-            <Label className="text-sm text-muted-foreground mb-2 block">文章标题</Label>
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-sm font-medium">文章标题</Label>
+              <span className="text-xs text-muted-foreground">{title.length}/60 字符</span>
+            </div>
             <div className="relative">
               <Input
-                placeholder={isGenerating ? "AI 正在生成标题..." : "输入文章标题..."}
+                placeholder={isGenerating ? "AI 正在生成标题..." : "输入文章标题，或由 AI 自动生成"}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-xl font-bold pr-10"
+                className="text-lg font-semibold h-12 pr-10"
                 disabled={isGenerating}
               />
               {suggestedTitles.length > 0 && (
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   <DropdownMenu open={showTitleDropdown} onOpenChange={setShowTitleDropdown}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground">
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[500px]">
                       <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium">
-                        AI 建议标题
+                        AI 建议标题（点击选择）
                       </div>
                       {suggestedTitles.map((suggestedTitle, index) => (
                         <DropdownMenuItem
@@ -342,24 +348,27 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-              <span>{title.length}/60 字符</span>
-              {title.length > 0 && title.length <= 60 && (
-                <span className="text-green-500 flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" /> 长度合适
-                </span>
-              )}
-            </div>
+            {title.length > 0 && title.length <= 60 && (
+              <p className="text-xs text-green-500 mt-1 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" /> 标题长度适合 SEO
+              </p>
+            )}
           </div>
 
           {/* 内容编辑区 */}
-          <Textarea
-            placeholder={isGenerating ? "AI 正在生成内容..." : "内容将由 AI 自动生成，您也可以手动编辑..."}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-[400px] resize-none text-base leading-relaxed"
-            disabled={isGenerating}
-          />
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-sm font-medium">文章内容</Label>
+              <span className="text-xs text-muted-foreground">支持 Markdown 格式</span>
+            </div>
+            <Textarea
+              placeholder={isGenerating ? "AI 正在生成内容..." : "内容将由 AI 自动生成，您也可以手动编辑..."}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="min-h-[400px] resize-none text-base leading-relaxed"
+              disabled={isGenerating}
+            />
+          </div>
 
           {/* 底部统计 */}
           <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
