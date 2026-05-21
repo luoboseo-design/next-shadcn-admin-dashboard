@@ -218,7 +218,6 @@ export default function ContentEditorPage() {
               </div>
             </div>
           </div>
-          </div>
 
           {/* AI 工具栏 */}
           <div className="flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
