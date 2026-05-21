@@ -230,8 +230,8 @@ export default function SEOMonitorPage() {
   const guestPostStats = {
     total: guestPostOrders.length,
     published: guestPostOrders.filter((o) => o.status === "published").length,
-    inProgress: guestPostOrders.filter((o) => ["writing", "review"].includes(o.status)).length,
-    totalViews: guestPostOrders.reduce((acc, o) => acc + o.views, 0),
+    pending: guestPostOrders.filter((o) => o.status !== "published").length,
+    totalPlatforms: guestPostOrders.reduce((acc, o) => acc + o.mediaCount, 0),
   };
 
   return (
@@ -455,22 +455,16 @@ export default function SEOMonitorPage() {
               <div className="mt-1 text-2xl font-semibold">{guestPostStats.total}</div>
             </div>
             <div className="rounded-lg border bg-card p-4">
-              <div className="text-sm text-muted-foreground">撰写/审核中</div>
-              <div className="mt-1 text-2xl font-semibold text-amber-500">{guestPostStats.inProgress}</div>
+              <div className="text-sm text-muted-foreground">总平台数</div>
+              <div className="mt-1 text-2xl font-semibold">{guestPostStats.totalPlatforms}</div>
+            </div>
+            <div className="rounded-lg border bg-card p-4">
+              <div className="text-sm text-muted-foreground">待发布</div>
+              <div className="mt-1 text-2xl font-semibold text-amber-500">{guestPostStats.pending}</div>
             </div>
             <div className="rounded-lg border bg-card p-4">
               <div className="text-sm text-muted-foreground">已发布</div>
               <div className="mt-1 text-2xl font-semibold text-emerald-500">{guestPostStats.published}</div>
-            </div>
-            <div className="rounded-lg border bg-card p-4">
-              <div className="text-sm text-muted-foreground">总阅读量</div>
-              <div className="mt-1 flex items-center gap-2">
-                <span className="text-2xl font-semibold">{guestPostStats.totalViews.toLocaleString()}</span>
-                <span className="flex items-center text-xs text-emerald-500">
-                  <TrendingUp className="h-3 w-3 mr-0.5" />
-                  +28%
-                </span>
-              </div>
             </div>
           </div>
 
@@ -546,7 +540,9 @@ export default function SEOMonitorPage() {
                         <span>·</span>
                         <span className="text-primary/80 font-medium">{order.packageName}</span>
                         <span>·</span>
-                        <span>{order.completedCount}/{order.mediaCount} 已发布</span>
+                        <span>
+                          {order.completedCount}/{order.mediaCount} 已发布
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground sm:hidden">
                         <Badge variant="secondary" className={cn("text-xs h-5", status.color)}>
