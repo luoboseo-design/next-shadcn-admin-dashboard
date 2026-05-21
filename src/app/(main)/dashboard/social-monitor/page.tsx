@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   FileText,
+  MessageSquare,
+  Heart,
+  Users,
   CheckCircle2,
   Clock,
   ExternalLink,
-  Filter,
   Download,
-  Globe,
   ChevronDown,
   ChevronRight,
   Search,
   Calendar,
+  Link2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,114 +37,224 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-// 模拟任务数据 - 简化为客户报告所需字段
+// 服务类型
+const serviceTypes = [
+  { id: "post", label: "发帖", icon: FileText },
+  { id: "comment", label: "评论", icon: MessageSquare },
+  { id: "like", label: "点赞", icon: Heart },
+  { id: "follower", label: "粉丝增长", icon: Users },
+];
+
+// 平台（用于评论、点赞、粉丝增长）
+const platforms = [
+  { id: "reddit", label: "Reddit", color: "bg-orange-500" },
+  { id: "instagram", label: "Instagram", color: "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400" },
+  { id: "twitter", label: "X (Twitter)", color: "bg-black" },
+];
+
+// 发布平台（用于发帖服务）
+const publishPlatforms = [
+  "Reddit", "知乎", "Medium", "微博", "Twitter/X", 
+  "LinkedIn", "小红书", "百家号", "头条", "搜狐"
+];
+
+// 模拟任务数据
 const tasks = [
+  // 发帖任务
   {
-    id: "SOC-001",
-    name: "品牌软文推广计划",
+    id: "SM-001",
+    name: "品牌软文推广",
+    serviceType: "post",
+    platform: "reddit", // 下单时选择的平台
     websiteUrl: "https://example.com",
     keywords: ["AI工具", "效率提升"],
-    totalArticles: 10,
-    totalPlatforms: 8,
-    pending: 2,
-    published: 8,
     createdAt: "2024-01-15",
+    // 发帖特有字段
+    totalArticles: 5,
+    totalPlatforms: 5,
+    pending: 1,
+    published: 4,
     articles: [
       { id: 1, title: "AI工具如何提升工作效率", platform: "Reddit", status: "published", url: "https://reddit.com/r/tech/abc123" },
       { id: 2, title: "自动化工作流程分享", platform: "知乎", status: "published", url: "https://zhihu.com/p/123456" },
       { id: 3, title: "2024年必备效率工具", platform: "Medium", status: "published", url: "https://medium.com/@user/abc" },
-      { id: 4, title: "从繁琐到高效的转变", platform: "微博", status: "published", url: "https://weibo.com/123456" },
-      { id: 5, title: "AI自动化的真实体验", platform: "Twitter/X", status: "published", url: "https://x.com/user/status/123" },
-      { id: 6, title: "提高团队协作效率", platform: "LinkedIn", status: "published", url: "https://linkedin.com/posts/123" },
-      { id: 7, title: "数字化转型案例", platform: "小红书", status: "published", url: "https://xiaohongshu.com/abc" },
-      { id: 8, title: "智能办公新趋势", platform: "百家号", status: "published", url: "https://baijiahao.baidu.com/abc" },
-      { id: 9, title: "企业效率提升指南", platform: "头条", status: "pending", url: null },
-      { id: 10, title: "AI赋能企业发展", platform: "搜狐", status: "pending", url: null },
+      { id: 4, title: "从繁琐到高效的转变", platform: "小红书", status: "published", url: "https://xiaohongshu.com/note/abc" },
+      { id: 5, title: "AI自动化的真实体验", platform: "头条", status: "pending", url: null },
     ],
   },
   {
-    id: "SOC-002",
-    name: "新品上市宣传",
+    id: "SM-002",
+    name: "新品发布宣传",
+    serviceType: "post",
+    platform: "instagram",
     websiteUrl: "https://newproduct.com",
     keywords: ["新品发布", "科技创新"],
-    totalArticles: 5,
-    totalPlatforms: 5,
-    pending: 0,
-    published: 5,
     createdAt: "2024-01-18",
+    totalArticles: 3,
+    totalPlatforms: 3,
+    pending: 0,
+    published: 3,
     articles: [
-      { id: 1, title: "革命性新品震撼发布", platform: "Reddit", status: "published", url: "https://reddit.com/r/gadgets/xyz" },
-      { id: 2, title: "科技创新引领未来", platform: "知乎", status: "published", url: "https://zhihu.com/p/789" },
-      { id: 3, title: "新品深度评测", platform: "Medium", status: "published", url: "https://medium.com/@tech/review" },
-      { id: 4, title: "用户体验全面升级", platform: "微博", status: "published", url: "https://weibo.com/789" },
-      { id: 5, title: "行业专家解读", platform: "LinkedIn", status: "published", url: "https://linkedin.com/posts/456" },
+      { id: 1, title: "革命性新品震撼发布", platform: "微博", status: "published", url: "https://weibo.com/123456" },
+      { id: 2, title: "科技创新引领未来", platform: "百家号", status: "published", url: "https://baijiahao.baidu.com/abc" },
+      { id: 3, title: "新品深度评测", platform: "搜狐", status: "published", url: "https://sohu.com/a/123456" },
+    ],
+  },
+  // 评论任务
+  {
+    id: "SM-003",
+    name: "Reddit评论引流",
+    serviceType: "comment",
+    platform: "reddit",
+    websiteUrl: "https://myproduct.com",
+    keywords: ["推荐", "好用"],
+    createdAt: "2024-01-20",
+    totalComments: 50,
+    completed: 48,
+    pending: 2,
+    targetPosts: [
+      { id: 1, postUrl: "https://reddit.com/r/tech/post1", commentsPlaced: 10, status: "completed" },
+      { id: 2, postUrl: "https://reddit.com/r/gadgets/post2", commentsPlaced: 10, status: "completed" },
+      { id: 3, postUrl: "https://reddit.com/r/productivity/post3", commentsPlaced: 10, status: "completed" },
+      { id: 4, postUrl: "https://reddit.com/r/software/post4", commentsPlaced: 10, status: "completed" },
+      { id: 5, postUrl: "https://reddit.com/r/tools/post5", commentsPlaced: 8, status: "in_progress" },
     ],
   },
   {
-    id: "SOC-003",
-    name: "SEO外链建设",
-    websiteUrl: "https://mybusiness.com",
-    keywords: ["SEO优化", "外链建设"],
-    totalArticles: 20,
-    totalPlatforms: 15,
-    pending: 8,
-    published: 12,
-    createdAt: "2024-01-20",
-    articles: [
-      { id: 1, title: "SEO优化完整指南", platform: "Reddit", status: "published", url: "https://reddit.com/r/seo/guide" },
-      { id: 2, title: "外链建设策略", platform: "知乎", status: "published", url: "https://zhihu.com/p/seo" },
-      { id: 3, title: "搜索排名提升技巧", platform: "Medium", status: "published", url: "https://medium.com/@seo/tips" },
-      { id: 4, title: "内容营销与SEO", platform: "微博", status: "published", url: "https://weibo.com/seo" },
-      { id: 5, title: "关键词研究方法", platform: "LinkedIn", status: "published", url: "https://linkedin.com/posts/seo" },
-      { id: 6, title: "网站优化实战", platform: "小红书", status: "published", url: "https://xiaohongshu.com/seo" },
-      { id: 7, title: "技术SEO详解", platform: "百家号", status: "published", url: "https://baijiahao.baidu.com/seo" },
-      { id: 8, title: "移动端SEO优化", platform: "头条", status: "published", url: "https://toutiao.com/seo" },
-      { id: 9, title: "本地SEO策略", platform: "搜狐", status: "published", url: "https://sohu.com/seo" },
-      { id: 10, title: "电商SEO技巧", platform: "网易", status: "published", url: "https://163.com/seo" },
-      { id: 11, title: "SEO数据分析", platform: "凤凰网", status: "published", url: "https://ifeng.com/seo" },
-      { id: 12, title: "语音搜索优化", platform: "腾讯", status: "published", url: "https://qq.com/seo" },
-      { id: 13, title: "视频SEO优化", platform: "B站", status: "pending", url: null },
-      { id: 14, title: "图片SEO技巧", platform: "抖音", status: "pending", url: null },
-      { id: 15, title: "新闻稿SEO", platform: "快手", status: "pending", url: null },
-      { id: 16, title: "社交媒体SEO", platform: "微信公众号", status: "pending", url: null },
-      { id: 17, title: "品牌SEO建设", platform: "豆瓣", status: "pending", url: null },
-      { id: 18, title: "竞品SEO分析", platform: "简书", status: "pending", url: null },
-      { id: 19, title: "SEO工具推荐", platform: "CSDN", status: "pending", url: null },
-      { id: 20, title: "SEO趋势预测", platform: "掘金", status: "pending", url: null },
+    id: "SM-004",
+    name: "Instagram评论互动",
+    serviceType: "comment",
+    platform: "instagram",
+    websiteUrl: "https://instagram.com/mybrand",
+    keywords: ["喜欢", "关注"],
+    createdAt: "2024-01-22",
+    totalComments: 30,
+    completed: 30,
+    pending: 0,
+    targetPosts: [
+      { id: 1, postUrl: "https://instagram.com/p/abc123", commentsPlaced: 10, status: "completed" },
+      { id: 2, postUrl: "https://instagram.com/p/def456", commentsPlaced: 10, status: "completed" },
+      { id: 3, postUrl: "https://instagram.com/p/ghi789", commentsPlaced: 10, status: "completed" },
     ],
+  },
+  // 点赞任务
+  {
+    id: "SM-005",
+    name: "X帖子点赞推广",
+    serviceType: "like",
+    platform: "twitter",
+    websiteUrl: "https://x.com/myaccount",
+    keywords: [],
+    createdAt: "2024-01-23",
+    totalLikes: 200,
+    completed: 200,
+    pending: 0,
+    targetPosts: [
+      { id: 1, postUrl: "https://x.com/user/status/123", likesAdded: 50, status: "completed" },
+      { id: 2, postUrl: "https://x.com/user/status/456", likesAdded: 50, status: "completed" },
+      { id: 3, postUrl: "https://x.com/user/status/789", likesAdded: 50, status: "completed" },
+      { id: 4, postUrl: "https://x.com/user/status/012", likesAdded: 50, status: "completed" },
+    ],
+  },
+  {
+    id: "SM-006",
+    name: "Reddit帖子点赞",
+    serviceType: "like",
+    platform: "reddit",
+    websiteUrl: "https://reddit.com/user/mybrand",
+    keywords: [],
+    createdAt: "2024-01-24",
+    totalLikes: 100,
+    completed: 75,
+    pending: 25,
+    targetPosts: [
+      { id: 1, postUrl: "https://reddit.com/r/tech/post1", likesAdded: 25, status: "completed" },
+      { id: 2, postUrl: "https://reddit.com/r/gadgets/post2", likesAdded: 25, status: "completed" },
+      { id: 3, postUrl: "https://reddit.com/r/software/post3", likesAdded: 25, status: "completed" },
+      { id: 4, postUrl: "https://reddit.com/r/tools/post4", likesAdded: 0, status: "pending" },
+    ],
+  },
+  // 粉丝增长任务
+  {
+    id: "SM-007",
+    name: "Instagram粉丝增长",
+    serviceType: "follower",
+    platform: "instagram",
+    websiteUrl: "https://instagram.com/mybrand",
+    keywords: [],
+    createdAt: "2024-01-25",
+    targetFollowers: 500,
+    addedFollowers: 320,
+    pending: 180,
+    status: "in_progress",
+  },
+  {
+    id: "SM-008",
+    name: "X账号粉丝增长",
+    serviceType: "follower",
+    platform: "twitter",
+    websiteUrl: "https://x.com/mybrand",
+    keywords: [],
+    createdAt: "2024-01-26",
+    targetFollowers: 1000,
+    addedFollowers: 1000,
+    pending: 0,
+    status: "completed",
   },
 ];
 
 export default function SocialMonitorPage() {
-  const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [serviceFilter, setServiceFilter] = useState("all");
+  const [platformFilter, setPlatformFilter] = useState("all");
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
-
-  // 计算总体统计
-  const totalArticles = tasks.reduce((sum, t) => sum + t.totalArticles, 0);
-  const totalPlatforms = tasks.reduce((sum, t) => sum + t.totalPlatforms, 0);
-  const totalPending = tasks.reduce((sum, t) => sum + t.pending, 0);
-  const totalPublished = tasks.reduce((sum, t) => sum + t.published, 0);
 
   // 筛选任务
   const filteredTasks = tasks.filter((task) => {
-    const matchesStatus =
-      statusFilter === "all" ||
-      (statusFilter === "completed" && task.pending === 0) ||
-      (statusFilter === "in_progress" && task.pending > 0);
     const matchesSearch =
       task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.websiteUrl.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
+      task.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesService = serviceFilter === "all" || task.serviceType === serviceFilter;
+    const matchesPlatform = platformFilter === "all" || task.platform === platformFilter;
+    return matchesSearch && matchesService && matchesPlatform;
   });
+
+  // 统计数据
+  const stats = {
+    postTasks: tasks.filter(t => t.serviceType === "post").length,
+    commentTasks: tasks.filter(t => t.serviceType === "comment").length,
+    likeTasks: tasks.filter(t => t.serviceType === "like").length,
+    followerTasks: tasks.filter(t => t.serviceType === "follower").length,
+  };
+
+  const getServiceInfo = (type: string) => {
+    return serviceTypes.find(s => s.id === type) || serviceTypes[0];
+  };
+
+  const getPlatformInfo = (platformId: string) => {
+    return platforms.find(p => p.id === platformId) || platforms[0];
+  };
+
+  const getTaskStatus = (task: typeof tasks[0]) => {
+    if (task.serviceType === "post") {
+      return task.pending === 0 ? "completed" : "in_progress";
+    }
+    if (task.serviceType === "comment" || task.serviceType === "like") {
+      return task.pending === 0 ? "completed" : "in_progress";
+    }
+    if (task.serviceType === "follower") {
+      return task.status;
+    }
+    return "in_progress";
+  };
 
   return (
     <div className="space-y-6">
       {/* 页面标题 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">社交媒体发布报告</h1>
-          <p className="text-muted-foreground mt-1">查看任务发布情况和完成状态</p>
+          <h1 className="text-2xl font-bold">社交媒体报告</h1>
+          <p className="text-muted-foreground mt-1">查看任务完成情况</p>
         </div>
         <Button variant="outline" className="gap-2">
           <Download className="h-4 w-4" />
@@ -154,206 +265,422 @@ export default function SocialMonitorPage() {
       {/* 统计卡片 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              总文章数
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold">{totalArticles}</span>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-blue-100">
+                <FileText className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.postTasks}</p>
+                <p className="text-xs text-muted-foreground">发帖任务</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              总平台数
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-blue-500" />
-              <span className="text-2xl font-bold">{totalPlatforms}</span>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-purple-100">
+                <MessageSquare className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.commentTasks}</p>
+                <p className="text-xs text-muted-foreground">评论任务</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              待发布
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-yellow-500" />
-              <span className="text-2xl font-bold">{totalPending}</span>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-pink-100">
+                <Heart className="h-5 w-5 text-pink-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.likeTasks}</p>
+                <p className="text-xs text-muted-foreground">点赞任务</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              已发布
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <span className="text-2xl font-bold">{totalPublished}</span>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-green-100">
+                <Users className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.followerTasks}</p>
+                <p className="text-xs text-muted-foreground">粉丝任务</p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* 筛选栏 */}
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="搜索任务名称或网站..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="状态筛选" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">全部状态</SelectItem>
-            <SelectItem value="completed">已完成</SelectItem>
-            <SelectItem value="in_progress">进行中</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="搜索任务名称或ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={serviceFilter} onValueChange={setServiceFilter}>
+              <SelectTrigger className="w-full md:w-36">
+                <SelectValue placeholder="服务类型" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部类型</SelectItem>
+                {serviceTypes.map(type => (
+                  <SelectItem key={type.id} value={type.id}>{type.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={platformFilter} onValueChange={setPlatformFilter}>
+              <SelectTrigger className="w-full md:w-36">
+                <SelectValue placeholder="平台" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部平台</SelectItem>
+                {platforms.map(p => (
+                  <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* 任务列表 */}
-      <div className="space-y-4">
-        {filteredTasks.map((task) => (
-          <Card key={task.id} className="overflow-hidden">
-            {/* 任务摘要 */}
-            <div
-              className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => setExpandedTask(expandedTask === task.id ? null : task.id)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
-                    {expandedTask === task.id ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
+      <div className="space-y-3">
+        {filteredTasks.map((task) => {
+          const serviceInfo = getServiceInfo(task.serviceType);
+          const platformInfo = getPlatformInfo(task.platform);
+          const ServiceIcon = serviceInfo.icon;
+          const isExpanded = expandedTask === task.id;
+          const status = getTaskStatus(task);
+
+          return (
+            <Card key={task.id} className="overflow-hidden">
+              {/* 任务摘要行 */}
+              <div
+                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => setExpandedTask(isExpanded ? null : task.id)}
+              >
+                <div className="flex items-center gap-4">
+                  {/* 展开图标 */}
+                  <div className="shrink-0 text-muted-foreground">
+                    {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                   </div>
-                  <div>
-                    <div className="font-medium">{task.name}</div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span>{task.websiteUrl}</span>
+
+                  {/* 平台图标 */}
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0", platformInfo.color)}>
+                    {platformInfo.label.charAt(0)}
+                  </div>
+
+                  {/* 任务信息 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium truncate">{task.name}</span>
+                      <Badge variant="outline" className="shrink-0 text-xs gap-1">
+                        <ServiceIcon className="h-3 w-3" />
+                        {serviceInfo.label}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-0.5">
+                      <span className="truncate">{task.websiteUrl}</span>
                       <span>·</span>
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1 shrink-0">
                         <Calendar className="h-3 w-3" />
                         {task.createdAt}
                       </span>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold">{task.totalArticles}</div>
-                    <div className="text-xs text-muted-foreground">总文章</div>
+
+                  {/* 统计数据 */}
+                  <div className="hidden md:flex items-center gap-6 shrink-0">
+                    {task.serviceType === "post" && (
+                      <>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold">{task.totalArticles}</div>
+                          <div className="text-xs text-muted-foreground">总文章</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold">{task.totalPlatforms}</div>
+                          <div className="text-xs text-muted-foreground">总平台</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-yellow-600">{task.pending}</div>
+                          <div className="text-xs text-muted-foreground">待发布</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-green-600">{task.published}</div>
+                          <div className="text-xs text-muted-foreground">已发布</div>
+                        </div>
+                      </>
+                    )}
+                    {task.serviceType === "comment" && (
+                      <>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold">{task.totalComments}</div>
+                          <div className="text-xs text-muted-foreground">总评论</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-yellow-600">{task.pending}</div>
+                          <div className="text-xs text-muted-foreground">待完成</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-green-600">{task.completed}</div>
+                          <div className="text-xs text-muted-foreground">已完成</div>
+                        </div>
+                      </>
+                    )}
+                    {task.serviceType === "like" && (
+                      <>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold">{task.totalLikes}</div>
+                          <div className="text-xs text-muted-foreground">总点赞</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-yellow-600">{task.pending}</div>
+                          <div className="text-xs text-muted-foreground">待完成</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-green-600">{task.completed}</div>
+                          <div className="text-xs text-muted-foreground">已完成</div>
+                        </div>
+                      </>
+                    )}
+                    {task.serviceType === "follower" && (
+                      <>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold">{task.targetFollowers}</div>
+                          <div className="text-xs text-muted-foreground">目标粉丝</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-yellow-600">{task.pending}</div>
+                          <div className="text-xs text-muted-foreground">待增长</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-green-600">{task.addedFollowers}</div>
+                          <div className="text-xs text-muted-foreground">已增长</div>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold">{task.totalPlatforms}</div>
-                    <div className="text-xs text-muted-foreground">总平台</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-yellow-600">{task.pending}</div>
-                    <div className="text-xs text-muted-foreground">待发布</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-green-600">{task.published}</div>
-                    <div className="text-xs text-muted-foreground">已发布</div>
-                  </div>
-                  <Badge variant={task.pending === 0 ? "default" : "secondary"}>
-                    {task.pending === 0 ? "已完成" : "进行中"}
+
+                  {/* 状态标签 */}
+                  <Badge className={cn(
+                    "shrink-0",
+                    status === "completed" ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                  )}>
+                    {status === "completed" ? "已完成" : "进行中"}
                   </Badge>
                 </div>
-              </div>
 
-              {/* 关键词 */}
-              <div className="flex items-center gap-2 mt-3 ml-11">
-                <span className="text-xs text-muted-foreground">关键词：</span>
-                {task.keywords.map((kw) => (
-                  <Badge key={kw} variant="outline" className="text-xs">
-                    {kw}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* 展开详情 - 文章列表 */}
-            {expandedTask === task.id && (
-              <div className="border-t bg-muted/30">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">#</TableHead>
-                      <TableHead>文章标题</TableHead>
-                      <TableHead>发布平台</TableHead>
-                      <TableHead>状态</TableHead>
-                      <TableHead>发布链接</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {task.articles.map((article, index) => (
-                      <TableRow key={article.id}>
-                        <TableCell className="text-muted-foreground">{index + 1}</TableCell>
-                        <TableCell className="font-medium">{article.title}</TableCell>
-                        <TableCell>{article.platform}</TableCell>
-                        <TableCell>
-                          {article.status === "published" ? (
-                            <Badge variant="default" className="bg-green-500">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              已发布
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary">
-                              <Clock className="h-3 w-3 mr-1" />
-                              待发布
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {article.url ? (
-                            <a
-                              href={article.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-primary hover:underline text-sm"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              查看链接
-                            </a>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">-</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
+                {/* 关键词 */}
+                {task.keywords.length > 0 && (
+                  <div className="flex items-center gap-2 mt-3 ml-14">
+                    <span className="text-xs text-muted-foreground">关键词：</span>
+                    {task.keywords.map((kw) => (
+                      <Badge key={kw} variant="secondary" className="text-xs">{kw}</Badge>
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+                )}
               </div>
-            )}
-          </Card>
-        ))}
+
+              {/* 展开详情 */}
+              {isExpanded && (
+                <div className="border-t bg-muted/30 p-4">
+                  {/* 发帖任务详情 */}
+                  {task.serviceType === "post" && task.articles && (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">#</TableHead>
+                          <TableHead>文章标题</TableHead>
+                          <TableHead>发布平台</TableHead>
+                          <TableHead>状态</TableHead>
+                          <TableHead>发布链接</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {task.articles.map((article, index) => (
+                          <TableRow key={article.id}>
+                            <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                            <TableCell className="font-medium">{article.title}</TableCell>
+                            <TableCell>{article.platform}</TableCell>
+                            <TableCell>
+                              {article.status === "published" ? (
+                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 gap-1">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  已发布
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  待发布
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {article.url ? (
+                                <a
+                                  href={article.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1 text-primary hover:underline text-sm"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Link2 className="h-3 w-3" />
+                                  查看
+                                </a>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+
+                  {/* 评论任务详情 */}
+                  {task.serviceType === "comment" && task.targetPosts && (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">#</TableHead>
+                          <TableHead>目标帖子</TableHead>
+                          <TableHead>评论数</TableHead>
+                          <TableHead>状态</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {task.targetPosts.map((post, index) => (
+                          <TableRow key={post.id}>
+                            <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                            <TableCell>
+                              <a
+                                href={post.postUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-primary hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Link2 className="h-3 w-3" />
+                                {post.postUrl}
+                              </a>
+                            </TableCell>
+                            <TableCell>{post.commentsPlaced}</TableCell>
+                            <TableCell>
+                              {post.status === "completed" ? (
+                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 gap-1">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  已完成
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  进行中
+                                </Badge>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+
+                  {/* 点赞任务详情 */}
+                  {task.serviceType === "like" && task.targetPosts && (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">#</TableHead>
+                          <TableHead>目标帖子</TableHead>
+                          <TableHead>点赞数</TableHead>
+                          <TableHead>状态</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {task.targetPosts.map((post, index) => (
+                          <TableRow key={post.id}>
+                            <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                            <TableCell>
+                              <a
+                                href={post.postUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-primary hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Link2 className="h-3 w-3" />
+                                {post.postUrl}
+                              </a>
+                            </TableCell>
+                            <TableCell>{post.likesAdded}</TableCell>
+                            <TableCell>
+                              {post.status === "completed" ? (
+                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 gap-1">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  已完成
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  待完成
+                                </Badge>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+
+                  {/* 粉丝增长任务详情 */}
+                  {task.serviceType === "follower" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="p-4 bg-background rounded-lg border text-center">
+                          <p className="text-2xl font-bold">{task.targetFollowers}</p>
+                          <p className="text-xs text-muted-foreground mt-1">目标粉丝数</p>
+                        </div>
+                        <div className="p-4 bg-background rounded-lg border text-center">
+                          <p className="text-2xl font-bold text-green-600">+{task.addedFollowers}</p>
+                          <p className="text-xs text-muted-foreground mt-1">已增长</p>
+                        </div>
+                        <div className="p-4 bg-background rounded-lg border text-center">
+                          <p className="text-2xl font-bold text-yellow-600">{task.pending}</p>
+                          <p className="text-xs text-muted-foreground mt-1">待增长</p>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-muted-foreground">完成进度</span>
+                          <span className="font-medium">{Math.round(task.addedFollowers / task.targetFollowers * 100)}%</span>
+                        </div>
+                        <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-green-500 rounded-full transition-all"
+                            style={{ width: `${task.addedFollowers / task.targetFollowers * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Card>
+          );
+        })}
 
         {filteredTasks.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
