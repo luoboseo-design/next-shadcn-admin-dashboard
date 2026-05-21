@@ -1,34 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Plus,
-  Search,
-  MoreHorizontal,
-  Play,
-  Pause,
-  Settings,
-  Activity,
-  Zap,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-  TrendingUp,
-} from "lucide-react";
+
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  GitBranch,
+  MoreHorizontal,
+  Pause,
+  Play,
+  Plus,
+  Search,
+  Settings,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +30,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
 // 工作流配置数据
@@ -192,7 +189,7 @@ export default function WorkflowsPage() {
     return matchesSearch && matchesService;
   });
 
-  const services = [...new Set(workflows.map(wf => wf.service))];
+  const services = [...new Set(workflows.map((wf) => wf.service))];
 
   return (
     <div className="space-y-6">
@@ -218,7 +215,7 @@ export default function WorkflowsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">运行中</p>
-                <p className="text-xl font-bold">{workflows.filter(w => w.status === "running").length}</p>
+                <p className="text-xl font-bold">{workflows.filter((w) => w.status === "running").length}</p>
               </div>
             </div>
           </CardContent>
@@ -231,7 +228,7 @@ export default function WorkflowsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">已暂停</p>
-                <p className="text-xl font-bold">{workflows.filter(w => w.status === "paused").length}</p>
+                <p className="text-xl font-bold">{workflows.filter((w) => w.status === "paused").length}</p>
               </div>
             </div>
           </CardContent>
@@ -282,7 +279,9 @@ export default function WorkflowsPage() {
           <SelectContent>
             <SelectItem value="all">全部服务</SelectItem>
             {services.map((service) => (
-              <SelectItem key={service} value={service}>{service}</SelectItem>
+              <SelectItem key={service} value={service}>
+                {service}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -296,16 +295,16 @@ export default function WorkflowsPage() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                      workflow.status === "running" 
-                        ? "bg-green-100 dark:bg-green-900/30" 
-                        : "bg-muted"
-                    }`}>
-                      <Workflow className={`h-5 w-5 ${
-                        workflow.status === "running" 
-                          ? "text-green-600 dark:text-green-400" 
-                          : "text-muted-foreground"
-                      }`} />
+                    <div
+                      className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                        workflow.status === "running" ? "bg-green-100 dark:bg-green-900/30" : "bg-muted"
+                      }`}
+                    >
+                      <GitBranch
+                        className={`h-5 w-5 ${
+                          workflow.status === "running" ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                        }`}
+                      />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -323,12 +322,8 @@ export default function WorkflowsPage() {
                   <div className="mt-4 flex items-center gap-2 flex-wrap">
                     {workflow.steps.map((step, index) => (
                       <div key={index} className="flex items-center">
-                        <div className="px-3 py-1 bg-muted rounded-full text-xs">
-                          {step.name}
-                        </div>
-                        {index < workflow.steps.length - 1 && (
-                          <div className="w-4 h-px bg-border mx-1" />
-                        )}
+                        <div className="px-3 py-1 bg-muted rounded-full text-xs">{step.name}</div>
+                        {index < workflow.steps.length - 1 && <div className="w-4 h-px bg-border mx-1" />}
                       </div>
                     ))}
                   </div>
@@ -353,9 +348,11 @@ export default function WorkflowsPage() {
                     <div className="flex items-center gap-1.5">
                       <TrendingUp className="h-4 w-4 text-muted-foreground" />
                       <span className="text-muted-foreground">成功率:</span>
-                      <span className={`font-medium ${
-                        workflow.stats.successRate >= 90 ? "text-green-600" : "text-amber-600"
-                      }`}>
+                      <span
+                        className={`font-medium ${
+                          workflow.stats.successRate >= 90 ? "text-green-600" : "text-amber-600"
+                        }`}
+                      >
                         {workflow.stats.successRate}%
                       </span>
                     </div>
