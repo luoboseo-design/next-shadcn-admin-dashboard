@@ -42,6 +42,8 @@ import {
   X,
   Loader2,
   Lightbulb,
+  ImagePlus,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +65,7 @@ export default function ContentEditorPage() {
   const [activeTab, setActiveTab] = useState("write");
   const [suggestedTitles, setSuggestedTitles] = useState<string[]>([]);
   const [showTitleDropdown, setShowTitleDropdown] = useState(false);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
 
   // 模拟 AI 生成标题
   const generateTitles = async () => {
@@ -295,6 +298,67 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
                 )}
               </Button>
             </div>
+          </div>
+
+          {/* 封面图上传 */}
+          <div className="mb-6">
+            <Label className="text-sm font-medium mb-2 block">封面图</Label>
+            {coverImage ? (
+              <div className="relative rounded-lg overflow-hidden border bg-muted">
+                <img 
+                  src={coverImage} 
+                  alt="封面图" 
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => document.getElementById('cover-upload')?.click()}
+                  >
+                    <ImagePlus className="h-4 w-4 mr-1" />
+                    更换
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => setCoverImage(null)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    删除
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div 
+                className="border-2 border-dashed rounded-lg h-48 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                onClick={() => document.getElementById('cover-upload')?.click()}
+              >
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                  <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium">点击上传封面图</p>
+                  <p className="text-xs text-muted-foreground mt-1">推荐尺寸 1200 x 630 px</p>
+                </div>
+              </div>
+            )}
+            <input
+              id="cover-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    setCoverImage(e.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
           </div>
 
           {/* 标题输入 - 带下拉建议 */}
