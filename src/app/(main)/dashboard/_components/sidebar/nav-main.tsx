@@ -29,6 +29,7 @@ import type { NavGroup, NavMainItem } from "@/navigation/sidebar/sidebar-items";
 
 interface NavMainProps {
   readonly items: readonly NavGroup[];
+  readonly isAuthenticated?: boolean; // 是否已登录
 }
 
 const IsComingSoon = () => (
@@ -141,9 +142,17 @@ const NavItemCollapsed = ({
   );
 };
 
-export function NavMain({ items }: NavMainProps) {
+export function NavMain({ items, isAuthenticated = true }: NavMainProps) {
   const path = usePathname();
   const { state, isMobile } = useSidebar();
+
+  // 根据登录状态过滤菜单分组
+  const filteredItems = items.filter((group) => {
+    if (group.requireAuth && !isAuthenticated) {
+      return false;
+    }
+    return true;
+  });
 
   const isItemActive = (url: string, subItems?: NavMainItem["subItems"]) => {
     if (subItems?.length) {
@@ -181,7 +190,7 @@ export function NavMain({ items }: NavMainProps) {
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-      {items.map((group) => (
+      {filteredItems.map((group) => (
         <SidebarGroup key={group.id}>
           {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
           <SidebarGroupContent className="flex flex-col gap-2">

@@ -38,6 +38,7 @@ export interface NavGroup {
   id: number;
   label?: string;
   items: NavMainItem[];
+  requireAuth?: boolean; // 是否需要登录才能看到
 }
 
 export const sidebarItems: NavGroup[] = [
@@ -87,6 +88,7 @@ export const sidebarItems: NavGroup[] = [
   {
     id: 2,
     label: "仪表盘",
+    requireAuth: true, // 需要登录才能看到
     items: [
       {
         title: "任务中心",
