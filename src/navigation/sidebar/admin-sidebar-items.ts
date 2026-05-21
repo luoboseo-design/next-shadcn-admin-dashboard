@@ -1,15 +1,20 @@
 import {
-  BarChart3,
+  Activity,
+  Bot,
   CreditCard,
   FileText,
   Globe,
-  LayoutDashboard,
+  Home,
   type LucideIcon,
-  Package,
+  Newspaper,
+  Search,
   Settings,
-  Shield,
+  Share2,
   Users,
-  Wallet,
+  Workflow,
+  Database,
+  CheckCircle,
+  Server,
 } from "lucide-react";
 
 export interface AdminNavItem {
@@ -17,6 +22,10 @@ export interface AdminNavItem {
   url: string;
   icon?: LucideIcon;
   badge?: string;
+  subItems?: {
+    title: string;
+    url: string;
+  }[];
 }
 
 export interface AdminNavGroup {
@@ -31,67 +40,112 @@ export const adminSidebarItems: AdminNavGroup[] = [
     label: "概览",
     items: [
       {
-        title: "仪表盘",
+        title: "控制台",
         url: "/admin",
-        icon: LayoutDashboard,
+        icon: Home,
       },
       {
-        title: "数据分析",
-        url: "/admin/analytics",
-        icon: BarChart3,
+        title: "系统监控",
+        url: "/admin/monitor",
+        icon: Activity,
       },
     ],
   },
   {
     id: 2,
+    label: "资源配置",
+    items: [
+      {
+        title: "SEO 资源库",
+        url: "/admin/resources/seo",
+        icon: Search,
+        subItems: [
+          { title: "博客站点", url: "/admin/resources/seo/blogs" },
+          { title: "论坛列表", url: "/admin/resources/seo/forums" },
+          { title: "目录站点", url: "/admin/resources/seo/directories" },
+          { title: "客座媒体", url: "/admin/resources/seo/guest-posts" },
+        ],
+      },
+      {
+        title: "GEO 资源库",
+        url: "/admin/resources/geo",
+        icon: Globe,
+        subItems: [
+          { title: "AI 平台配置", url: "/admin/resources/geo/ai-platforms" },
+          { title: "引用来源库", url: "/admin/resources/geo/citations" },
+        ],
+      },
+      {
+        title: "社交媒体资源",
+        url: "/admin/resources/social",
+        icon: Share2,
+        subItems: [
+          { title: "Reddit 账号池", url: "/admin/resources/social/reddit" },
+          { title: "Twitter 账号池", url: "/admin/resources/social/twitter" },
+          { title: "LinkedIn 账号池", url: "/admin/resources/social/linkedin" },
+        ],
+      },
+      {
+        title: "新闻媒体资源",
+        url: "/admin/resources/news",
+        icon: Newspaper,
+        subItems: [
+          { title: "新闻站点", url: "/admin/resources/news/sites" },
+          { title: "发稿渠道", url: "/admin/resources/news/channels" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    label: "工作流管理",
+    items: [
+      {
+        title: "工作流配置",
+        url: "/admin/workflows",
+        icon: Workflow,
+      },
+      {
+        title: "AI 代理设置",
+        url: "/admin/ai-agents",
+        icon: Bot,
+      },
+      {
+        title: "执行日志",
+        url: "/admin/logs",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    id: 4,
     label: "业务管理",
     items: [
+      {
+        title: "订单管理",
+        url: "/admin/orders",
+        icon: CheckCircle,
+      },
       {
         title: "用户管理",
         url: "/admin/users",
         icon: Users,
       },
       {
-        title: "订单管理",
-        url: "/admin/orders",
-        icon: FileText,
-      },
-      {
-        title: "媒体资源",
-        url: "/admin/platforms",
-        icon: Globe,
-      },
-      {
-        title: "服务套餐",
-        url: "/admin/packages",
-        icon: Package,
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "财务中心",
-    items: [
-      {
-        title: "收入统计",
+        title: "财务中心",
         url: "/admin/finance",
-        icon: Wallet,
-      },
-      {
-        title: "充值记录",
-        url: "/admin/recharge",
         icon: CreditCard,
       },
     ],
   },
   {
-    id: 4,
+    id: 5,
     label: "系统",
     items: [
       {
-        title: "权限管理",
-        url: "/admin/permissions",
-        icon: Shield,
+        title: "服务定价",
+        url: "/admin/pricing",
+        icon: Database,
       },
       {
         title: "系统设置",

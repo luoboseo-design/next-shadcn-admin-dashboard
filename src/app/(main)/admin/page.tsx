@@ -1,180 +1,214 @@
 "use client";
 
-import { useState } from "react";
+import {
+  Activity,
+  AlertTriangle,
+  ArrowUpRight,
+  CheckCircle2,
+  Clock,
+  Play,
+  RefreshCw,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
 
-import { ArrowDownRight, ArrowUpRight, DollarSign, FileText, TrendingUp, Users } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
-// 模拟数据
-const stats = {
-  totalUsers: 2856,
-  userGrowth: 12.5,
-  totalOrders: 1234,
-  orderGrowth: 8.2,
-  totalRevenue: 89650,
-  revenueGrowth: 15.3,
-  activeUsers: 856,
-  activeGrowth: -2.1,
+// 模拟数据 - 系统概览
+const systemStats = {
+  activeWorkflows: 23,
+  queuedTasks: 156,
+  completedToday: 89,
+  successRate: 94.5,
+  totalUsers: 128,
+  totalOrders: 1847,
+  monthlyRevenue: 52800,
+  resourcesCount: {
+    blogs: 856,
+    forums: 234,
+    socialAccounts: 178,
+    newsSites: 92,
+  },
 };
 
-const recentOrders = [
+// 工作流执行状态
+const workflowStatus = [
   {
-    id: "ORD-001",
-    user: "张三",
-    service: "SEO 服务",
-    subService: "外链代发",
-    amount: 180,
+    id: "wf-001",
+    name: "SEO 外链代发",
     status: "running",
-    createdAt: "2024-01-25 14:30",
+    activeJobs: 12,
+    queuedJobs: 45,
+    completedToday: 38,
+    successRate: 96,
   },
   {
-    id: "ORD-002",
-    user: "李四",
-    service: "GEO 服务",
-    subService: "关键词优化",
-    amount: 600,
-    status: "pending",
-    createdAt: "2024-01-25 13:15",
-  },
-  {
-    id: "ORD-003",
-    user: "王五",
-    service: "社交媒体",
-    subService: "Reddit",
-    amount: 300,
-    status: "completed",
-    createdAt: "2024-01-25 11:45",
-  },
-  {
-    id: "ORD-004",
-    user: "赵六",
-    service: "发稿服务",
-    subService: "新闻稿发布",
-    amount: 1000,
+    id: "wf-002",
+    name: "客座文章发布",
     status: "running",
-    createdAt: "2024-01-25 10:20",
+    activeJobs: 5,
+    queuedJobs: 18,
+    completedToday: 12,
+    successRate: 92,
   },
   {
-    id: "ORD-005",
-    user: "钱七",
-    service: "SEO 服务",
-    subService: "客座文章",
-    amount: 1500,
-    status: "completed",
-    createdAt: "2024-01-25 09:00",
+    id: "wf-003",
+    name: "GEO 关键词优化",
+    status: "running",
+    activeJobs: 3,
+    queuedJobs: 8,
+    completedToday: 15,
+    successRate: 88,
+  },
+  {
+    id: "wf-004",
+    name: "社交媒体发布",
+    status: "paused",
+    activeJobs: 0,
+    queuedJobs: 23,
+    completedToday: 24,
+    successRate: 91,
+  },
+  {
+    id: "wf-005",
+    name: "新闻稿发布",
+    status: "running",
+    activeJobs: 2,
+    queuedJobs: 6,
+    completedToday: 8,
+    successRate: 95,
   },
 ];
 
-const recentUsers = [
-  { id: "U001", name: "张三", email: "zhangsan@example.com", balance: 2500, orders: 12, registeredAt: "2024-01-20" },
-  { id: "U002", name: "李四", email: "lisi@example.com", balance: 1800, orders: 8, registeredAt: "2024-01-22" },
-  { id: "U003", name: "王五", email: "wangwu@example.com", balance: 5000, orders: 25, registeredAt: "2024-01-23" },
-  { id: "U004", name: "赵六", email: "zhaoliu@example.com", balance: 800, orders: 3, registeredAt: "2024-01-24" },
-  { id: "U005", name: "钱七", email: "qianqi@example.com", balance: 3200, orders: 15, registeredAt: "2024-01-25" },
+// 最近执行任务
+const recentTasks = [
+  {
+    id: "task-001",
+    orderId: "ORD-2024-0156",
+    service: "外链代发",
+    user: "北京科技有限公司",
+    status: "completed",
+    platform: "medium.com",
+    completedAt: "2分钟前",
+  },
+  {
+    id: "task-002",
+    orderId: "ORD-2024-0155",
+    service: "外链代发",
+    user: "上海营销公司",
+    status: "running",
+    platform: "wordpress.com",
+    step: "正在发布内容...",
+  },
+  {
+    id: "task-003",
+    orderId: "ORD-2024-0154",
+    service: "客座文章",
+    user: "深圳电商公司",
+    status: "running",
+    platform: "techcrunch.com",
+    step: "等待审核...",
+  },
+  {
+    id: "task-004",
+    orderId: "ORD-2024-0153",
+    service: "Reddit 发帖",
+    user: "杭州互联网公司",
+    status: "completed",
+    platform: "reddit.com/r/technology",
+    completedAt: "5分钟前",
+  },
+  {
+    id: "task-005",
+    orderId: "ORD-2024-0152",
+    service: "外链代发",
+    user: "广州贸易公司",
+    status: "failed",
+    platform: "blogger.com",
+    error: "账号被限制",
+  },
 ];
 
-const serviceStats = [
-  { name: "SEO 服务", orders: 456, revenue: 35600, percentage: 40 },
-  { name: "GEO 服务", orders: 234, revenue: 28400, percentage: 32 },
-  { name: "社交媒体", orders: 312, revenue: 15600, percentage: 17 },
-  { name: "发稿服务", orders: 232, revenue: 10050, percentage: 11 },
+// 系统告警
+const systemAlerts = [
+  {
+    id: "alert-001",
+    type: "warning",
+    message: "Reddit 账号池可用数量不足 (剩余 12 个)",
+    time: "10分钟前",
+  },
+  {
+    id: "alert-002",
+    type: "error",
+    message: "Blogger.com 发布失败率上升至 25%",
+    time: "30分钟前",
+  },
+  {
+    id: "alert-003",
+    type: "info",
+    message: "新增 50 个博客站点资源已验证完成",
+    time: "1小时前",
+  },
 ];
-
-const statusLabels: Record<string, string> = {
-  pending: "待处理",
-  running: "运行中",
-  completed: "已完成",
-};
-
-const statusColors: Record<string, string> = {
-  pending: "bg-muted text-muted-foreground",
-  running: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  completed: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-};
 
 export default function AdminDashboardPage() {
-  const [period, setPeriod] = useState("7d");
-
   return (
     <div className="space-y-6">
       {/* 页面标题 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">管理仪表盘</h1>
-          <p className="text-muted-foreground mt-1">平台运营数据概览</p>
+          <h1 className="text-2xl font-bold">控制台</h1>
+          <p className="text-muted-foreground mt-1">系统运行状态和工作流监控</p>
         </div>
-        <Select value={period} onValueChange={setPeriod}>
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="24h">最近24小时</SelectItem>
-            <SelectItem value="7d">最近7天</SelectItem>
-            <SelectItem value="30d">最近30天</SelectItem>
-            <SelectItem value="90d">最近90天</SelectItem>
-          </SelectContent>
-        </Select>
+        <Button variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          刷新数据
+        </Button>
       </div>
 
-      {/* KPI 卡片 */}
+      {/* 系统告警 */}
+      {systemAlerts.length > 0 && (
+        <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+          <CardContent className="pt-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+              <div className="flex-1 space-y-2">
+                <p className="font-medium text-amber-700 dark:text-amber-400">系统告警 ({systemAlerts.length})</p>
+                {systemAlerts.slice(0, 2).map((alert) => (
+                  <div key={alert.id} className="flex items-center justify-between text-sm">
+                    <span className="text-amber-600 dark:text-amber-300">{alert.message}</span>
+                    <span className="text-amber-500/70 text-xs">{alert.time}</span>
+                  </div>
+                ))}
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/admin/monitor">查看全部</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 核心指标 */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">总用户数</p>
-                <p className="text-2xl font-bold mt-1">{stats.totalUsers.toLocaleString()}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-3 text-sm">
-              <ArrowUpRight className="h-4 w-4 text-green-500" />
-              <span className="text-green-500 font-medium">+{stats.userGrowth}%</span>
-              <span className="text-muted-foreground">vs 上周</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">总订单数</p>
-                <p className="text-2xl font-bold mt-1">{stats.totalOrders.toLocaleString()}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-3 text-sm">
-              <ArrowUpRight className="h-4 w-4 text-green-500" />
-              <span className="text-green-500 font-medium">+{stats.orderGrowth}%</span>
-              <span className="text-muted-foreground">vs 上周</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">总收入</p>
-                <p className="text-2xl font-bold mt-1">${stats.totalRevenue.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">运行中工作流</p>
+                <p className="text-3xl font-bold mt-1">{systemStats.activeWorkflows}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <Play className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-3 text-sm">
-              <ArrowUpRight className="h-4 w-4 text-green-500" />
-              <span className="text-green-500 font-medium">+{stats.revenueGrowth}%</span>
-              <span className="text-muted-foreground">vs 上周</span>
+            <div className="flex items-center gap-1 mt-2 text-sm text-green-600 dark:text-green-400">
+              <Zap className="h-3 w-3" />
+              <span>系统正常运行</span>
             </div>
           </CardContent>
         </Card>
@@ -183,45 +217,137 @@ export default function AdminDashboardPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">活跃用户</p>
-                <p className="text-2xl font-bold mt-1">{stats.activeUsers.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">队列中任务</p>
+                <p className="text-3xl font-bold mt-1">{systemStats.queuedTasks}</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-3 text-sm">
-              <ArrowDownRight className="h-4 w-4 text-red-500" />
-              <span className="text-red-500 font-medium">{stats.activeGrowth}%</span>
-              <span className="text-muted-foreground">vs 上周</span>
+            <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+              <span>预计 2-3 小时完成</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">今日完成</p>
+                <p className="text-3xl font-bold mt-1">{systemStats.completedToday}</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-sm text-green-600 dark:text-green-400">
+              <TrendingUp className="h-3 w-3" />
+              <span>较昨日 +12%</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">成功率</p>
+                <p className="text-3xl font-bold mt-1">{systemStats.successRate}%</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <Activity className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+            <Progress value={systemStats.successRate} className="mt-3 h-1.5" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 资源概览 */}
+      <div className="grid gap-4 sm:grid-cols-4">
+        <Card className="bg-muted/30">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">博客站点</p>
+                <p className="text-xl font-semibold">{systemStats.resourcesCount.blogs}</p>
+              </div>
+              <Badge variant="secondary" className="text-xs">可用</Badge>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-muted/30">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">论坛列表</p>
+                <p className="text-xl font-semibold">{systemStats.resourcesCount.forums}</p>
+              </div>
+              <Badge variant="secondary" className="text-xs">可用</Badge>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-muted/30">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">社交账号</p>
+                <p className="text-xl font-semibold">{systemStats.resourcesCount.socialAccounts}</p>
+              </div>
+              <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">低库存</Badge>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-muted/30">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">新闻站点</p>
+                <p className="text-xl font-semibold">{systemStats.resourcesCount.newsSites}</p>
+              </div>
+              <Badge variant="secondary" className="text-xs">可用</Badge>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* 服务统计和最近订单 */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* 服务分布 */}
+        {/* 工作流状态 */}
         <Card>
-          <CardHeader>
-            <CardTitle>服务收入分布</CardTitle>
-            <CardDescription>各服务类别收入占比</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-medium">工作流状态</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/admin/workflows">
+                管理
+                <ArrowUpRight className="h-3 w-3 ml-1" />
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {serviceStats.map((service) => (
-                <div key={service.name} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{service.name}</span>
-                    <span className="text-muted-foreground">
-                      ${service.revenue.toLocaleString()} ({service.percentage}%)
-                    </span>
+              {workflowStatus.map((wf) => (
+                <div key={wf.id} className="flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    {wf.status === "running" ? (
+                      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                    ) : (
+                      <div className="h-2 w-2 rounded-full bg-amber-500" />
+                    )}
                   </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${service.percentage}%` }}
-                    />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-sm truncate">{wf.name}</p>
+                      <Badge variant={wf.status === "running" ? "default" : "secondary"} className="text-xs">
+                        {wf.status === "running" ? "运行中" : "已暂停"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                      <span>执行中: {wf.activeJobs}</span>
+                      <span>队列: {wf.queuedJobs}</span>
+                      <span>今日: {wf.completedToday}</span>
+                      <span className="text-green-600 dark:text-green-400">{wf.successRate}%</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -229,32 +355,44 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* 最近订单 */}
+        {/* 最近执行任务 */}
         <Card>
-          <CardHeader>
-            <CardTitle>最近订单</CardTitle>
-            <CardDescription>最新5笔订单</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-medium">最近执行任务</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/admin/logs">
+                查看日志
+                <ArrowUpRight className="h-3 w-3 ml-1" />
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-                      {order.user.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{order.user}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {order.service} - {order.subService}
-                      </p>
-                    </div>
+            <div className="space-y-3">
+              {recentTasks.map((task) => (
+                <div key={task.id} className="flex items-start gap-3 py-2 border-b last:border-0">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {task.status === "completed" && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                    {task.status === "running" && <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />}
+                    {task.status === "failed" && <AlertTriangle className="h-4 w-4 text-red-500" />}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">${order.amount}</p>
-                    <Badge variant="secondary" className={cn("text-xs", statusColors[order.status])}>
-                      {statusLabels[order.status]}
-                    </Badge>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium truncate">{task.service}</p>
+                      <span className="text-xs text-muted-foreground">{task.orderId}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">{task.user}</p>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-xs text-muted-foreground">{task.platform}</span>
+                      {task.status === "completed" && (
+                        <span className="text-xs text-green-600">{task.completedAt}</span>
+                      )}
+                      {task.status === "running" && (
+                        <span className="text-xs text-blue-600">{task.step}</span>
+                      )}
+                      {task.status === "failed" && (
+                        <span className="text-xs text-red-600">{task.error}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -262,47 +400,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* 最近注册用户 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>最近注册用户</CardTitle>
-          <CardDescription>新注册用户列表</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b text-left text-sm text-muted-foreground">
-                  <th className="pb-3 font-medium">用户</th>
-                  <th className="pb-3 font-medium">邮箱</th>
-                  <th className="pb-3 font-medium text-right">余额</th>
-                  <th className="pb-3 font-medium text-right">订单数</th>
-                  <th className="pb-3 font-medium text-right">注册时间</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentUsers.map((user) => (
-                  <tr key={user.id} className="border-b last:border-0">
-                    <td className="py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
-                          {user.name.charAt(0)}
-                        </div>
-                        <span className="font-medium">{user.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 text-muted-foreground">{user.email}</td>
-                    <td className="py-3 text-right font-medium">${user.balance.toLocaleString()}</td>
-                    <td className="py-3 text-right">{user.orders}</td>
-                    <td className="py-3 text-right text-muted-foreground">{user.registeredAt}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
