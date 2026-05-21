@@ -59,7 +59,6 @@ export const sidebarItems: NavGroup[] = [
         subItems: [
           { title: "外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
           { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit },
-          { title: "内容撰写", url: "/dashboard/services/seo/content", icon: FileEdit },
         ],
       },
       {
@@ -123,6 +122,11 @@ export const sidebarItems: NavGroup[] = [
         title: "数据概览",
         url: "/dashboard/default",
         icon: LayoutDashboard,
+      },
+      {
+        title: "内容撰写",
+        url: "/dashboard/content",
+        icon: FileEdit,
       },
       {
         title: "账单中心",
