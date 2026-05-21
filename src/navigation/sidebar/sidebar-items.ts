@@ -143,6 +143,11 @@ export const sidebarItems: NavGroup[] = [
         icon: CreditCard,
       },
       {
+        title: "账户设置",
+        url: "/dashboard/account",
+        icon: Users,
+      },
+      {
         title: "CRM",
         url: "/dashboard/crm",
         icon: ChartBar,
