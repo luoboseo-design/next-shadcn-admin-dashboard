@@ -295,7 +295,7 @@ export default function ContentEditorPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="write">SEO 分析</TabsTrigger>
-              <TabsTrigger value="preview">预览</TabsTrigger>
+              <TabsTrigger value="preview">GEO 分析</TabsTrigger>
             </TabsList>
 
             <TabsContent value="write" className="space-y-6 mt-0">
