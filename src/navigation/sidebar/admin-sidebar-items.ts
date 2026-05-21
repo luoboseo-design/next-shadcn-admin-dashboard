@@ -15,6 +15,8 @@ import {
   Database,
   CheckCircle,
   Server,
+  BookOpen,
+  Key,
 } from "lucide-react";
 
 export interface AdminNavItem {
@@ -140,12 +142,33 @@ export const adminSidebarItems: AdminNavGroup[] = [
   },
   {
     id: 5,
+    label: "内容管理",
+    items: [
+      {
+        title: "博文管理",
+        url: "/admin/blog",
+        icon: BookOpen,
+        subItems: [
+          { title: "所有博文", url: "/admin/blog" },
+          { title: "新建博文", url: "/admin/blog/new" },
+          { title: "分类管理", url: "/admin/blog/categories" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 6,
     label: "系统",
     items: [
       {
         title: "服务定价",
         url: "/admin/pricing",
         icon: Database,
+      },
+      {
+        title: "API 配置",
+        url: "/admin/api-config",
+        icon: Key,
       },
       {
         title: "系统设置",
