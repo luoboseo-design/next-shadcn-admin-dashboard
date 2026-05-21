@@ -221,7 +221,6 @@ function PricingTable() {
                   <th className="text-left py-3 px-4">说明</th>
                   <th className="text-left py-3 px-4">交付时间</th>
                   <th className="text-left py-3 px-4">示例平台</th>
-                  <th className="text-right py-3 px-4">单价</th>
                 </tr>
               </thead>
               <tbody>
@@ -247,9 +246,6 @@ function PricingTable() {
                             </span>
                           ))}
                         </div>
-                      </td>
-                      <td className="py-3 px-4 text-right font-semibold">
-                        ${info.pricePerArticle}/篇
                       </td>
                     </tr>
                   );
