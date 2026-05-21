@@ -108,6 +108,12 @@ export const sidebarItems: NavGroup[] = [
         icon: ClipboardList,
       },
       {
+        title: "SEO 监控",
+        url: "/dashboard/seo-monitor",
+        icon: Link2,
+        isNew: true,
+      },
+      {
         title: "GEO 监控",
         url: "/dashboard/geo-monitor",
         icon: Activity,
