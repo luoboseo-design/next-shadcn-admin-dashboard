@@ -41,6 +41,7 @@ const backlinkOrders = [
     id: "BL-001",
     name: "产品页面外链建设",
     targetUrl: "https://example.com/product",
+    keyword: "产品推荐",
     anchorText: "最佳产品推荐",
     platforms: ["知乎", "简书", "CSDN"],
     status: "completed",
@@ -55,6 +56,7 @@ const backlinkOrders = [
     id: "BL-002",
     name: "服务页面权重提升",
     targetUrl: "https://example.com/service",
+    keyword: "SEO服务",
     anchorText: "专业服务商",
     platforms: ["百度贴吧", "天涯论坛", "豆瓣"],
     status: "in_progress",
@@ -69,6 +71,7 @@ const backlinkOrders = [
     id: "BL-003",
     name: "博客内容推广计划",
     targetUrl: "https://example.com/blog",
+    keyword: "",
     anchorText: "行业深度分析",
     platforms: ["Medium", "Dev.to", "Hashnode"],
     status: "pending",
@@ -83,6 +86,7 @@ const backlinkOrders = [
     id: "BL-004",
     name: "工具页 SEO 优化",
     targetUrl: "https://example.com/tool",
+    keyword: "在线工具",
     anchorText: "免费在线工具",
     platforms: ["知乎", "简书"],
     status: "in_progress",
@@ -376,6 +380,12 @@ export default function SEOMonitorPage() {
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                         <span className="font-mono">{order.id}</span>
+                        {order.keyword && (
+                          <>
+                            <span>·</span>
+                            <span className="text-primary/80 font-medium">{order.keyword}</span>
+                          </>
+                        )}
                         <span>·</span>
                         <span className="truncate">{order.targetUrl}</span>
                       </div>
