@@ -230,37 +230,97 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
 
   const geoTotalScore = geoScoreItems.reduce((sum, item) => sum + item.score, 0);
 
-  // SEO 检查项
-  const seoChecks: SeoCheckItem[] = [
-    {
-      id: "title",
+  // SEO 评分计算 - 符合SEO写作规范
+  const seoChecks = {
+    // 标题优化
+    titleLength: {
       label: "标题长度",
+      description: "标题应在10-60字符之间",
       status: title.length >= 10 && title.length <= 60 ? "good" : title.length > 0 ? "warning" : "error",
-      message: title.length === 0 ? "请输入标题" : title.length < 10 ? "标题过短，建议10-60字" : title.length > 60 ? "标题过长，建议10-60字" : "标题长度合适",
+      score: title.length >= 10 && title.length <= 60 ? 15 : title.length > 0 ? 8 : 0,
+      weight: 15,
+      detail: `${title.length}/60 字符`,
     },
-    {
-      id: "content",
+    // 标题含关键词
+    titleKeyword: {
+      label: "标题关键词",
+      description: "标题应包含目标关键词",
+      status: keywords.length > 0 && keywords.some(kw => title.toLowerCase().includes(kw.toLowerCase())) ? "good" : keywords.length > 0 ? "error" : "warning",
+      score: keywords.length > 0 && keywords.some(kw => title.toLowerCase().includes(kw.toLowerCase())) ? 10 : 0,
+      weight: 10,
+      detail: keywords.length > 0 && keywords.some(kw => title.toLowerCase().includes(kw.toLowerCase())) ? "已包含" : "未包含",
+    },
+    // 内容长度
+    contentLength: {
       label: "内容长度",
+      description: "优质内容建议800字以上",
       status: wordCount >= 800 ? "good" : wordCount >= 300 ? "warning" : "error",
-      message: wordCount < 300 ? "内容过短，建议至少800字" : wordCount < 800 ? "内容偏短，建议增加到800字以上" : "内容长度良好",
+      score: wordCount >= 800 ? 15 : wordCount >= 300 ? 8 : Math.round(wordCount / 300 * 5),
+      weight: 15,
+      detail: `${wordCount} 字`,
     },
-    {
-      id: "keywords",
-      label: "关键词使用",
+    // 关键词密度
+    keywordDensity: {
+      label: "关键词密度",
+      description: "理想密度为1%-3%",
       status: parseFloat(keywordDensity) >= 1 && parseFloat(keywordDensity) <= 3 ? "good" : parseFloat(keywordDensity) > 0 ? "warning" : "error",
-      message: parseFloat(keywordDensity) === 0 ? "未使用关键词" : parseFloat(keywordDensity) < 1 ? "关键词密度过低" : parseFloat(keywordDensity) > 3 ? "关键词密度过高" : "关键词密度合适",
+      score: parseFloat(keywordDensity) >= 1 && parseFloat(keywordDensity) <= 3 ? 10 : parseFloat(keywordDensity) > 0 ? 5 : 0,
+      weight: 10,
+      detail: `${keywordDensity}%`,
     },
-    {
-      id: "headings",
+    // 首段关键词
+    firstParagraph: {
+      label: "首段关键词",
+      description: "首段100字内应出现关键词",
+      status: keywords.length > 0 && keywords.some(kw => content.slice(0, 100).toLowerCase().includes(kw.toLowerCase())) ? "good" : keywords.length > 0 ? "warning" : "error",
+      score: keywords.length > 0 && keywords.some(kw => content.slice(0, 100).toLowerCase().includes(kw.toLowerCase())) ? 10 : 0,
+      weight: 10,
+      detail: keywords.length > 0 && keywords.some(kw => content.slice(0, 100).toLowerCase().includes(kw.toLowerCase())) ? "已包含" : "未包含",
+    },
+    // 标题结构H2/H3
+    headingStructure: {
       label: "标题结构",
-      status: content.includes("##") ? "good" : content.length > 500 ? "warning" : "error",
-      message: content.includes("##") ? "包含小标题" : "建议添加小标题结构",
+      description: "使用H2/H3组织内容层级",
+      status: (content.match(/^##\s/gm) || []).length >= 2 ? "good" : content.includes("##") ? "warning" : "error",
+      score: Math.min((content.match(/^##\s|^###\s/gm) || []).length * 3, 10),
+      weight: 10,
+      detail: `${(content.match(/^##\s|^###\s/gm) || []).length} 个标题`,
     },
-  ];
+    // 段落结构
+    paragraphStructure: {
+      label: "段落结构",
+      description: "段落不宜过长，便于阅读",
+      status: content.split(/\n\n+/).filter(p => p.trim().length > 0).every(p => p.length < 500) ? "good" : "warning",
+      score: content.split(/\n\n+/).filter(p => p.trim().length > 0 && p.length < 500).length >= 3 ? 10 : 5,
+      weight: 10,
+      detail: `${content.split(/\n\n+/).filter(p => p.trim().length > 0).length} 个段落`,
+    },
+    // 列表使用
+    listUsage: {
+      label: "列表使用",
+      description: "使用列表提高可读性",
+      status: (content.match(/^-\s|^\d+\.\s/gm) || []).length >= 3 ? "good" : content.match(/^-\s|^\d+\.\s/gm) ? "warning" : "error",
+      score: Math.min((content.match(/^-\s|^\d+\.\s/gm) || []).length * 2, 10),
+      weight: 10,
+      detail: `${(content.match(/^-\s|^\d+\.\s/gm) || []).length} 个列表项`,
+    },
+    // 内部链接
+    internalLinks: {
+      label: "内链外链",
+      description: "添加相关链接提升权重",
+      status: (content.match(/\[.+\]\(.+\)|https?:\/\//g) || []).length >= 2 ? "good" : content.match(/\[.+\]\(.+\)|https?:\/\//) ? "warning" : "error",
+      score: Math.min((content.match(/\[.+\]\(.+\)|https?:\/\//g) || []).length * 3, 10),
+      weight: 10,
+      detail: `${(content.match(/\[.+\]\(.+\)|https?:\/\//g) || []).length} 个链接`,
+    },
+  };
 
-  const seoScore = Math.round(
-    (seoChecks.filter(c => c.status === "good").length / seoChecks.length) * 100
-  );
+  const seoScoreItems = Object.entries(seoChecks).map(([key, item]) => ({
+    key,
+    ...item,
+  }));
+
+  const seoTotalScore = seoScoreItems.reduce((sum, item) => sum + item.score, 0);
 
   const addKeyword = () => {
     if (newKeyword.trim() && !keywords.includes(newKeyword.trim())) {
@@ -567,8 +627,8 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
               <TabsTrigger value="preview">GEO 分析</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="write" className="space-y-6 mt-0">
-              {/* SEO 评分 */}
+            <TabsContent value="write" className="space-y-4 mt-0">
+              {/* SEO 总评分 */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center justify-between">
@@ -578,95 +638,127 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
                     </span>
                     <span className={cn(
                       "text-2xl font-bold",
-                      seoScore >= 80 ? "text-green-500" : seoScore >= 50 ? "text-yellow-500" : "text-red-500"
+                      seoTotalScore >= 80 ? "text-green-500" : seoTotalScore >= 50 ? "text-yellow-500" : "text-red-500"
                     )}>
-                      {seoScore}
+                      {seoTotalScore}
                     </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Progress 
-                    value={seoScore} 
+                    value={seoTotalScore} 
                     className={cn(
                       "h-2 mb-4",
-                      seoScore >= 80 ? "[&>div]:bg-green-500" : seoScore >= 50 ? "[&>div]:bg-yellow-500" : "[&>div]:bg-red-500"
+                      seoTotalScore >= 80 ? "[&>div]:bg-green-500" : seoTotalScore >= 50 ? "[&>div]:bg-yellow-500" : "[&>div]:bg-red-500"
                     )}
                   />
-                  <div className="space-y-3">
-                    {seoChecks.map((check) => (
-                      <div key={check.id} className="flex items-start gap-2">
-                        {check.status === "good" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                        ) : check.status === "warning" ? (
-                          <AlertCircle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                        ) : (
-                          <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                        )}
-                        <div>
-                          <div className="text-sm font-medium">{check.label}</div>
-                          <div className="text-xs text-muted-foreground">{check.message}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    SEO 评估内容在搜索引擎中的排名潜力
+                  </p>
                 </CardContent>
               </Card>
 
-              {/* 内容建议 */}
+              {/* SEO 评分详情 */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    评分详情
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {seoScoreItems.map((item) => (
+                    <div key={item.key} className="space-y-1.5">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          {item.status === "good" ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          ) : item.status === "warning" ? (
+                            <AlertCircle className="h-4 w-4 text-yellow-500" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          )}
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {item.score}/{item.weight}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Progress 
+                          value={(item.score / item.weight) * 100} 
+                          className={cn(
+                            "h-1.5 flex-1",
+                            item.status === "good" ? "[&>div]:bg-green-500" : 
+                            item.status === "warning" ? "[&>div]:bg-yellow-500" : "[&>div]:bg-red-500"
+                          )}
+                        />
+                        <span className="text-xs text-muted-foreground w-16 text-right">
+                          {item.detail}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground pl-6">{item.description}</p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* SEO 优化建议 */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <Lightbulb className="h-4 w-4" />
-                    优化建议
+                    SEO 优化建议
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex items-start gap-2 text-sm">
-                    <ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span>在标题中包含主要关键词</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span>添加 2-3 个小标题来组织内容</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span>在首段和结尾自然融入关键词</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span>添加内部链接和外部引用</span>
-                  </div>
+                  {seoScoreItems.filter(item => item.status !== "good").slice(0, 4).map((item) => (
+                    <div key={item.key} className="flex items-start gap-2 text-sm">
+                      <ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-medium">{item.label}：</span>
+                        <span className="text-muted-foreground">
+                          {item.key === "titleLength" && "调整标题长度至10-60字符"}
+                          {item.key === "titleKeyword" && "在标题中加入目标关键词"}
+                          {item.key === "contentLength" && "增加内容长度至800字以上"}
+                          {item.key === "keywordDensity" && "调整关键词密度至1%-3%"}
+                          {item.key === "firstParagraph" && "在首段100字内加入关键词"}
+                          {item.key === "headingStructure" && "添加2-3个H2/H3小标题"}
+                          {item.key === "paragraphStructure" && "拆分过长段落"}
+                          {item.key === "listUsage" && "使用列表整理要点"}
+                          {item.key === "internalLinks" && "添加相关链接"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  {seoScoreItems.filter(item => item.status !== "good").length === 0 && (
+                    <div className="text-sm text-green-600 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      内容已针对搜索引擎充分优化
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
-              {/* 关键词分析 */}
+              {/* 搜索结果预览 */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
-                    关键词分析
+                    搜索结果预览
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {keywords.map((kw) => {
-                      const escapedKw = escapeRegex(kw);
-                      const count = (content.match(new RegExp(escapedKw, "gi")) || []).length;
-                      return (
-                        <div key={kw} className="flex items-center justify-between">
-                          <span className="text-sm">{kw}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">出现 {count} 次</span>
-                            {count > 0 ? (
-                              <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-                            ) : (
-                              <AlertCircle className="h-3.5 w-3.5 text-yellow-500" />
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="p-3 border rounded-lg bg-background">
+                    <div className="text-blue-600 text-base hover:underline cursor-pointer line-clamp-2">
+                      {title || "文章标题将显示在这里"}
+                    </div>
+                    <div className="text-green-700 text-xs mt-1">
+                      {"example.com › blog › article"}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
+                      {content.replace(/^##?\s.+$/gm, '').replace(/\n+/g, ' ').slice(0, 120) || "文章描述将显示在这里..."}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
