@@ -5,7 +5,6 @@ import {
   FileEdit,
   Globe,
   Home,
-  LayoutDashboard,
   Link2,
   type LucideIcon,
   Newspaper,
@@ -117,11 +116,6 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/news-monitor",
         icon: Newspaper,
         isNew: true,
-      },
-      {
-        title: "数据概览",
-        url: "/dashboard/default",
-        icon: LayoutDashboard,
       },
       {
         title: "内容撰写",
