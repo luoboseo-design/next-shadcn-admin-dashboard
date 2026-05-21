@@ -300,67 +300,6 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
             </div>
           </div>
 
-          {/* 封面图上传 */}
-          <div className="mb-6">
-            <Label className="text-sm font-medium mb-2 block">封面图</Label>
-            {coverImage ? (
-              <div className="relative rounded-lg overflow-hidden border bg-muted">
-                <img 
-                  src={coverImage} 
-                  alt="封面图" 
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    onClick={() => document.getElementById('cover-upload')?.click()}
-                  >
-                    <ImagePlus className="h-4 w-4 mr-1" />
-                    更换
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => setCoverImage(null)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    删除
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div 
-                className="border-2 border-dashed rounded-lg h-48 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
-                onClick={() => document.getElementById('cover-upload')?.click()}
-              >
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                  <ImagePlus className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium">点击上传封面图</p>
-                  <p className="text-xs text-muted-foreground mt-1">推荐尺寸 1200 x 630 px</p>
-                </div>
-              </div>
-            )}
-            <input
-              id="cover-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = (e) => {
-                    setCoverImage(e.target?.result as string);
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }}
-            />
-          </div>
-
           {/* 标题输入 - 带下拉建议 */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
@@ -440,6 +379,87 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
               onChange={setContent}
               placeholder={isGenerating ? "AI 正在生成内容..." : "内容将由 AI 自动生成，您也可以手动编辑..."}
               disabled={isGenerating}
+            />
+          </div>
+
+          {/* AI 生成封面图 */}
+          <div className="mb-6 p-4 bg-muted/30 rounded-xl border">
+            <div className="flex items-center justify-between mb-3">
+              <Label className="text-sm font-medium">封面图</Label>
+              {!coverImage && content.length > 100 && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    // 模拟AI生成封面图
+                    setCoverImage("https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop");
+                  }}
+                  className="gap-1"
+                >
+                  <Wand2 className="h-3.5 w-3.5" />
+                  AI 生成封面
+                </Button>
+              )}
+            </div>
+            {coverImage ? (
+              <div className="relative rounded-lg overflow-hidden">
+                <img 
+                  src={coverImage} 
+                  alt="封面图" 
+                  className="w-full h-40 object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => {
+                      // 重新生成
+                      setCoverImage("https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop");
+                    }}
+                  >
+                    <Wand2 className="h-4 w-4 mr-1" />
+                    重新生成
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => document.getElementById('cover-upload')?.click()}
+                  >
+                    <ImagePlus className="h-4 w-4 mr-1" />
+                    上传自定义
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => setCoverImage(null)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-lg h-32 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <ImagePlus className="h-8 w-8" />
+                <p className="text-xs">
+                  {content.length < 100 ? "输入内容后可生成封面图" : "点击上方按钮生成封面图"}
+                </p>
+              </div>
+            )}
+            <input
+              id="cover-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    setCoverImage(e.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
             />
           </div>
 
