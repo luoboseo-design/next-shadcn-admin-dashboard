@@ -125,16 +125,18 @@ const seoServices = [
     description: "在高权重媒体发布品牌文章",
     pricingMode: "package" as PricingMode,
     status: "active",
-    packages: [
-      { id: "3media", name: "3媒体套餐", quantity: 3, unit: "家媒体", price: 299 },
-      { id: "5media", name: "5媒体套餐", quantity: 5, unit: "家媒体", price: 449 },
-      { id: "10media", name: "10媒体套餐", quantity: 10, unit: "家媒体", price: 799 },
+    // DR等级定价
+    drTiers: [
+      { id: "dr30", name: "DR 30+", description: "入门级高质量外链，适合新站或预算有限的项目", deliveryDays: "3-5天", examples: ["行业博客", "垂直媒体", "专业论坛"] },
+      { id: "dr50", name: "DR 50+", description: "中等权重外链，适合常规SEO优化需求", deliveryDays: "5-7天", examples: ["Dev.to", "Hackernoon", "36氪", "虎嗅"] },
+      { id: "dr70", name: "DR 70+", description: "高权重外链，显著提升网站权威度", deliveryDays: "7-14天", examples: ["Entrepreneur", "Business Insider", "界面新闻"] },
+      { id: "dr80", name: "DR 80+", description: "顶级权重外链，快速建立行业权威", deliveryDays: "14-21天", examples: ["Forbes", "TechCrunch", "Wired", "Bloomberg"] },
     ],
-    platformTypes: [
-      { id: "tech", name: "科技媒体", enabled: true, priceMultiplier: 1.2 },
-      { id: "business", name: "商业媒体", enabled: true, priceMultiplier: 1.5 },
-      { id: "lifestyle", name: "生活方式", enabled: true, priceMultiplier: 1 },
-      { id: "industry", name: "行业垂直", enabled: true, priceMultiplier: 1.3 },
+    // 打包套餐（不支持单篇）
+    packages: [
+      { id: "growth", name: "成长版", quantity: 5, unit: "篇文章", discount: 10, recommended: true },
+      { id: "pro", name: "专业版", quantity: 10, unit: "篇文章", discount: 15 },
+      { id: "enterprise", name: "企业版", quantity: 30, unit: "篇文章", discount: 25 },
     ],
   },
 ];
@@ -490,8 +492,69 @@ export default function ProductsPage() {
                     {/* 套餐定价模式 */}
                     {service.pricingMode === "package" && "packages" in service && (
                       <div className="space-y-4">
+                        {/* 客座文章特有：DR等级配置 */}
+                        {"drTiers" in service && service.drTiers && (
+                          <div className="space-y-3 mb-6">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium">DR 等级配置</h4>
+                              <Button variant="outline" size="sm">
+                                <Plus className="h-4 w-4 mr-1" />
+                                添加等级
+                              </Button>
+                            </div>
+                            <div className="border rounded-lg">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>DR 等级</TableHead>
+                                    <TableHead>说明</TableHead>
+                                    <TableHead>交付时间</TableHead>
+                                    <TableHead>示例平台</TableHead>
+                                    <TableHead>状态</TableHead>
+                                    <TableHead className="w-20">操作</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {service.drTiers.map((tier) => (
+                                    <TableRow key={tier.id}>
+                                      <TableCell className="font-medium">{tier.name}</TableCell>
+                                      <TableCell className="text-muted-foreground max-w-[200px] text-sm">
+                                        {tier.description}
+                                      </TableCell>
+                                      <TableCell>{tier.deliveryDays}</TableCell>
+                                      <TableCell>
+                                        <div className="flex flex-wrap gap-1">
+                                          {tier.examples.map((ex) => (
+                                            <span key={ex} className="px-2 py-0.5 bg-muted rounded text-xs">
+                                              {ex}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Switch defaultChecked />
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex items-center gap-1">
+                                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                                            <Pencil className="h-3.5 w-3.5" />
+                                          </Button>
+                                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                          </Button>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 套餐配置 */}
                         <div className="flex items-center justify-between">
-                          <h4 className="font-medium">套餐定价</h4>
+                          <h4 className="font-medium">{"drTiers" in service ? "批量套餐（折扣）" : "套餐定价"}</h4>
                           <Button variant="outline" size="sm">
                             <Plus className="h-4 w-4 mr-1" />
                             添加套餐
@@ -504,7 +567,11 @@ export default function ProductsPage() {
                                 <TableHead className="w-10" />
                                 <TableHead>套餐名称</TableHead>
                                 <TableHead>数量</TableHead>
-                                <TableHead>价格</TableHead>
+                                {"drTiers" in service ? (
+                                  <TableHead>折扣</TableHead>
+                                ) : (
+                                  <TableHead>价格</TableHead>
+                                )}
                                 <TableHead>状态</TableHead>
                                 <TableHead className="w-20">操作</TableHead>
                               </TableRow>
@@ -515,11 +582,26 @@ export default function ProductsPage() {
                                   <TableCell>
                                     <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
                                   </TableCell>
-                                  <TableCell className="font-medium">{pkg.name}</TableCell>
+                                  <TableCell className="font-medium">
+                                    <div className="flex items-center gap-2">
+                                      {pkg.name}
+                                      {"recommended" in pkg && pkg.recommended && (
+                                        <Badge className="bg-primary/10 text-primary text-xs">推荐</Badge>
+                                      )}
+                                    </div>
+                                  </TableCell>
                                   <TableCell>
                                     {pkg.quantity} {pkg.unit}
                                   </TableCell>
-                                  <TableCell className="font-mono">${pkg.price}</TableCell>
+                                  {"drTiers" in service ? (
+                                    <TableCell className="text-green-600 font-medium">
+                                      {"discount" in pkg && pkg.discount ? `省 ${pkg.discount}%` : "-"}
+                                    </TableCell>
+                                  ) : (
+                                    <TableCell className="font-mono">
+                                      {"price" in pkg ? `$${pkg.price}` : "-"}
+                                    </TableCell>
+                                  )}
                                   <TableCell>
                                     <Switch defaultChecked />
                                   </TableCell>
@@ -543,7 +625,7 @@ export default function ProductsPage() {
                           </Table>
                         </div>
 
-                        {/* 平台类型及价格系数 */}
+                        {/* 平台类型及价格系数（仅外链代发有此配置） */}
                         {"platformTypes" in service && service.platformTypes && (
                           <div className="space-y-3 mt-6">
                             <div className="flex items-center justify-between">
@@ -673,7 +755,7 @@ export default function ProductsPage() {
                       </div>
                     )}
 
-                    {/* 单价×数量×平台 定价模式（GEO关键词） */}
+                    {/* 单价×数量×平台 定价模式��GEO关键词） */}
                     {service.pricingMode === "unit_platform" && "unitPricing" in service && (
                       <div className="space-y-6">
                         <div className="space-y-3">
