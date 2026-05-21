@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
@@ -452,40 +454,61 @@ export default function DiagnosePage() {
                     <span className="font-medium">AI 分析完成</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    以下是我们对你网站的分析结果，请确认或修改
+                    以下是我们对你网站的分析结果，可直接编辑修改
                   </p>
                 </div>
                 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted-foreground">品牌名称</div>
-                    <div className="font-medium">{formData.brandName}</div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">品牌名称</Label>
+                    <Input 
+                      value={formData.brandName}
+                      onChange={(e) => updateFormData({ brandName: e.target.value })}
+                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted-foreground">网站语言</div>
-                    <div className="font-medium">{formData.language}</div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">网站语言</Label>
+                    <Input 
+                      value={formData.language}
+                      onChange={(e) => updateFormData({ language: e.target.value })}
+                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted-foreground">目标市场</div>
-                    <div className="font-medium">{formData.country}</div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">目标市场</Label>
+                    <Input 
+                      value={formData.country}
+                      onChange={(e) => updateFormData({ country: e.target.value })}
+                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted-foreground">行业类型</div>
-                    <div className="font-medium">{formData.industry}</div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">行业类型</Label>
+                    <Input 
+                      value={formData.industry}
+                      onChange={(e) => updateFormData({ industry: e.target.value })}
+                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted-foreground">业务模式</div>
-                    <div className="font-medium">{formData.businessModel}</div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">业务模式</Label>
+                    <Input 
+                      value={formData.businessModel}
+                      onChange={(e) => updateFormData({ businessModel: e.target.value })}
+                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted-foreground">目标客户</div>
-                    <div className="font-medium">{formData.targetCustomers}</div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">目标客户</Label>
+                    <Input 
+                      value={formData.targetCustomers}
+                      onChange={(e) => updateFormData({ targetCustomers: e.target.value })}
+                    />
                   </div>
                 </div>
                 
-                <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground">核心产品/服务</div>
-                  <div className="font-medium">{formData.coreProducts}</div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">核心产品/服务</Label>
+                  <Input 
+                    value={formData.coreProducts}
+                    onChange={(e) => updateFormData({ coreProducts: e.target.value })}
+                  />
                 </div>
               </div>
             )}
@@ -494,33 +517,87 @@ export default function DiagnosePage() {
             {currentStep === 4 && (
               <div className="space-y-6">
                 <div>
-                  <div className="text-sm font-medium mb-3">识别到的主要竞争对手</div>
-                  <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-sm font-medium">识别到的主要竞争对手</div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        updateFormData({
+                          competitors: [...formData.competitors, { name: "", domain: "", strength: "" }]
+                        });
+                      }}
+                      className="h-7 text-xs gap-1"
+                    >
+                      <Plus className="h-3 w-3" />
+                      添加竞品
+                    </Button>
+                  </div>
+                  <div className="space-y-3">
                     {formData.competitors.map((competitor, index) => (
                       <div 
                         key={index}
-                        className="flex items-center justify-between p-3 rounded-lg border"
+                        className="flex items-start gap-3 p-3 rounded-lg border"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded bg-muted flex items-center justify-center text-sm font-medium">
-                            {index + 1}
-                          </div>
-                          <div>
-                            <div className="font-medium">{competitor.name}</div>
-                            <div className="text-xs text-muted-foreground">{competitor.domain}</div>
-                          </div>
+                        <div className="w-6 h-6 rounded bg-muted flex items-center justify-center text-xs font-medium shrink-0 mt-1">
+                          {index + 1}
                         </div>
-                        <Badge variant="secondary">{competitor.strength}</Badge>
+                        <div className="flex-1 grid gap-2 sm:grid-cols-3">
+                          <Input
+                            placeholder="竞品名称"
+                            value={competitor.name}
+                            onChange={(e) => {
+                              const updated = [...formData.competitors];
+                              updated[index] = { ...updated[index], name: e.target.value };
+                              updateFormData({ competitors: updated });
+                            }}
+                            className="h-8 text-sm"
+                          />
+                          <Input
+                            placeholder="域名"
+                            value={competitor.domain}
+                            onChange={(e) => {
+                              const updated = [...formData.competitors];
+                              updated[index] = { ...updated[index], domain: e.target.value };
+                              updateFormData({ competitors: updated });
+                            }}
+                            className="h-8 text-sm"
+                          />
+                          <Input
+                            placeholder="竞争优势"
+                            value={competitor.strength}
+                            onChange={(e) => {
+                              const updated = [...formData.competitors];
+                              updated[index] = { ...updated[index], strength: e.target.value };
+                              updateFormData({ competitors: updated });
+                            }}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const updated = formData.competitors.filter((_, i) => i !== index);
+                            updateFormData({ competitors: updated });
+                          }}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
                     ))}
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="text-sm font-medium">市场定位分析</div>
-                  <div className="p-4 rounded-lg bg-muted/50 text-sm">
-                    {formData.marketPosition}
-                  </div>
+                  <Label className="text-sm font-medium">市场定位分析</Label>
+                  <Textarea
+                    value={formData.marketPosition}
+                    onChange={(e) => updateFormData({ marketPosition: e.target.value })}
+                    className="min-h-[80px] text-sm"
+                    placeholder="描述你在市场中的定位..."
+                  />
                 </div>
               </div>
             )}
@@ -612,7 +689,7 @@ export default function DiagnosePage() {
                       已选 {formData.selectedKeywords.length} 个
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
                     {formData.suggestedKeywords.map((keyword, index) => (
                       <label
                         key={index}
@@ -632,6 +709,45 @@ export default function DiagnosePage() {
                       </label>
                     ))}
                   </div>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="添加自定义关键词"
+                      className="h-8 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                          const newKeyword = e.currentTarget.value.trim();
+                          if (!formData.suggestedKeywords.includes(newKeyword)) {
+                            updateFormData({
+                              suggestedKeywords: [...formData.suggestedKeywords, newKeyword],
+                              selectedKeywords: [...formData.selectedKeywords, newKeyword],
+                            });
+                          }
+                          e.currentTarget.value = '';
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs shrink-0"
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                        if (input?.value.trim()) {
+                          const newKeyword = input.value.trim();
+                          if (!formData.suggestedKeywords.includes(newKeyword)) {
+                            updateFormData({
+                              suggestedKeywords: [...formData.suggestedKeywords, newKeyword],
+                              selectedKeywords: [...formData.selectedKeywords, newKeyword],
+                            });
+                          }
+                          input.value = '';
+                        }
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      添加
+                    </Button>
+                  </div>
                 </div>
 
                 {/* 长尾词建议 */}
@@ -642,7 +758,7 @@ export default function DiagnosePage() {
                       已选 {formData.selectedLongTails.length} 个
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
                     {formData.suggestedLongTails.map((keyword, index) => (
                       <label
                         key={index}
@@ -662,6 +778,45 @@ export default function DiagnosePage() {
                       </label>
                     ))}
                   </div>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="添加自定义长尾词"
+                      className="h-8 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                          const newKeyword = e.currentTarget.value.trim();
+                          if (!formData.suggestedLongTails.includes(newKeyword)) {
+                            updateFormData({
+                              suggestedLongTails: [...formData.suggestedLongTails, newKeyword],
+                              selectedLongTails: [...formData.selectedLongTails, newKeyword],
+                            });
+                          }
+                          e.currentTarget.value = '';
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs shrink-0"
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                        if (input?.value.trim()) {
+                          const newKeyword = input.value.trim();
+                          if (!formData.suggestedLongTails.includes(newKeyword)) {
+                            updateFormData({
+                              suggestedLongTails: [...formData.suggestedLongTails, newKeyword],
+                              selectedLongTails: [...formData.selectedLongTails, newKeyword],
+                            });
+                          }
+                          input.value = '';
+                        }
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      添加
+                    </Button>
+                  </div>
                 </div>
 
                 {/* 问答建议 */}
@@ -672,7 +827,7 @@ export default function DiagnosePage() {
                       已选 {formData.selectedQueries.length} 个
                     </span>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 mb-2">
                     {formData.suggestedQueries.map((query, index) => (
                       <label
                         key={index}
@@ -691,6 +846,45 @@ export default function DiagnosePage() {
                         {query}
                       </label>
                     ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="添加自定义问答，如：XX产品怎么样？"
+                      className="h-8 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                          const newQuery = e.currentTarget.value.trim();
+                          if (!formData.suggestedQueries.includes(newQuery)) {
+                            updateFormData({
+                              suggestedQueries: [...formData.suggestedQueries, newQuery],
+                              selectedQueries: [...formData.selectedQueries, newQuery],
+                            });
+                          }
+                          e.currentTarget.value = '';
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs shrink-0"
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                        if (input?.value.trim()) {
+                          const newQuery = input.value.trim();
+                          if (!formData.suggestedQueries.includes(newQuery)) {
+                            updateFormData({
+                              suggestedQueries: [...formData.suggestedQueries, newQuery],
+                              selectedQueries: [...formData.selectedQueries, newQuery],
+                            });
+                          }
+                          input.value = '';
+                        }
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      添加
+                    </Button>
                   </div>
                 </div>
               </div>
