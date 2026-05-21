@@ -303,49 +303,60 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
               <Label className="text-sm font-medium">文章标题</Label>
               <span className="text-xs text-muted-foreground">{title.length}/60 字符</span>
             </div>
-            <div className="relative">
+            <div 
+              className="relative"
+              onMouseEnter={() => suggestedTitles.length > 0 && setShowTitleDropdown(true)}
+              onMouseLeave={() => setShowTitleDropdown(false)}
+            >
               <Input
                 placeholder={isGenerating ? "AI 正在生成标题..." : "输入文章标题，或由 AI 自动生成"}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-lg font-semibold h-12 pr-10"
+                onFocus={() => suggestedTitles.length > 0 && setShowTitleDropdown(true)}
+                className={cn(
+                  "text-lg font-semibold h-12 pr-10",
+                  suggestedTitles.length > 0 && "pr-10"
+                )}
                 disabled={isGenerating}
               />
               {suggestedTitles.length > 0 && (
-                <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <DropdownMenu open={showTitleDropdown} onOpenChange={setShowTitleDropdown}>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground">
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[500px]">
-                      <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium">
+                <>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                    <ChevronDown className={cn("h-4 w-4 transition-transform", showTitleDropdown && "rotate-180")} />
+                  </div>
+                  {showTitleDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-lg z-50">
+                      <div className="px-3 py-2 text-xs text-muted-foreground font-medium border-b">
                         AI 建议标题（点击选择）
                       </div>
-                      {suggestedTitles.map((suggestedTitle, index) => (
-                        <DropdownMenuItem
-                          key={index}
-                          onClick={() => {
-                            setTitle(suggestedTitle);
-                            setShowTitleDropdown(false);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <span className={cn(
-                            "truncate",
-                            title === suggestedTitle && "font-medium text-primary"
-                          )}>
-                            {suggestedTitle}
-                          </span>
-                          {title === suggestedTitle && (
-                            <CheckCircle2 className="h-4 w-4 ml-auto text-primary shrink-0" />
-                          )}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                      <div className="py-1">
+                        {suggestedTitles.map((suggestedTitle, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setTitle(suggestedTitle);
+                              setShowTitleDropdown(false);
+                            }}
+                            className={cn(
+                              "px-3 py-2 cursor-pointer hover:bg-muted flex items-center justify-between",
+                              title === suggestedTitle && "bg-muted/50"
+                            )}
+                          >
+                            <span className={cn(
+                              "truncate",
+                              title === suggestedTitle && "font-medium text-primary"
+                            )}>
+                              {suggestedTitle}
+                            </span>
+                            {title === suggestedTitle && (
+                              <CheckCircle2 className="h-4 w-4 text-primary shrink-0 ml-2" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
             {title.length > 0 && title.length <= 60 && (
