@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import Link from "next/link";
+
 import { BadgeCheck, Bell, Check, CreditCard, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -70,23 +72,29 @@ export function AccountSwitcher({
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <BadgeCheck />
-            Account
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/account">
+              <BadgeCheck />
+              账户设置
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard />
-            Billing
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/billing">
+              <CreditCard />
+              账单中心
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell />
-            Notifications
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/notifications">
+              <Bell />
+              通知消息
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut />
-          Log out
+          退出登录
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
