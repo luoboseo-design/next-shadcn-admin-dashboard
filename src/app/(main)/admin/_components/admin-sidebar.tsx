@@ -58,7 +58,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="overflow-y-auto">
         {adminSidebarItems.map((group) => (
           <SidebarGroup key={group.id}>
             {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
@@ -126,7 +126,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         ))}
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="返回用户端">
