@@ -65,11 +65,9 @@ export interface Platform {
 
 export type TaskStatus =
   | "pending" // 待处理
-  | "analyzing" // AI 分析中
-  | "publishing" // 发布中
-  | "awaiting" // 待验收
+  | "running" // 运行中
   | "completed" // 已完成
-  | "failed"; // 失败
+  | "accepted"; // 已验收
 
 export type PublishResultStatus = "success" | "pending" | "failed";
 
