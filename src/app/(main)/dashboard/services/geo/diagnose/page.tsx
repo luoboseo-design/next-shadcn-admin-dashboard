@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -59,10 +59,12 @@ const aiPlatforms = [
 
 export default function DiagnosePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [analyzeStatus, setAnalyzeStatus] = useState("");
+  const [initialized, setInitialized] = useState(false);
 
   // 表单数据
   const [formData, setFormData] = useState({
@@ -108,8 +110,28 @@ export default function DiagnosePage() {
     updateFormData({ [field]: updated });
   };
 
-  // 模拟 AI 分析网站
-  const analyzeWebsite = async () => {
+  // 页面加载时检查URL参数，如果有url则直接开始分析
+  useEffect(() => {
+    if (initialized) return;
+    
+    const urlParam = searchParams.get('url');
+    if (urlParam) {
+      const decodedUrl = decodeURIComponent(urlParam);
+      setFormData(prev => ({ ...prev, domain: decodedUrl }));
+      setInitialized(true);
+      // 直接跳到第2步并开始分析
+      setCurrentStep(2);
+      // 延迟一下再开始分析，确保状态更新
+      setTimeout(() => {
+        startAnalysis(decodedUrl);
+      }, 100);
+    } else {
+      setInitialized(true);
+    }
+  }, [searchParams, initialized]);
+
+  // 开始分析（抽出来方便复用）
+  const startAnalysis = async (domain: string) => {
     setIsAnalyzing(true);
     setAnalyzeProgress(0);
     
@@ -144,94 +166,78 @@ export default function DiagnosePage() {
     setAnalyzeProgress(100);
     
     // 模拟生成分析结果
-    const domainName = formData.domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
+    const domainName = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
     const brandGuess = domainName.split('.')[0];
-    const isChineseSite = Math.random() > 0.5; // 模拟判断
+    const isChineseSite = Math.random() > 0.5;
     
     // 模拟 AI 平台检测结果
     const platformResults: Record<string, { found: boolean; mentions: number; sentiment: string }> = {};
-    const recommendedPlatforms: string[] = [];
-    
     aiPlatforms.forEach(p => {
-      const found = Math.random() > 0.5;
-      const mentions = found ? Math.floor(Math.random() * 20) + 1 : 0;
-      const sentiments = ["positive", "neutral", "negative"];
+      const found = Math.random() > 0.6;
       platformResults[p.id] = {
         found,
-        mentions,
-        sentiment: found ? sentiments[Math.floor(Math.random() * 3)] : "none",
+        mentions: found ? Math.floor(Math.random() * 10) + 1 : 0,
+        sentiment: found ? (Math.random() > 0.3 ? "positive" : "neutral") : "none"
       };
-      if (!found) {
-        recommendedPlatforms.push(p.id);
-      }
     });
-    
+
+    // 计算可见性得分
     const foundCount = Object.values(platformResults).filter(r => r.found).length;
-    const score = Math.round((foundCount / aiPlatforms.length) * 100);
-    
-    // 生成关键词建议
-    const industry = isChineseSite ? "企业服务" : "Technology";
-    const suggestedKeywords = isChineseSite 
-      ? [`${brandGuess}`, `${industry}解决方案`, `${industry}服务商`, `${industry}平台`, `${industry}公司`]
-      : [`${brandGuess}`, `${industry} solutions`, `best ${industry} platform`, `${industry} services`, `${industry} tools`];
-    
-    const suggestedLongTails = isChineseSite
-      ? [`${brandGuess}怎么样`, `${brandGuess}好不好`, `${industry}哪家好`, `${industry}排行榜`, `${industry}对比`, `${industry}价格`]
-      : [`${brandGuess} review`, `${brandGuess} vs competitors`, `best ${industry} 2024`, `${industry} comparison`, `${industry} pricing`];
-    
-    const suggestedQueries = isChineseSite
-      ? [
-          `${brandGuess}和竞品相比有什么优势？`,
-          `${industry}领域有哪些值得推荐的服务商？`,
-          `如何选择合适的${industry}解决方案？`,
-          `${industry}的最新趋势是什么？`,
-          `中小企业如何选择${industry}服务？`,
-          `${industry}一般怎么收费？`,
-        ]
-      : [
-          `What are the advantages of ${brandGuess}?`,
-          `What are the best ${industry} solutions?`,
-          `How to choose the right ${industry} platform?`,
-          `What are the latest trends in ${industry}?`,
-          `${industry} for small businesses?`,
-          `How much does ${industry} cost?`,
-        ];
-    
-    const competitors = isChineseSite
-      ? [
-          { name: "竞品A", domain: "competitor-a.com", strength: "市场份额大" },
-          { name: "竞品B", domain: "competitor-b.cn", strength: "价格优势" },
-          { name: "竞品C", domain: "competitor-c.com", strength: "技术领先" },
-        ]
-      : [
-          { name: "Competitor A", domain: "competitor-a.com", strength: "Market leader" },
-          { name: "Competitor B", domain: "competitor-b.com", strength: "Price advantage" },
-          { name: "Competitor C", domain: "competitor-c.io", strength: "Tech innovation" },
-        ];
-    
+    const visibilityScore = Math.round((foundCount / aiPlatforms.length) * 100);
+
+    // 生成推荐关键词
+    const keywordSuggestions = [
+      `${brandGuess}`,
+      `${brandGuess}怎么样`,
+      `${brandGuess}好不好`,
+      `${brandGuess}推荐`,
+      `${brandGuess}替代品`,
+    ];
+
+    const longTailSuggestions = [
+      `${brandGuess}哪个版本好`,
+      `${brandGuess}新手入门`,
+      `${brandGuess}高级技巧`,
+      `${brandGuess}常见问题`,
+      `${brandGuess}使用教程`,
+    ];
+
+    const querySuggestions = [
+      `${brandGuess}和竞品相比有什么优势？`,
+      `${brandGuess}适合什么样的用户？`,
+      `如何快速上手${brandGuess}？`,
+      `${brandGuess}的核心功能有哪些？`,
+      `${brandGuess}的价格是多少？`,
+    ];
+
+    // 更新表单数据
     updateFormData({
       brandName: brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1),
-      language: isChineseSite ? "中文" : "English",
-      country: isChineseSite ? "中国" : "Global",
-      industry: industry,
-      businessModel: isChineseSite ? "B2B / SaaS" : "B2B / SaaS",
-      coreProducts: isChineseSite ? "企业级解决方案、SaaS平台、技术服务" : "Enterprise solutions, SaaS platform, Tech services",
-      targetCustomers: isChineseSite ? "中大型企业、科技公司、创业团队" : "Mid-large enterprises, Tech companies, Startups",
-      competitors,
-      marketPosition: isChineseSite ? "行业中游，有一定知名度但AI可见性待提升" : "Mid-market player with room for AI visibility improvement",
-      aiVisibilityScore: score,
-      platformResults,
-      suggestedKeywords,
-      suggestedLongTails,
-      suggestedQueries,
-      selectedKeywords: suggestedKeywords.slice(0, 3),
-      selectedLongTails: suggestedLongTails.slice(0, 4),
-      selectedQueries: suggestedQueries.slice(0, 3),
-      recommendedPlatforms,
+      language: isChineseSite ? "中文" : "英文",
+      country: isChineseSite ? "中国" : "全球",
+      industry: "互联网/科技",
+      businessModel: "SaaS/软件服务",
+      coreProducts: `${brandGuess}平台、${brandGuess}服务`,
+      targetCustomers: isChineseSite ? "中国企业用户" : "全球企业用户",
+      competitors: "竞品A、竞品B、竞品C",
+      competitorAdvantage: "产品体验、技术实力、客户服务",
+      aiPlatformResults: platformResults,
+      visibilityScore,
+      suggestedKeywords: keywordSuggestions,
+      suggestedLongTails: longTailSuggestions,
+      suggestedQueries: querySuggestions,
+      recommendedPlatforms: isChineseSite 
+        ? ["deepseek", "doubao", "tongyi", "wenxin"]
+        : ["chatgpt", "perplexity", "gemini", "claude"],
     });
-    
+
     setIsAnalyzing(false);
     setCurrentStep(3);
+  };
+
+  // 模拟 AI 分析网站（从步骤1进入时使用）
+  const analyzeWebsite = async () => {
+    await startAnalysis(formData.domain);
   };
 
   const nextStep = () => {
