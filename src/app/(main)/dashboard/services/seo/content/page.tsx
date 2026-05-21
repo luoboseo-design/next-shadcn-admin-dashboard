@@ -4,11 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import {
   Select,
   SelectContent,
@@ -370,13 +370,11 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <Label className="text-sm font-medium">文章内容</Label>
-              <span className="text-xs text-muted-foreground">支持 Markdown 格式</span>
             </div>
-            <Textarea
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
               placeholder={isGenerating ? "AI 正在生成内容..." : "内容将由 AI 自动生成，您也可以手动编辑..."}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[400px] resize-none text-base leading-relaxed"
               disabled={isGenerating}
             />
           </div>
