@@ -1,4 +1,5 @@
 import {
+  Activity,
   Banknote,
   Calendar,
   ChartBar,
@@ -105,6 +106,12 @@ export const sidebarItems: NavGroup[] = [
         title: "任务中心",
         url: "/dashboard/tasks",
         icon: ClipboardList,
+      },
+      {
+        title: "GEO 监控",
+        url: "/dashboard/geo-monitor",
+        icon: Activity,
+        isNew: true,
       },
       {
         title: "数据概览",
