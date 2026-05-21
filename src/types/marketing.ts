@@ -93,8 +93,11 @@ export interface PublishResult {
   errorMessage?: string;
 }
 
+export type TaskType = "backlink" | "guest_post";
+
 export interface BacklinkTask {
   id: string;
+  name?: string;
   targetUrl: string;
   keywords: string[];
   anchorTexts: string[];
@@ -107,6 +110,13 @@ export interface BacklinkTask {
   totalPlatforms: number;
   completedPlatforms: number;
   successRate: number;
+  avgDa?: number;
+  taskType?: TaskType;
+  // 客座文章特有字段
+  articleTitle?: string;
+  targetSite?: string;
+  wordCount?: number;
+  totalViews?: number;
   pricing: TaskPricing;
   createdAt: Date;
   updatedAt: Date;
