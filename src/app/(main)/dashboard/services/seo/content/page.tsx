@@ -379,7 +379,8 @@ export default function ContentEditorPage() {
                 <CardContent>
                   <div className="space-y-3">
                     {keywords.map((kw) => {
-                      const count = (content.match(new RegExp(kw, "gi")) || []).length;
+                      const escapedKw = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                      const count = (content.match(new RegExp(escapedKw, "gi")) || []).length;
                       return (
                         <div key={kw} className="flex items-center justify-between">
                           <span className="text-sm">{kw}</span>
