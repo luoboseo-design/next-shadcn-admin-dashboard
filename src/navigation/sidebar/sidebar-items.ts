@@ -120,6 +120,12 @@ export const sidebarItems: NavGroup[] = [
         isNew: true,
       },
       {
+        title: "社交媒体",
+        url: "/dashboard/social-monitor",
+        icon: Share2,
+        isNew: true,
+      },
+      {
         title: "数据概览",
         url: "/dashboard/default",
         icon: LayoutDashboard,
