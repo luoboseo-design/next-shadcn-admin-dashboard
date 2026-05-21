@@ -21,7 +21,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { getTaskById, taskStatusLabels, taskStatusColors } from "@/data/mock-tasks";
-import { TaskProgress } from "../_components/task-progress";
 import { PublishResultsTable } from "../_components/publish-results-table";
 import { AcceptanceDialog } from "../_components/acceptance-dialog";
 import { cn } from "@/lib/utils";
@@ -261,43 +260,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
         </Card>
       )}
 
-      {/* 关键词和进度 */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>关键词</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {task.keywords.map((kw, i) => (
-                <Badge key={i} variant="secondary" className="text-sm">
-                  {kw}
-                </Badge>
-              ))}
-            </div>
-            {task.anchorTexts.length > 0 && (
-              <>
-                <div className="text-sm text-muted-foreground mt-4 mb-2">锚文本</div>
-                <div className="flex flex-wrap gap-2">
-                  {task.anchorTexts.map((text, i) => (
-                    <Badge key={i} variant="outline" className="text-sm">
-                      {text}
-                    </Badge>
-                  ))}
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>执行进度</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TaskProgress task={task} />
-          </CardContent>
-        </Card>
-      </div>
+
 
       {/* 发布结果表格 - 仅外链任务显示 */}
       {!isGuestPost && task.publishResults.length > 0 && (
