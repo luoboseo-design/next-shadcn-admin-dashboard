@@ -368,11 +368,11 @@ export default function GeoOptimizationPage() {
                     <div className="text-sm font-medium text-muted-foreground">{platformCategoryLabels.en}</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {aiPlatforms.filter(p => p.category === "en").map((platform) => (
-                        <button
+                        <div
                           key={platform.id}
                           onClick={() => togglePlatform(platform.id)}
                           className={cn(
-                            "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left",
+                            "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left cursor-pointer",
                             selectedPlatforms.includes(platform.id)
                               ? "border-primary bg-primary/5"
                               : "border-border hover:border-muted-foreground/30"
@@ -388,7 +388,7 @@ export default function GeoOptimizationPage() {
                           <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
                             {platform.description}
                           </p>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -398,11 +398,11 @@ export default function GeoOptimizationPage() {
                     <div className="text-sm font-medium text-muted-foreground">{platformCategoryLabels.zh}</div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                       {aiPlatforms.filter(p => p.category === "zh").map((platform) => (
-                        <button
+                        <div
                           key={platform.id}
                           onClick={() => togglePlatform(platform.id)}
                           className={cn(
-                            "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left",
+                            "relative flex flex-col items-start p-3 rounded-lg border-2 transition-all text-left cursor-pointer",
                             selectedPlatforms.includes(platform.id)
                               ? "border-primary bg-primary/5"
                               : "border-border hover:border-muted-foreground/30"
@@ -418,7 +418,7 @@ export default function GeoOptimizationPage() {
                           <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
                             {platform.description}
                           </p>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   </div>

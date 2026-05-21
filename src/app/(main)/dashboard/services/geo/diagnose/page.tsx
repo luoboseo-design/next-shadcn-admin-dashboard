@@ -32,6 +32,8 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Plus,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -523,8 +525,9 @@ export default function DiagnosePage() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
+                        const currentCompetitors = Array.isArray(formData.competitors) ? formData.competitors : [];
                         updateFormData({
-                          competitors: [...formData.competitors, { name: "", domain: "", strength: "" }]
+                          competitors: [...currentCompetitors, { name: "", domain: "", strength: "" }]
                         });
                       }}
                       className="h-7 text-xs gap-1"
@@ -534,7 +537,7 @@ export default function DiagnosePage() {
                     </Button>
                   </div>
                   <div className="space-y-3">
-                    {formData.competitors.map((competitor, index) => (
+                    {Array.isArray(formData.competitors) && formData.competitors.map((competitor, index) => (
                       <div 
                         key={index}
                         className="flex items-start gap-3 p-3 rounded-lg border"
