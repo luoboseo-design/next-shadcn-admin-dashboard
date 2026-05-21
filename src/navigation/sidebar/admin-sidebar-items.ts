@@ -1,22 +1,23 @@
 import {
   Activity,
+  BookOpen,
   Bot,
+  CheckCircle,
   CreditCard,
+  Database,
   FileText,
   Globe,
   Home,
+  Key,
   type LucideIcon,
   Newspaper,
+  Package,
   Search,
+  Server,
   Settings,
   Share2,
   Users,
   Workflow,
-  Database,
-  CheckCircle,
-  Server,
-  BookOpen,
-  Key,
 } from "lucide-react";
 
 export interface AdminNavItem {
@@ -124,6 +125,11 @@ export const adminSidebarItems: AdminNavGroup[] = [
     label: "业务管理",
     items: [
       {
+        title: "产品管理",
+        url: "/admin/products",
+        icon: Package,
+      },
+      {
         title: "订单管理",
         url: "/admin/orders",
         icon: CheckCircle,
@@ -160,11 +166,6 @@ export const adminSidebarItems: AdminNavGroup[] = [
     id: 6,
     label: "系统",
     items: [
-      {
-        title: "服务定价",
-        url: "/admin/pricing",
-        icon: Database,
-      },
       {
         title: "API 配置",
         url: "/admin/api-config",
