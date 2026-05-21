@@ -50,6 +50,7 @@ interface SeoCheckItem {
 export default function ContentEditorPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [brandName, setBrandName] = useState("");
   const [keywords, setKeywords] = useState<string[]>(["SEO优化", "内容营销"]);
   const [newKeyword, setNewKeyword] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -173,34 +174,46 @@ export default function ContentEditorPage() {
             </div>
           </div>
 
-          {/* 关键词 */}
-          <div className="mb-6">
-            <Label className="text-sm text-muted-foreground mb-2 block">目标关键词</Label>
-            <div className="flex flex-wrap items-center gap-2">
-              {keywords.map((kw) => (
-                <Badge key={kw} variant="secondary" className="gap-1 pr-1">
-                  {kw}
-                  <button
-                    onClick={() => removeKeyword(kw)}
-                    className="ml-1 hover:bg-muted rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-              <div className="flex items-center gap-1">
-                <Input
-                  placeholder="添加关键词"
-                  value={newKeyword}
-                  onChange={(e) => setNewKeyword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addKeyword()}
-                  className="h-7 w-32 text-sm"
-                />
-                <Button variant="ghost" size="sm" className="h-7 px-2" onClick={addKeyword}>
-                  <Plus className="h-4 w-4" />
-                </Button>
+          {/* 品牌名称和关键词 */}
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm text-muted-foreground mb-2 block">品牌名称</Label>
+              <Input
+                placeholder="输入品牌名称"
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <div>
+              <Label className="text-sm text-muted-foreground mb-2 block">目标关键词</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                {keywords.map((kw) => (
+                  <Badge key={kw} variant="secondary" className="gap-1 pr-1">
+                    {kw}
+                    <button
+                      onClick={() => removeKeyword(kw)}
+                      className="ml-1 hover:bg-muted rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                <div className="flex items-center gap-1">
+                  <Input
+                    placeholder="添加关键词"
+                    value={newKeyword}
+                    onChange={(e) => setNewKeyword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addKeyword()}
+                    className="h-7 w-28 text-sm"
+                  />
+                  <Button variant="ghost" size="sm" className="h-7 px-2" onClick={addKeyword}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
+          </div>
           </div>
 
           {/* AI 工具栏 */}
