@@ -77,6 +77,7 @@ export default function GeoOptimizationPage() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [diagnosisApplied, setDiagnosisApplied] = useState(false);
+  const [diagnoseUrl, setDiagnoseUrl] = useState("");
 
   // 读取诊断结果并自动填充
   useEffect(() => {
@@ -262,48 +263,42 @@ export default function GeoOptimizationPage() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* 页面标题 */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-            <Globe className="h-7 w-7 text-primary" />
-            GEO 优化服务
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            让你的品牌在 AI 搜索结果中排名更靠前
-          </p>
-        </div>
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/services/geo/diagnose" className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            智能诊断
-          </Link>
-        </Button>
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+          <Globe className="h-7 w-7 text-primary" />
+          GEO 优化服务
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          让你的品牌在 AI 搜索结果中排名更靠前
+        </p>
       </div>
 
-      {/* 流程指示 */}
+      {/* 诊断入口 */}
       <Card className="bg-muted/30 border-dashed">
         <CardContent className="py-4">
-          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold">1</div>
-              <span className="text-sm">免费诊断</span>
-              <Check className="h-4 w-4 text-green-500" />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <Input
+                placeholder="输入网站地址，AI 智能分析并推荐优化方案"
+                value={diagnoseUrl}
+                onChange={(e) => setDiagnoseUrl(e.target.value)}
+                className="h-11"
+              />
             </div>
-            <ChevronRight className="hidden md:block h-4 w-4 text-muted-foreground" />
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">2</div>
-              <span className="text-sm font-medium">选择优化服务</span>
-            </div>
-            <ChevronRight className="hidden md:block h-4 w-4 text-muted-foreground" />
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground text-sm font-bold">3</div>
-              <span className="text-sm text-muted-foreground">我们执行优化</span>
-            </div>
-            <ChevronRight className="hidden md:block h-4 w-4 text-muted-foreground" />
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground text-sm font-bold">4</div>
-              <span className="text-sm text-muted-foreground">排名提升</span>
-            </div>
+            <Button
+              onClick={() => {
+                const url = diagnoseUrl.trim();
+                if (url) {
+                  router.push(`/dashboard/services/geo/diagnose?url=${encodeURIComponent(url)}`);
+                } else {
+                  router.push('/dashboard/services/geo/diagnose');
+                }
+              }}
+              className="h-11 px-6 gap-2"
+            >
+              <Search className="h-4 w-4" />
+              开始诊断
+            </Button>
           </div>
         </CardContent>
       </Card>
