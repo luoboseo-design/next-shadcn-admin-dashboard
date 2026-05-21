@@ -4,6 +4,7 @@ import {
   Calendar,
   ChartBar,
   ClipboardList,
+  CreditCard,
   FileEdit,
   Fingerprint,
   Forklift,
@@ -135,6 +136,11 @@ export const sidebarItems: NavGroup[] = [
         title: "数据概览",
         url: "/dashboard/default",
         icon: LayoutDashboard,
+      },
+      {
+        title: "账单中心",
+        url: "/dashboard/billing",
+        icon: CreditCard,
       },
       {
         title: "CRM",
