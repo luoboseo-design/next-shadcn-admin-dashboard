@@ -17,6 +17,14 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Globe,
   Building2,
   Users,
@@ -69,6 +77,52 @@ export default function DiagnosePage() {
   const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [analyzeStatus, setAnalyzeStatus] = useState("");
   const [initialized, setInitialized] = useState(false);
+
+  // 添加弹窗状态
+  const [addDialog, setAddDialog] = useState<{
+    open: boolean;
+    type: 'keyword' | 'longTail' | 'query';
+    value: string;
+  }>({ open: false, type: 'keyword', value: '' });
+
+  const dialogConfig = {
+    keyword: { title: '添加关键词', placeholder: '输入自定义关键词', description: '添加一个新的关键词到推荐列表' },
+    longTail: { title: '添加长尾词', placeholder: '输入自定义长尾词', description: '添加一个新的长尾关键词' },
+    query: { title: '添加问答', placeholder: '输入自定义问答，如：XX产品怎么样？', description: '添加一个用户可能会问的问题' },
+  };
+
+  const handleAddConfirm = () => {
+    const value = addDialog.value.trim();
+    if (!value) return;
+
+    switch (addDialog.type) {
+      case 'keyword':
+        if (!formData.suggestedKeywords.includes(value)) {
+          updateFormData({
+            suggestedKeywords: [...formData.suggestedKeywords, value],
+            selectedKeywords: [...formData.selectedKeywords, value],
+          });
+        }
+        break;
+      case 'longTail':
+        if (!formData.suggestedLongTails.includes(value)) {
+          updateFormData({
+            suggestedLongTails: [...formData.suggestedLongTails, value],
+            selectedLongTails: [...formData.selectedLongTails, value],
+          });
+        }
+        break;
+      case 'query':
+        if (!formData.suggestedQueries.includes(value)) {
+          updateFormData({
+            suggestedQueries: [...formData.suggestedQueries, value],
+            selectedQueries: [...formData.selectedQueries, value],
+          });
+        }
+        break;
+    }
+    setAddDialog({ open: false, type: 'keyword', value: '' });
+  };
 
   // 表单数据
   const [formData, setFormData] = useState({
@@ -713,15 +767,7 @@ export default function DiagnosePage() {
                     ))}
                     <button
                       type="button"
-                      onClick={() => {
-                        const newKeyword = prompt('输入自定义关键词');
-                        if (newKeyword?.trim() && !formData.suggestedKeywords.includes(newKeyword.trim())) {
-                          updateFormData({
-                            suggestedKeywords: [...formData.suggestedKeywords, newKeyword.trim()],
-                            selectedKeywords: [...formData.selectedKeywords, newKeyword.trim()],
-                          });
-                        }
-                      }}
+                      onClick={() => setAddDialog({ open: true, type: 'keyword', value: '' })}
                       className="flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all"
                     >
                       <Plus className="h-4 w-4 text-muted-foreground" />
@@ -758,15 +804,7 @@ export default function DiagnosePage() {
                     ))}
                     <button
                       type="button"
-                      onClick={() => {
-                        const newKeyword = prompt('输入自定义长尾词');
-                        if (newKeyword?.trim() && !formData.suggestedLongTails.includes(newKeyword.trim())) {
-                          updateFormData({
-                            suggestedLongTails: [...formData.suggestedLongTails, newKeyword.trim()],
-                            selectedLongTails: [...formData.selectedLongTails, newKeyword.trim()],
-                          });
-                        }
-                      }}
+                      onClick={() => setAddDialog({ open: true, type: 'longTail', value: '' })}
                       className="flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all"
                     >
                       <Plus className="h-4 w-4 text-muted-foreground" />
@@ -803,15 +841,7 @@ export default function DiagnosePage() {
                     ))}
                     <button
                       type="button"
-                      onClick={() => {
-                        const newQuery = prompt('输入自定义问答');
-                        if (newQuery?.trim() && !formData.suggestedQueries.includes(newQuery.trim())) {
-                          updateFormData({
-                            suggestedQueries: [...formData.suggestedQueries, newQuery.trim()],
-                            selectedQueries: [...formData.selectedQueries, newQuery.trim()],
-                          });
-                        }
-                      }}
+                      onClick={() => setAddDialog({ open: true, type: 'query', value: '' })}
                       className="flex items-center justify-center gap-2 w-full p-2.5 rounded border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all text-sm text-muted-foreground"
                     >
                       <Plus className="h-4 w-4" />
@@ -851,6 +881,39 @@ export default function DiagnosePage() {
           )}
         </div>
       </div>
+
+      {/* 添加弹窗 */}
+      <Dialog open={addDialog.open} onOpenChange={(open) => setAddDialog(prev => ({ ...prev, open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{dialogConfig[addDialog.type].title}</DialogTitle>
+            <DialogDescription>
+              {dialogConfig[addDialog.type].description}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder={dialogConfig[addDialog.type].placeholder}
+              value={addDialog.value}
+              onChange={(e) => setAddDialog(prev => ({ ...prev, value: e.target.value }))}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddConfirm();
+                }
+              }}
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setAddDialog({ open: false, type: 'keyword', value: '' })}>
+              取消
+            </Button>
+            <Button onClick={handleAddConfirm} disabled={!addDialog.value.trim()}>
+              确定添加
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
