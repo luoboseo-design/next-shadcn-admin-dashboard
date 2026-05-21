@@ -1,148 +1,88 @@
 import type { PlatformType } from "@/types/marketing";
 
-// 客座文章平台类型
-export type GuestPostPlatformType = "tech" | "business" | "content" | "custom";
+// DR等级类型
+export type DRTier = "dr30" | "dr50" | "dr70" | "dr80";
 
-export const guestPostPlatformLabels: Record<GuestPostPlatformType, string> = {
-  tech: "科技媒体",
-  business: "商业媒体",
-  content: "内容平台",
-  custom: "定制",
+export const drTierLabels: Record<DRTier, string> = {
+  dr30: "DR 30+",
+  dr50: "DR 50+",
+  dr70: "DR 70+",
+  dr80: "DR 80+",
 };
 
-// 平台等级
-export type PlatformTier = "standard" | "premium" | "elite";
-
-export const platformTierLabels: Record<PlatformTier, string> = {
-  standard: "标准版",
-  premium: "高级版",
-  elite: "精英版",
-};
-
-// 平台详情
-export interface GuestPostPlatformInfo {
-  type: GuestPostPlatformType;
+// DR等级详情
+export interface DRTierInfo {
+  tier: DRTier;
   label: string;
   description: string;
+  pricePerArticle: number;
+  deliveryDays: string;
   features: string[];
-  platforms: string[];
-  tiers: {
-    tier: PlatformTier;
-    daRange: string;
-    pricePerArticle: number;
-    examples: string[];
-  }[];
+  examples: string[];
 }
 
-export const guestPostPlatformDetails: Record<GuestPostPlatformType, GuestPostPlatformInfo> = {
-  tech: {
-    type: "tech",
-    label: "科技媒体",
-    description: "在顶级科技媒体发布专业文章，获取行业权威背书和高质量外链",
+export const drTierDetails: Record<DRTier, DRTierInfo> = {
+  dr30: {
+    tier: "dr30",
+    label: "DR 30+",
+    description: "入门级高质量外链，适合新站或预算有限的项目",
+    pricePerArticle: 80,
+    deliveryDays: "3-5天",
     features: [
-      "科技行业权威平台",
-      "精准技术受众",
-      "高转载率",
-      "利于品牌建设",
+      "DR 30-49 网站",
+      "永久 Dofollow 链接",
+      "原创文章 800+ 字",
+      "相关行业网站",
     ],
-    platforms: ["TechCrunch", "Wired", "The Verge", "36氪", "虎嗅", "InfoQ"],
-    tiers: [
-      {
-        tier: "standard",
-        daRange: "DA 50-69",
-        pricePerArticle: 150,
-        examples: ["Dev.to", "Hackernoon", "DZone"],
-      },
-      {
-        tier: "premium",
-        daRange: "DA 70-84",
-        pricePerArticle: 350,
-        examples: ["VentureBeat", "TNW", "36氪"],
-      },
-      {
-        tier: "elite",
-        daRange: "DA 85+",
-        pricePerArticle: 800,
-        examples: ["TechCrunch", "Wired", "The Verge"],
-      },
-    ],
+    examples: ["行业博客", "垂直媒体", "专业论坛"],
   },
-  business: {
-    type: "business",
-    label: "商业媒体",
-    description: "在商业财经媒体发布深度文章，提升企业公信力和品牌价值",
+  dr50: {
+    tier: "dr50",
+    label: "DR 50+",
+    description: "中等权重外链，适合常规SEO优化需求",
+    pricePerArticle: 150,
+    deliveryDays: "5-7天",
     features: [
-      "商业决策者受众",
-      "企业信誉背书",
-      "高端品牌曝光",
-      "投资人关注渠道",
+      "DR 50-69 网站",
+      "永久 Dofollow 链接",
+      "原创文章 1000+ 字",
+      "高流量网站",
+      "内容审核保证",
     ],
-    platforms: ["Forbes", "Entrepreneur", "Inc.", "创业邦", "界面新闻", "第一财经"],
-    tiers: [
-      {
-        tier: "standard",
-        daRange: "DA 50-69",
-        pricePerArticle: 200,
-        examples: ["Business2Community", "AllBusiness", "创业邦"],
-      },
-      {
-        tier: "premium",
-        daRange: "DA 70-84",
-        pricePerArticle: 500,
-        examples: ["Entrepreneur", "Inc.", "界面新闻"],
-      },
-      {
-        tier: "elite",
-        daRange: "DA 85+",
-        pricePerArticle: 1200,
-        examples: ["Forbes", "Bloomberg", "第一财经"],
-      },
-    ],
+    examples: ["Dev.to", "Hackernoon", "36氪", "虎嗅"],
   },
-  content: {
-    type: "content",
-    label: "内容平台",
-    description: "在主流内容平台建立专栏影响力，持续输出高质量内容获取流量",
+  dr70: {
+    tier: "dr70",
+    label: "DR 70+",
+    description: "高权重外链，显著提升网站权威度",
+    pricePerArticle: 350,
+    deliveryDays: "7-14天",
     features: [
-      "大众内容平台",
-      "SEO 友好",
-      "易于长期运营",
-      "性价比高",
+      "DR 70-79 网站",
+      "永久 Dofollow 链接",
+      "原创文章 1500+ 字",
+      "权威媒体平台",
+      "专业编辑润色",
+      "效果追踪报告",
     ],
-    platforms: ["Medium", "知乎", "简书", "CSDN", "掘金", "Substack"],
-    tiers: [
-      {
-        tier: "standard",
-        daRange: "DA 60-74",
-        pricePerArticle: 80,
-        examples: ["简书", "CSDN", "博客园"],
-      },
-      {
-        tier: "premium",
-        daRange: "DA 75-89",
-        pricePerArticle: 150,
-        examples: ["知乎专栏", "掘金", "少数派"],
-      },
-      {
-        tier: "elite",
-        daRange: "DA 90+",
-        pricePerArticle: 300,
-        examples: ["Medium", "Substack", "知乎"],
-      },
-    ],
+    examples: ["Entrepreneur", "Business Insider", "界面新闻"],
   },
-  custom: {
-    type: "custom",
-    label: "定制",
-    description: "根据您的特定需求，定制专属客座文章发布方案",
+  dr80: {
+    tier: "dr80",
+    label: "DR 80+",
+    description: "顶级权重外链，快速建立行业权威",
+    pricePerArticle: 800,
+    deliveryDays: "14-21天",
     features: [
-      "一对一需求沟通",
-      "行业专属平台",
-      "灵活文章数量",
-      "定制化报价",
+      "DR 80+ 顶级网站",
+      "永久 Dofollow 链接",
+      "原创文章 2000+ 字",
+      "顶级媒体曝光",
+      "专业内容策划",
+      "优先发布排期",
+      "定制化服务",
     ],
-    platforms: [],
-    tiers: [],
+    examples: ["Forbes", "TechCrunch", "Wired", "Bloomberg"],
   },
 };
 
@@ -260,9 +200,8 @@ export interface GuestPostFormData {
   keywords: string;
   articleContent?: string; // 用户提供文章时使用
   
-  // 平台选择
-  platformType: GuestPostPlatformType;
-  platformTier: PlatformTier;
+  // DR选择
+  drTier: DRTier;
   
   // 套餐选择
   packageId: string;
@@ -270,3 +209,70 @@ export interface GuestPostFormData {
   // 定制需求
   customRequirements?: string;
 }
+
+// 兼容旧类型（保留以防其他地方使用）
+export type GuestPostPlatformType = "tech" | "business" | "content" | "custom";
+export type PlatformTier = "standard" | "premium" | "elite";
+
+export const guestPostPlatformLabels: Record<GuestPostPlatformType, string> = {
+  tech: "科技媒体",
+  business: "商业媒体",
+  content: "内容平台",
+  custom: "定制",
+};
+
+export const platformTierLabels: Record<PlatformTier, string> = {
+  standard: "标准版",
+  premium: "高级版",
+  elite: "精英版",
+};
+
+// 旧结构保留以防止编译错误
+export interface GuestPostPlatformInfo {
+  type: GuestPostPlatformType;
+  label: string;
+  description: string;
+  features: string[];
+  platforms: string[];
+  tiers: {
+    tier: PlatformTier;
+    daRange: string;
+    pricePerArticle: number;
+    examples: string[];
+  }[];
+}
+
+export const guestPostPlatformDetails: Record<GuestPostPlatformType, GuestPostPlatformInfo> = {
+  tech: {
+    type: "tech",
+    label: "科技媒体",
+    description: "在顶级科技媒体发布专业文章",
+    features: [],
+    platforms: [],
+    tiers: [],
+  },
+  business: {
+    type: "business",
+    label: "商业媒体",
+    description: "在商业财经媒体发布深度文章",
+    features: [],
+    platforms: [],
+    tiers: [],
+  },
+  content: {
+    type: "content",
+    label: "内容平台",
+    description: "在主流内容平台建立专栏影响力",
+    features: [],
+    platforms: [],
+    tiers: [],
+  },
+  custom: {
+    type: "custom",
+    label: "定制",
+    description: "根据您的特定需求定制方案",
+    features: [],
+    platforms: [],
+    tiers: [],
+  },
+};

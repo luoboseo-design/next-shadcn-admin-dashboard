@@ -1,36 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Check, Clock, ExternalLink, FileText, Globe, MessageSquare, Sparkles, Upload } from "lucide-react";
+import { Check, Clock, Sparkles, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  guestPostPlatformLabels,
-  guestPostPlatformDetails,
+  drTierLabels,
+  drTierDetails,
   contentModeLabels,
   contentModeDetails,
-  platformTierLabels,
-  type GuestPostPlatformType,
-  type PlatformTier,
+  type DRTier,
   type ContentMode,
   type GuestPostFormData,
 } from "@/data/guest-posts";
 
-const platformTypes: GuestPostPlatformType[] = ["tech", "business", "content", "custom"];
+const drTiers: DRTier[] = ["dr30", "dr50", "dr70", "dr80"];
 
 interface GuestPostFormProps {
   selectedPackageId: string;
-  onPlatformChange?: (platform: GuestPostPlatformType | null) => void;
-  onTierChange?: (tier: PlatformTier) => void;
+  onDRTierChange?: (tier: DRTier) => void;
 }
 
-export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChange }: GuestPostFormProps) {
+export function GuestPostForm({ selectedPackageId, onDRTierChange }: GuestPostFormProps) {
   const [formData, setFormData] = useState<GuestPostFormData>({
     websiteUrl: "",
     companyName: "",
@@ -39,20 +34,14 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
     topics: "",
     keywords: "",
     articleContent: "",
-    platformType: "tech",
-    platformTier: "standard",
+    drTier: "dr50",
     packageId: selectedPackageId,
     customRequirements: "",
   });
 
-  const handlePlatformChange = (platform: GuestPostPlatformType) => {
-    setFormData((prev) => ({ ...prev, platformType: platform }));
-    onPlatformChange?.(platform);
-  };
-
-  const handleTierChange = (tier: PlatformTier) => {
-    setFormData((prev) => ({ ...prev, platformTier: tier }));
-    onTierChange?.(tier);
+  const handleDRTierChange = (tier: DRTier) => {
+    setFormData((prev) => ({ ...prev, drTier: tier }));
+    onDRTierChange?.(tier);
   };
 
   const handleContentModeChange = (mode: ContentMode) => {
@@ -63,11 +52,79 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
     }));
   };
 
-  const isCustomSelected = formData.platformType === "custom";
-  const selectedPlatformInfo = guestPostPlatformDetails[formData.platformType];
+  const selectedDRInfo = drTierDetails[formData.drTier];
 
   return (
     <div className="space-y-6">
+      {/* DR 选择 */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+          DR 选择
+        </h3>
+
+        <RadioGroup
+          value={formData.drTier}
+          onValueChange={(value) => handleDRTierChange(value as DRTier)}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+        >
+          {drTiers.map((tier) => {
+            const info = drTierDetails[tier];
+            const isSelected = formData.drTier === tier;
+
+            return (
+              <label
+                key={tier}
+                className={`relative flex flex-col cursor-pointer rounded-lg border p-4 transition-all ${
+                  isSelected ? "border-primary bg-primary/5" : "hover:border-muted-foreground/30"
+                }`}
+              >
+                <RadioGroupItem value={tier} className="sr-only" />
+                <span className="font-bold text-lg">{info.label}</span>
+                <span className="text-xl font-bold text-primary mt-1">${info.pricePerArticle}</span>
+                <span className="text-xs text-muted-foreground">/篇</span>
+                {isSelected && (
+                  <Check className="absolute right-3 top-3 h-4 w-4 text-primary" />
+                )}
+              </label>
+            );
+          })}
+        </RadioGroup>
+
+        {/* DR 等级说明 */}
+        <div className="p-4 rounded-lg border bg-muted/30">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h4 className="font-semibold">{selectedDRInfo.label}</h4>
+              <p className="text-sm text-muted-foreground">{selectedDRInfo.description}</p>
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              {selectedDRInfo.deliveryDays}
+            </div>
+          </div>
+          
+          <ul className="grid grid-cols-2 gap-2 mb-3">
+            {selectedDRInfo.features.map((feature, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm">
+                <Check className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="pt-3 border-t">
+            <span className="text-xs text-muted-foreground">示例平台：</span>
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {selectedDRInfo.examples.map((ex) => (
+                <span key={ex} className="px-2 py-0.5 bg-background rounded text-xs">
+                  {ex}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 基础信息 */}
       <div className="space-y-4">
         <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
@@ -217,133 +274,6 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
               onChange={(e) => setFormData((prev) => ({ ...prev, keywords: e.target.value }))}
             />
           </div>
-        </div>
-      )}
-
-      {/* 平台选择 */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-          平台选择
-        </h3>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {platformTypes.map((type) => (
-            <div
-              key={type}
-              className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors"
-            >
-              <Checkbox
-                id={`platform-${type}`}
-                checked={formData.platformType === type}
-                onCheckedChange={(checked) => {
-                  if (checked) handlePlatformChange(type);
-                }}
-              />
-              <Label htmlFor={`platform-${type}`} className="text-sm font-normal cursor-pointer">
-                {guestPostPlatformLabels[type]}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 平台详情（非定制） */}
-      {!isCustomSelected && (
-        <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <FileText className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-semibold">{selectedPlatformInfo.label}</h4>
-              <p className="text-sm text-muted-foreground">{selectedPlatformInfo.description}</p>
-            </div>
-          </div>
-
-          {/* 平台等级选择 */}
-          <div className="mb-4">
-            <Label className="text-sm mb-2 block">选择平台等级</Label>
-            <RadioGroup
-              value={formData.platformTier}
-              onValueChange={(value) => handleTierChange(value as PlatformTier)}
-              className="grid grid-cols-3 gap-2"
-            >
-              {selectedPlatformInfo.tiers.map((tier) => (
-                <label
-                  key={tier.tier}
-                  className={`relative flex flex-col cursor-pointer rounded-lg border p-3 text-center transition-all ${
-                    formData.platformTier === tier.tier
-                      ? "border-primary bg-white dark:bg-background"
-                      : "hover:border-muted-foreground/30"
-                  }`}
-                >
-                  <RadioGroupItem value={tier.tier} className="sr-only" />
-                  <span className="font-semibold text-sm">{platformTierLabels[tier.tier]}</span>
-                  <span className="text-xs text-muted-foreground">{tier.daRange}</span>
-                  <span className="text-sm font-bold mt-1">${tier.pricePerArticle}/篇</span>
-                </label>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* 特性列表 */}
-          <ul className="space-y-1.5 mb-3">
-            {selectedPlatformInfo.features.map((feature, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm">
-                <Check className="h-3.5 w-3.5 text-green-500 shrink-0" />
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* 示例平台 */}
-          <div className="flex flex-wrap gap-1.5">
-            {selectedPlatformInfo.platforms.slice(0, 6).map((platform) => (
-              <span
-                key={platform}
-                className="px-2 py-0.5 bg-white dark:bg-background rounded text-xs"
-              >
-                {platform}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-3 pt-3 border-t flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {selectedPlatformInfo.tiers.find((t) => t.tier === formData.platformTier)?.examples.length || 0}+ 个可用平台
-            </span>
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/cases/guest-posts/${formData.platformType}`} className="gap-1.5">
-                查看案例
-                <ExternalLink className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* 定制需求 */}
-      {isCustomSelected && (
-        <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-              <MessageSquare className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <h4 className="font-semibold">定制需求</h4>
-              <p className="text-sm text-muted-foreground">请详细描述您的客座文章需求</p>
-            </div>
-          </div>
-          <Textarea
-            placeholder="请描述您的需求，例如：&#10;- 目标发布平台&#10;- 行业或领域要求&#10;- 文章风格偏好&#10;- 预算范围&#10;- 时间要求"
-            value={formData.customRequirements}
-            onChange={(e) => setFormData((prev) => ({ ...prev, customRequirements: e.target.value }))}
-            rows={6}
-            className="bg-white dark:bg-background"
-          />
-          <p className="text-sm text-muted-foreground mt-2">
-            提交后我们的顾问将在 24 小时内与您联系，制定专属方案
-          </p>
         </div>
       )}
     </div>

@@ -11,30 +11,25 @@ import { GuestPostForm } from "./_components/guest-post-form";
 import { PlatformShowcase } from "./_components/platform-showcase";
 import {
   guestPostPackages,
-  guestPostPlatformDetails,
-  type GuestPostPlatformType,
-  type PlatformTier,
+  drTierDetails,
+  drTierLabels,
+  type DRTier,
 } from "@/data/guest-posts";
 
 export default function GuestPostsServicePage() {
   const router = useRouter();
   const [selectedPackageId, setSelectedPackageId] = useState<string>("growth");
-  const [selectedPlatform, setSelectedPlatform] = useState<GuestPostPlatformType | null>(null);
-  const [selectedTier, setSelectedTier] = useState<PlatformTier>("standard");
+  const [selectedDRTier, setSelectedDRTier] = useState<DRTier>("dr50");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 计算价格
   const getPrice = () => {
-    if (!selectedPlatform || selectedPlatform === "custom") {
-      return null;
-    }
-    const platformInfo = guestPostPlatformDetails[selectedPlatform];
-    const tierInfo = platformInfo.tiers.find((t) => t.tier === selectedTier);
+    const drInfo = drTierDetails[selectedDRTier];
     const pkg = guestPostPackages.find((p) => p.id === selectedPackageId);
 
-    if (!tierInfo || !pkg) return null;
+    if (!drInfo || !pkg) return null;
 
-    const basePrice = tierInfo.pricePerArticle * pkg.articleCount;
+    const basePrice = drInfo.pricePerArticle * pkg.articleCount;
     const discount = pkg.discount || 0;
     return Math.round(basePrice * (1 - discount / 100));
   };
@@ -82,14 +77,13 @@ export default function GuestPostsServicePage() {
               <CardHeader>
                 <CardTitle>创建客座文章任务</CardTitle>
                 <CardDescription>
-                  填写文章需求和目标平台，AI 将为您生成并发布高质量内容
+                  选择DR等级和文章数量，AI 将为您生成并发布高质量内容
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <GuestPostForm
                   selectedPackageId={selectedPackageId}
-                  onPlatformChange={setSelectedPlatform}
-                  onTierChange={setSelectedTier}
+                  onDRTierChange={setSelectedDRTier}
                 />
               </CardContent>
             </Card>
@@ -99,7 +93,9 @@ export default function GuestPostsServicePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>选择套餐</CardTitle>
-                  <CardDescription>根据需求选择文章数量</CardDescription>
+                  <CardDescription>
+                    {drTierLabels[selectedDRTier]} · ${drTierDetails[selectedDRTier].pricePerArticle}/篇
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <PackageSelector
@@ -207,64 +203,99 @@ function PackageSelector({
 
 // 定价表组件
 function PricingTable() {
-  const platforms: GuestPostPlatformType[] = ["tech", "business", "content"];
+  const drTiers: DRTier[] = ["dr30", "dr50", "dr70", "dr80"];
 
   return (
     <div className="space-y-6">
-      {platforms.map((platformType) => {
-        const platform = guestPostPlatformDetails[platformType];
-        return (
-          <Card key={platformType}>
-            <CardHeader>
-              <CardTitle>{platform.label}</CardTitle>
-              <CardDescription>{platform.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-4">等级</th>
-                      <th className="text-left py-3 px-4">DA 权重</th>
-                      <th className="text-left py-3 px-4">示例平台</th>
-                      <th className="text-right py-3 px-4">单价</th>
+      <Card>
+        <CardHeader>
+          <CardTitle>DR 等级定价</CardTitle>
+          <CardDescription>根据目标网站的 Domain Rating 选择合适的等级</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-4">DR 等级</th>
+                  <th className="text-left py-3 px-4">说明</th>
+                  <th className="text-left py-3 px-4">交付时间</th>
+                  <th className="text-left py-3 px-4">示例平台</th>
+                  <th className="text-right py-3 px-4">单价</th>
+                </tr>
+              </thead>
+              <tbody>
+                {drTiers.map((tier) => {
+                  const info = drTierDetails[tier];
+                  return (
+                    <tr key={tier} className="border-b last:border-0">
+                      <td className="py-3 px-4">
+                        <span className="font-semibold">{info.label}</span>
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground max-w-[200px]">
+                        {info.description}
+                      </td>
+                      <td className="py-3 px-4">{info.deliveryDays}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex flex-wrap gap-1">
+                          {info.examples.map((ex) => (
+                            <span
+                              key={ex}
+                              className="px-2 py-0.5 bg-muted rounded text-xs"
+                            >
+                              {ex}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right font-semibold">
+                        ${info.pricePerArticle}/篇
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {platform.tiers.map((tier) => (
-                      <tr key={tier.tier} className="border-b last:border-0">
-                        <td className="py-3 px-4">
-                          <span className="font-medium">
-                            {tier.tier === "standard" && "标准版"}
-                            {tier.tier === "premium" && "高级版"}
-                            {tier.tier === "elite" && "精英版"}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">{tier.daRange}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex flex-wrap gap-1">
-                            {tier.examples.map((ex) => (
-                              <span
-                                key={ex}
-                                className="px-2 py-0.5 bg-muted rounded text-xs"
-                              >
-                                {ex}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-right font-semibold">
-                          ${tier.pricePerArticle}/篇
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>批量套餐优惠</CardTitle>
+          <CardDescription>购买多篇文章享受折扣</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-4">
+            {guestPostPackages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={cn(
+                  "p-4 rounded-lg border",
+                  pkg.recommended && "border-primary bg-primary/5"
+                )}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-semibold">{pkg.name}</span>
+                  {pkg.recommended && (
+                    <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
+                      推荐
+                    </span>
+                  )}
+                </div>
+                <div className="text-2xl font-bold mb-1">{pkg.articleCount} 篇</div>
+                {pkg.discount ? (
+                  <div className="text-sm text-green-600 dark:text-green-400">
+                    节省 {pkg.discount}%
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground">原价</div>
+                )}
               </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
