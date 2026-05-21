@@ -26,11 +26,21 @@ const platformTypes: GuestPostPlatformType[] = ["tech", "business", "content", "
 
 interface GuestPostFormProps {
   selectedPackageId: string;
+  selectedPlatform?: GuestPostPlatformType;
+  selectedTier?: PlatformTier;
   onPlatformChange?: (platform: GuestPostPlatformType | null) => void;
   onTierChange?: (tier: PlatformTier) => void;
+  hidePlatformSelection?: boolean;
 }
 
-export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChange }: GuestPostFormProps) {
+export function GuestPostForm({ 
+  selectedPackageId, 
+  selectedPlatform: externalPlatform,
+  selectedTier: externalTier,
+  onPlatformChange, 
+  onTierChange,
+  hidePlatformSelection = false,
+}: GuestPostFormProps) {
   const [formData, setFormData] = useState<GuestPostFormData>({
     websiteUrl: "",
     companyName: "",
@@ -39,10 +49,20 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
     topics: "",
     keywords: "",
     articleContent: "",
-    platformType: "tech",
-    platformTier: "standard",
+    platformType: externalPlatform || "tech",
+    platformTier: externalTier || "standard",
     packageId: selectedPackageId,
     customRequirements: "",
+  });
+
+  // Sync with external platform/tier changes
+  useState(() => {
+    if (externalPlatform) {
+      setFormData((prev) => ({ ...prev, platformType: externalPlatform }));
+    }
+    if (externalTier) {
+      setFormData((prev) => ({ ...prev, platformTier: externalTier }));
+    }
   });
 
   const handlePlatformChange = (platform: GuestPostPlatformType) => {
@@ -63,8 +83,8 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
     }));
   };
 
-  const isCustomSelected = formData.platformType === "custom";
-  const selectedPlatformInfo = guestPostPlatformDetails[formData.platformType];
+  const isCustomSelected = (externalPlatform || formData.platformType) === "custom";
+  const selectedPlatformInfo = guestPostPlatformDetails[externalPlatform || formData.platformType];
 
   return (
     <div className="space-y-6">
@@ -220,35 +240,37 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
         </div>
       )}
 
-      {/* 平台选择 */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-          平台选择
-        </h3>
+      {/* 平台选择 - 可隐藏 */}
+      {!hidePlatformSelection && (
+        <div className="space-y-4">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            平台选择
+          </h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {platformTypes.map((type) => (
-            <div
-              key={type}
-              className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors"
-            >
-              <Checkbox
-                id={`platform-${type}`}
-                checked={formData.platformType === type}
-                onCheckedChange={(checked) => {
-                  if (checked) handlePlatformChange(type);
-                }}
-              />
-              <Label htmlFor={`platform-${type}`} className="text-sm font-normal cursor-pointer">
-                {guestPostPlatformLabels[type]}
-              </Label>
-            </div>
-          ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {platformTypes.map((type) => (
+              <div
+                key={type}
+                className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors"
+              >
+                <Checkbox
+                  id={`platform-${type}`}
+                  checked={formData.platformType === type}
+                  onCheckedChange={(checked) => {
+                    if (checked) handlePlatformChange(type);
+                  }}
+                />
+                <Label htmlFor={`platform-${type}`} className="text-sm font-normal cursor-pointer">
+                  {guestPostPlatformLabels[type]}
+                </Label>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 平台详情（非定制） */}
-      {!isCustomSelected && (
+      {/* 平台详情（非定制）- 可隐藏 */}
+      {!hidePlatformSelection && !isCustomSelected && (
         <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -322,8 +344,8 @@ export function GuestPostForm({ selectedPackageId, onPlatformChange, onTierChang
         </div>
       )}
 
-      {/* 定制需求 */}
-      {isCustomSelected && (
+      {/* 定制需求 - 可隐藏 */}
+      {!hidePlatformSelection && isCustomSelected && (
         <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">

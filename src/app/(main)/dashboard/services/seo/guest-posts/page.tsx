@@ -5,27 +5,37 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { FileEdit, Package, BarChart3, Check, ArrowRight, Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { FileEdit, Package, BarChart3, Check, ArrowRight, Loader2, Globe, Briefcase, FileText, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GuestPostForm } from "./_components/guest-post-form";
 import { PlatformShowcase } from "./_components/platform-showcase";
 import {
   guestPostPackages,
   guestPostPlatformDetails,
+  guestPostPlatformLabels,
   type GuestPostPlatformType,
   type PlatformTier,
 } from "@/data/guest-posts";
 
+const platformTypes: { type: GuestPostPlatformType; icon: React.ElementType }[] = [
+  { type: "tech", icon: Globe },
+  { type: "business", icon: Briefcase },
+  { type: "content", icon: FileText },
+  { type: "custom", icon: MessageSquare },
+];
+
 export default function GuestPostsServicePage() {
   const router = useRouter();
   const [selectedPackageId, setSelectedPackageId] = useState<string>("growth");
-  const [selectedPlatform, setSelectedPlatform] = useState<GuestPostPlatformType | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<GuestPostPlatformType>("tech");
   const [selectedTier, setSelectedTier] = useState<PlatformTier>("standard");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 计算价格
   const getPrice = () => {
-    if (!selectedPlatform || selectedPlatform === "custom") {
+    if (selectedPlatform === "custom") {
       return null;
     }
     const platformInfo = guestPostPlatformDetails[selectedPlatform];
@@ -46,6 +56,7 @@ export default function GuestPostsServicePage() {
   };
 
   const price = getPrice();
+  const selectedPlatformInfo = guestPostPlatformDetails[selectedPlatform];
 
   return (
     <div className="space-y-6">
@@ -77,29 +88,117 @@ export default function GuestPostsServicePage() {
         {/* 创建任务 */}
         <TabsContent value="create">
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            {/* 左侧：表单 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>创建客座文章任务</CardTitle>
-                <CardDescription>
-                  填写文章需求和目标平台，AI 将为您生成并发布高质量内容
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <GuestPostForm
-                  selectedPackageId={selectedPackageId}
-                  onPlatformChange={setSelectedPlatform}
-                  onTierChange={setSelectedTier}
-                />
-              </CardContent>
-            </Card>
+            {/* 左侧：平台选择 + 表单 */}
+            <div className="space-y-6">
+              {/* 平台选择 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>平台选择</CardTitle>
+                  <CardDescription>选择您希望发布文章的媒体平台类型</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {platformTypes.map(({ type, icon: Icon }) => {
+                      const isSelected = selectedPlatform === type;
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedPlatform(type)}
+                          className={cn(
+                            "flex items-center gap-2 p-3 rounded-lg border text-left transition-all",
+                            isSelected
+                              ? "border-primary bg-primary/5"
+                              : "hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <Checkbox checked={isSelected} className="pointer-events-none" />
+                          <Icon className={cn("h-4 w-4", isSelected ? "text-primary" : "text-muted-foreground")} />
+                          <span className={cn("text-sm font-medium", isSelected && "text-primary")}>
+                            {guestPostPlatformLabels[type]}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* 平台等级选择 */}
+                  {selectedPlatform !== "custom" && (
+                    <div className="mt-6 p-4 rounded-lg border bg-muted/30">
+                      <Label className="text-sm font-medium mb-3 block">选择平台等级</Label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {selectedPlatformInfo.tiers.map((tier) => {
+                          const isSelected = selectedTier === tier.tier;
+                          return (
+                            <button
+                              key={tier.tier}
+                              onClick={() => setSelectedTier(tier.tier)}
+                              className={cn(
+                                "relative flex flex-col rounded-lg border p-3 text-center transition-all",
+                                isSelected
+                                  ? "border-primary bg-primary/5"
+                                  : "hover:border-muted-foreground/30 bg-background"
+                              )}
+                            >
+                              <span className="font-semibold text-sm">
+                                {tier.tier === "standard" && "标准版"}
+                                {tier.tier === "premium" && "高级版"}
+                                {tier.tier === "elite" && "精英版"}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{tier.daRange}</span>
+                              <span className="text-sm font-bold mt-1">${tier.pricePerArticle}/篇</span>
+                              {isSelected && (
+                                <Check className="absolute right-2 top-2 h-4 w-4 text-primary" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {selectedPlatformInfo.tiers
+                          .find((t) => t.tier === selectedTier)
+                          ?.examples.map((ex) => (
+                            <span key={ex} className="px-2 py-0.5 bg-background rounded text-xs">
+                              {ex}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 表单 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>创建客座文章任务</CardTitle>
+                  <CardDescription>
+                    填写文章需求和目标信息，AI 将为您生成并发布高质量内容
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <GuestPostForm
+                    selectedPackageId={selectedPackageId}
+                    selectedPlatform={selectedPlatform}
+                    selectedTier={selectedTier}
+                    onPlatformChange={setSelectedPlatform}
+                    onTierChange={setSelectedTier}
+                    hidePlatformSelection
+                  />
+                </CardContent>
+              </Card>
+            </div>
 
             {/* 右侧：套餐选择 + 价格 */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>选择套餐</CardTitle>
-                  <CardDescription>根据需求选择文章数量</CardDescription>
+                  <CardDescription>
+                    {selectedPlatform !== "custom" 
+                      ? `${guestPostPlatformLabels[selectedPlatform]} · ${selectedTier === "standard" ? "标准版" : selectedTier === "premium" ? "高级版" : "精英版"}`
+                      : "定制方案"
+                    }
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <PackageSelector
