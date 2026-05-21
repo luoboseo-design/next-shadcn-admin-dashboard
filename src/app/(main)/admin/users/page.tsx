@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-import { Download, MoreHorizontal, Search, UserPlus, Building2 } from "lucide-react";
+import { Download, MoreHorizontal, Search, User, UserPlus } from "lucide-react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,14 +29,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-// 模拟企业用户数据
+// 模拟用户数据
 const mockUsers = [
   {
     id: "U001",
-    companyName: "北京科技有限公司",
-    contactName: "张总",
-    email: "zhang@bjtech.com",
+    name: "张明",
+    email: "zhangming@example.com",
     phone: "138****1234",
+    avatar: "",
     balance: 25000,
     totalSpent: 156000,
     orders: 89,
@@ -46,10 +47,10 @@ const mockUsers = [
   },
   {
     id: "U002",
-    companyName: "上海营销策划公司",
-    contactName: "李经理",
-    email: "li@shmarketing.com",
+    name: "李华",
+    email: "lihua@example.com",
     phone: "139****5678",
+    avatar: "",
     balance: 18000,
     totalSpent: 89000,
     orders: 56,
@@ -60,10 +61,10 @@ const mockUsers = [
   },
   {
     id: "U003",
-    companyName: "深圳电商科技公司",
-    contactName: "王总监",
-    email: "wang@szecom.com",
+    name: "王伟",
+    email: "wangwei@example.com",
     phone: "137****9012",
+    avatar: "",
     balance: 50000,
     totalSpent: 450000,
     orders: 235,
@@ -74,10 +75,10 @@ const mockUsers = [
   },
   {
     id: "U004",
-    companyName: "杭州互联网公司",
-    contactName: "赵经理",
-    email: "zhao@hznet.com",
+    name: "赵芳",
+    email: "zhaofang@example.com",
     phone: "136****3456",
+    avatar: "",
     balance: 8000,
     totalSpent: 24000,
     orders: 18,
@@ -88,10 +89,10 @@ const mockUsers = [
   },
   {
     id: "U005",
-    companyName: "广州贸易有限公司",
-    contactName: "钱总",
-    email: "qian@gztrade.com",
+    name: "钱进",
+    email: "qianjin@example.com",
     phone: "135****7890",
+    avatar: "",
     balance: 32000,
     totalSpent: 280000,
     orders: 156,
@@ -102,10 +103,10 @@ const mockUsers = [
   },
   {
     id: "U006",
-    companyName: "成都软件开发公司",
-    contactName: "孙经理",
-    email: "sun@cdsoft.com",
+    name: "孙丽",
+    email: "sunli@example.com",
     phone: "134****2345",
+    avatar: "",
     balance: 0,
     totalSpent: 5000,
     orders: 5,
@@ -116,10 +117,10 @@ const mockUsers = [
   },
   {
     id: "U007",
-    companyName: "南京数据科技公司",
-    contactName: "周总",
-    email: "zhou@njdata.com",
+    name: "周强",
+    email: "zhouqiang@example.com",
     phone: "133****6789",
+    avatar: "",
     balance: 120000,
     totalSpent: 890000,
     orders: 458,
@@ -130,10 +131,10 @@ const mockUsers = [
   },
   {
     id: "U008",
-    companyName: "武汉网络传媒公司",
-    contactName: "吴经理",
-    email: "wu@whmedia.com",
+    name: "吴敏",
+    email: "wumin@example.com",
     phone: "132****0123",
+    avatar: "",
     balance: 6000,
     totalSpent: 36000,
     orders: 28,
@@ -156,14 +157,17 @@ const statusColors: Record<string, string> = {
   banned: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
+function getInitials(name: string) {
+  return name.slice(0, 1);
+}
+
 export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   const filteredUsers = mockUsers.filter((user) => {
     const matchesSearch =
-      user.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.phone.includes(searchQuery);
     const matchesStatus = statusFilter === "all" || user.status === statusFilter;
@@ -183,7 +187,7 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">用户管理</h1>
-          <p className="text-muted-foreground mt-1">管理平台企业用户账户</p>
+          <p className="text-muted-foreground mt-1">管理平台用户账户</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
@@ -199,17 +203,13 @@ export default function AdminUsersPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>添加企业用户</DialogTitle>
-                <DialogDescription>创建一个新的企业用户账户</DialogDescription>
+                <DialogTitle>添加用户</DialogTitle>
+                <DialogDescription>创建一个新的用户账户</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="company">企业名称</Label>
-                  <Input id="company" placeholder="输入企业名称" />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="contact">联系人</Label>
-                  <Input id="contact" placeholder="输入联系人姓名" />
+                  <Label htmlFor="name">用户名</Label>
+                  <Input id="name" placeholder="输入用户名" />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">邮箱</Label>
@@ -218,6 +218,10 @@ export default function AdminUsersPage() {
                 <div className="grid gap-2">
                   <Label htmlFor="phone">手机号</Label>
                   <Input id="phone" placeholder="输入手机号" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">初始密码</Label>
+                  <Input id="password" type="password" placeholder="设置初始密码" />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="balance">初始余额</Label>
@@ -263,15 +267,15 @@ export default function AdminUsersPage() {
       {/* 筛选和搜索 */}
       <Card>
         <CardHeader>
-          <CardTitle>企业用户列表</CardTitle>
-          <CardDescription>共 {filteredUsers.length} 个企业用户</CardDescription>
+          <CardTitle>用户列表</CardTitle>
+          <CardDescription>共 {filteredUsers.length} 个用户</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="搜索企业名称、联系人、邮箱或手机号..."
+                placeholder="搜索用户名、邮箱或手机号..."
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -295,8 +299,8 @@ export default function AdminUsersPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b text-left text-sm text-muted-foreground">
-                  <th className="pb-3 font-medium">企业</th>
-                  <th className="pb-3 font-medium">联系人</th>
+                  <th className="pb-3 font-medium">用户</th>
+                  <th className="pb-3 font-medium">手机号</th>
                   <th className="pb-3 font-medium text-right">余额</th>
                   <th className="pb-3 font-medium text-right">消费总额</th>
                   <th className="pb-3 font-medium text-right">订单数</th>
@@ -311,27 +315,28 @@ export default function AdminUsersPage() {
                   <tr key={user.id} className="border-b last:border-0">
                     <td className="py-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Building2 className="h-4 w-4 text-primary" />
-                        </div>
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.avatar} />
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                            {getInitials(user.name)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <p className="font-medium">{user.companyName}</p>
+                          <p className="font-medium">{user.name}</p>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3">
-                      <div>
-                        <p className="text-sm">{user.contactName}</p>
-                        <p className="text-xs text-muted-foreground">{user.phone}</p>
-                      </div>
-                    </td>
+                    <td className="py-3 text-sm">{user.phone}</td>
                     <td className="py-3 text-right font-medium">${user.balance.toLocaleString()}</td>
                     <td className="py-3 text-right">${user.totalSpent.toLocaleString()}</td>
                     <td className="py-3 text-right">{user.orders}</td>
                     <td className="py-3 text-right">
                       {user.runningOrders > 0 ? (
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        <Badge
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                        >
                           {user.runningOrders}
                         </Badge>
                       ) : (
