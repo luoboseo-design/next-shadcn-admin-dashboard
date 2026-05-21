@@ -18,6 +18,7 @@ import {
   Eye,
   BarChart3,
   Globe,
+  Plus,
   TrendingUp,
 } from "lucide-react";
 import { getTaskById, taskStatusLabels, taskStatusColors } from "@/data/mock-tasks";
@@ -63,7 +64,15 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
             {task.id} · {isGuestPost ? "客座文章" : "外链代发"}
           </p>
         </div>
-        {task.status === "awaiting" && <AcceptanceDialog task={task} />}
+        <div className="flex items-center gap-3">
+          {task.status === "awaiting" && <AcceptanceDialog task={task} />}
+          <Button asChild>
+            <Link href="/dashboard/services/seo">
+              <Plus className="h-4 w-4 mr-2" />
+              新建任务
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* 基本信息卡片 */}
