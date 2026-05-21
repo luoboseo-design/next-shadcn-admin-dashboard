@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Wallet,
   Plus,
   Download,
   Search,
@@ -238,15 +237,9 @@ export default function BillingPage() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* 页面标题 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">账单中心</h1>
-          <p className="text-muted-foreground mt-1">管理您的账户余额和消费记录</p>
-        </div>
-        <Button onClick={() => setShowRechargeDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          充值
-        </Button>
+      <div>
+        <h1 className="text-2xl font-bold">账单中心</h1>
+        <p className="text-muted-foreground mt-1">管理您的账户余额和消费记录</p>
       </div>
 
       {/* 账户概览 */}
@@ -258,9 +251,10 @@ export default function BillingPage() {
                 <p className="text-sm text-muted-foreground">账户余额</p>
                 <p className="text-3xl font-bold mt-1">${balance.toLocaleString()}</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
+              <Button size="sm" onClick={() => setShowRechargeDialog(true)}>
+                <Plus className="h-4 w-4 mr-1" />
+                充值
+              </Button>
             </div>
           </CardContent>
         </Card>
