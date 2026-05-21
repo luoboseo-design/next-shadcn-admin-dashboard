@@ -108,7 +108,7 @@ const guestPostOrders = [
     packageName: "5媒体套餐",
     mediaCount: 5,
     completedCount: 5,
-    status: "published",
+    status: "completed",
     progress: 100,
     createdAt: "2024-01-10",
     publishedAt: "2024-01-24",
@@ -121,7 +121,7 @@ const guestPostOrders = [
     packageName: "3媒体套餐",
     mediaCount: 3,
     completedCount: 1,
-    status: "review",
+    status: "publishing",
     progress: 66,
     createdAt: "2024-01-18",
     publishedAt: null,
@@ -134,7 +134,7 @@ const guestPostOrders = [
     packageName: "10媒体套餐",
     mediaCount: 10,
     completedCount: 0,
-    status: "writing",
+    status: "publishing",
     progress: 30,
     createdAt: "2024-01-22",
     publishedAt: null,
@@ -147,7 +147,7 @@ const guestPostOrders = [
     packageName: "5媒体套餐",
     mediaCount: 5,
     completedCount: 0,
-    status: "pending",
+    status: "publishing",
     progress: 0,
     createdAt: "2024-01-25",
     publishedAt: null,
@@ -171,20 +171,10 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.E
     color: "bg-emerald-500/10 text-emerald-500",
     icon: CheckCircle2,
   },
-  writing: {
-    label: "撰写中",
+  publishing: {
+    label: "发布中",
     color: "bg-amber-500/10 text-amber-500",
-    icon: FileEdit,
-  },
-  review: {
-    label: "审核中",
-    color: "bg-purple-500/10 text-purple-500",
-    icon: Eye,
-  },
-  published: {
-    label: "已发布",
-    color: "bg-emerald-500/10 text-emerald-500",
-    icon: CheckCircle2,
+    icon: Loader2,
   },
 };
 
@@ -229,8 +219,8 @@ export default function SEOMonitorPage() {
 
   const guestPostStats = {
     total: guestPostOrders.length,
-    published: guestPostOrders.filter((o) => o.status === "published").length,
-    pending: guestPostOrders.filter((o) => o.status !== "published").length,
+    completed: guestPostOrders.filter((o) => o.status === "completed").length,
+    publishing: guestPostOrders.filter((o) => o.status === "publishing").length,
     totalPlatforms: guestPostOrders.reduce((acc, o) => acc + o.mediaCount, 0),
   };
 
@@ -459,12 +449,12 @@ export default function SEOMonitorPage() {
               <div className="mt-1 text-2xl font-semibold">{guestPostStats.totalPlatforms}</div>
             </div>
             <div className="rounded-lg border bg-card p-4">
-              <div className="text-sm text-muted-foreground">待发布</div>
-              <div className="mt-1 text-2xl font-semibold text-amber-500">{guestPostStats.pending}</div>
+              <div className="text-sm text-muted-foreground">发布中</div>
+              <div className="mt-1 text-2xl font-semibold text-amber-500">{guestPostStats.publishing}</div>
             </div>
             <div className="rounded-lg border bg-card p-4">
-              <div className="text-sm text-muted-foreground">已发布</div>
-              <div className="mt-1 text-2xl font-semibold text-emerald-500">{guestPostStats.published}</div>
+              <div className="text-sm text-muted-foreground">已完成</div>
+              <div className="mt-1 text-2xl font-semibold text-emerald-500">{guestPostStats.completed}</div>
             </div>
           </div>
 
