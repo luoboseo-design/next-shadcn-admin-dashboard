@@ -17,25 +17,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Sparkles,
   FileText,
   Target,
   TrendingUp,
-  Lightbulb,
-  RotateCcw,
   Copy,
   Download,
   Save,
   Wand2,
-  ListTree,
   Type,
   Hash,
   Clock,
   CheckCircle2,
   AlertCircle,
   ChevronRight,
+  ChevronDown,
   Plus,
   X,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,10 +56,87 @@ export default function ContentEditorPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [brandName, setBrandName] = useState("");
-  const [keywords, setKeywords] = useState<string[]>(["SEO优化", "内容营销"]);
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("write");
+  const [suggestedTitles, setSuggestedTitles] = useState<string[]>([]);
+  const [showTitleDropdown, setShowTitleDropdown] = useState(false);
+
+  // 模拟 AI 生成标题
+  const generateTitles = async () => {
+    if (keywords.length === 0) return;
+    
+    setIsGenerating(true);
+    // 模拟 API 调用延迟
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const brandPrefix = brandName ? `${brandName}：` : "";
+    const keyword = keywords[0];
+    const mockTitles = [
+      `${brandPrefix}${keyword}完整指南：从入门到精通`,
+      `2024年${keyword}最佳实践：${brandName || "专业"}解决方案`,
+      `${keyword}深度解析：${brandName || "企业"}如何实现突破`,
+      `掌握${keyword}的10个关键技巧`,
+      `${brandPrefix}${keyword}策略全解析`,
+    ];
+    
+    setSuggestedTitles(mockTitles);
+    setTitle(mockTitles[0]); // 默认选择第一个标题
+    setIsGenerating(false);
+    
+    // 自动生成内容
+    generateContent(mockTitles[0]);
+  };
+
+  // 模拟 AI 生成内容
+  const generateContent = async (articleTitle: string) => {
+    setIsGenerating(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const keyword = keywords[0] || "SEO优化";
+    const mockContent = `## ${articleTitle}
+
+在当今数字化时代，${keyword}已成为企业成功的关键因素。${brandName ? `${brandName}深知这一点，` : ""}本文将为您深入解析${keyword}的核心要素和最佳实践。
+
+## 什么是${keyword}？
+
+${keyword}是指通过一系列策略和技术手段，提升企业在目标市场中的竞争力和影响力。${brandName ? `作为行业领先者，${brandName}在这一领域积累了丰富的经验。` : ""}
+
+## ${keyword}的核心要素
+
+### 1. 策略规划
+在开始${keyword}之前，需要制定清晰的目标和执行计划。这包括：
+- 明确目标受众
+- 分析竞争对手
+- 制定内容策略
+
+### 2. 执行与优化
+${keyword}需要持续的执行和优化：
+- 定期发布高质量内容
+- 监控关键指标
+- 根据数据调整策略
+
+### 3. 效果评估
+通过数据分析评估${keyword}的效果：
+- 流量增长情况
+- 转化率变化
+- ROI 分析
+
+## 总结
+
+${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandName}，让专业团队助您实现目标。` : "通过持续优化，您一定能够取得理想的效果。"}`;
+
+    setContent(mockContent);
+    setIsGenerating(false);
+  };
+
+  // 当关键词或品牌名称变化时，自动生成
+  const handleGenerateContent = () => {
+    if (keywords.length > 0) {
+      generateTitles();
+    }
+  };
 
   // 转义正则特殊字符
   const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -110,20 +192,6 @@ export default function ContentEditorPage() {
     setKeywords(keywords.filter(k => k !== kw));
   };
 
-  const handleGenerate = async (type: "outline" | "content" | "rewrite") => {
-    setIsGenerating(true);
-    // 模拟 AI 生成
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    if (type === "outline") {
-      setContent(`## 引言\n介绍${keywords[0] || "主题"}的重要性和背景\n\n## ${keywords[0] || "核心概念"}是什么\n详细解释定义和基本概念\n\n## ${keywords[0] || "主题"}的核心优势\n- 优势一：提升效率\n- 优势二：降低成本\n- 优势三：增强效果\n\n## 如何实施${keywords[0] || "策略"}\n分步骤详细说明实施方法\n\n## 常见问题解答\n回答用户最关心的问题\n\n## 总结\n总结要点并给出行动建议`);
-    } else if (type === "content") {
-      setContent(prev => prev + "\n\n在当今数字化时代，" + (keywords[0] || "内容营销") + "已经成为企业获取客户的重要方式。通过高质量的内容，企业可以建立品牌权威性，吸引目标受众，并最终实现转化目标。\n\n研究表明，拥有优质内容策略的企业，其网站流量平均增长300%以上。这就是为什么越来越多的企业开始重视内容营销的原因。");
-    }
-    
-    setIsGenerating(false);
-  };
-
   return (
     <div className="min-h-screen">
       {/* 顶部工具栏 */}
@@ -160,25 +228,7 @@ export default function ContentEditorPage() {
       <div className="flex">
         {/* 左侧编辑区 */}
         <div className="flex-1 p-6 border-r min-h-[calc(100vh-57px)]">
-          {/* 标题输入 */}
-          <div className="mb-6">
-            <Input
-              placeholder="输入文章标题..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-2xl font-bold border-0 border-b rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary"
-            />
-            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-              <span>{title.length}/60 字符</span>
-              {title.length > 0 && title.length <= 60 && (
-                <span className="text-green-500 flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" /> 长度合适
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* 品牌名称和关键词 */}
+          {/* 品牌名称和关键词 - 放在最上面 */}
           <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm text-muted-foreground mb-2 block">品牌名称</Label>
@@ -219,56 +269,95 @@ export default function ContentEditorPage() {
             </div>
           </div>
 
-          {/* AI 工具栏 */}
-          <div className="flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
-            <span className="text-sm text-muted-foreground mr-2">AI 助手:</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleGenerate("outline")}
-              disabled={isGenerating}
+          {/* AI 生成按钮 */}
+          <div className="mb-6">
+            <Button 
+              onClick={handleGenerateContent} 
+              disabled={keywords.length === 0 || isGenerating}
+              className="w-full"
             >
-              <ListTree className="h-4 w-4 mr-2" />
-              生成大纲
+              {isGenerating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  AI 正在生成...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  AI 生成内容
+                </>
+              )}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleGenerate("content")}
-              disabled={isGenerating}
-            >
-              <Wand2 className="h-4 w-4 mr-2" />
-              续写内容
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isGenerating || !content}
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              改写优化
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isGenerating}
-            >
-              <Lightbulb className="h-4 w-4 mr-2" />
-              标题建议
-            </Button>
-            {isGenerating && (
-              <span className="text-sm text-muted-foreground animate-pulse ml-2">
-                AI 正在生成...
-              </span>
+            {keywords.length === 0 && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">请先添加关键词</p>
             )}
+          </div>
+
+          {/* 标题输入 - 带下拉建议 */}
+          <div className="mb-6 relative">
+            <Label className="text-sm text-muted-foreground mb-2 block">文章标题</Label>
+            <div className="relative">
+              <Input
+                placeholder={isGenerating ? "AI 正在生成标题..." : "输入文章标题..."}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="text-xl font-bold pr-10"
+                disabled={isGenerating}
+              />
+              {suggestedTitles.length > 0 && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <DropdownMenu open={showTitleDropdown} onOpenChange={setShowTitleDropdown}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[500px]">
+                      <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium">
+                        AI 建议标题
+                      </div>
+                      {suggestedTitles.map((suggestedTitle, index) => (
+                        <DropdownMenuItem
+                          key={index}
+                          onClick={() => {
+                            setTitle(suggestedTitle);
+                            setShowTitleDropdown(false);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <span className={cn(
+                            "truncate",
+                            title === suggestedTitle && "font-medium text-primary"
+                          )}>
+                            {suggestedTitle}
+                          </span>
+                          {title === suggestedTitle && (
+                            <CheckCircle2 className="h-4 w-4 ml-auto text-primary shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+              <span>{title.length}/60 字符</span>
+              {title.length > 0 && title.length <= 60 && (
+                <span className="text-green-500 flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> 长度合适
+                </span>
+              )}
+            </div>
           </div>
 
           {/* 内容编辑区 */}
           <Textarea
-            placeholder="开始撰写您的内容...&#10;&#10;提示：&#10;- 使用 ## 创建小标题&#10;- 使用 - 创建列表&#10;- 点击上方 AI 助手按钮获取帮助"
+            placeholder={isGenerating ? "AI 正在生成内容..." : "内容将由 AI 自动生成，您也可以手动编辑..."}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="min-h-[500px] resize-none text-base leading-relaxed"
+            className="min-h-[400px] resize-none text-base leading-relaxed"
+            disabled={isGenerating}
           />
 
           {/* 底部统计 */}
