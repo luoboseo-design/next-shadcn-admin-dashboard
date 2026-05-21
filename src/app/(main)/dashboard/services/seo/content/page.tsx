@@ -153,6 +153,83 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
     ? ((content.match(new RegExp(keywordPattern, "gi"))?.length || 0) / wordCount * 100).toFixed(1)
     : "0";
 
+  // GEO 评分计算
+  const geoChecks = {
+    // 引用和来源
+    citations: {
+      label: "引用来源",
+      description: "添加权威数据来源和引用",
+      count: (content.match(/根据|研究表明|数据显示|报告指出|专家表示|according to|study shows/gi) || []).length,
+      target: 3,
+      weight: 15,
+    },
+    // 统计数据
+    statistics: {
+      label: "统计数据",
+      description: "包含具体数字和统计信息",
+      count: (content.match(/\d+%|\d+倍|\d+个|\d+年|\d+万|\d+亿/g) || []).length,
+      target: 5,
+      weight: 15,
+    },
+    // 专业术语
+    expertise: {
+      label: "专业深度",
+      description: "使用行业专业术语和概念",
+      count: keywords.length > 0 
+        ? (content.match(new RegExp(keywordPattern, "gi")) || []).length 
+        : 0,
+      target: 8,
+      weight: 15,
+    },
+    // 结构化内容
+    structure: {
+      label: "内容结构",
+      description: "使用标题、列表、分段组织",
+      count: (content.match(/^##\s|^###\s|^-\s|^\d+\.\s/gm) || []).length,
+      target: 6,
+      weight: 15,
+    },
+    // 问答格式
+    qaFormat: {
+      label: "问答覆盖",
+      description: "回答用户可能提出的问题",
+      count: (content.match(/什么是|如何|为什么|怎么|哪些|多少|what|how|why|which/gi) || []).length,
+      target: 3,
+      weight: 10,
+    },
+    // 内容深度
+    depth: {
+      label: "内容深度",
+      description: "全面覆盖主题各方面",
+      count: Math.min(Math.floor(wordCount / 300), 10),
+      target: 5,
+      weight: 15,
+    },
+    // 可读性
+    readability: {
+      label: "可读性",
+      description: "段落简洁，句子清晰",
+      count: content.split(/\n\n+/).filter(p => p.trim().length > 0 && p.trim().length < 500).length,
+      target: 5,
+      weight: 15,
+    },
+  };
+
+  // 计算各项得分和总分
+  const calculateItemScore = (count: number, target: number, weight: number) => {
+    const ratio = Math.min(count / target, 1);
+    return Math.round(ratio * weight);
+  };
+
+  const geoScoreItems = Object.entries(geoChecks).map(([key, item]) => ({
+    key,
+    ...item,
+    score: calculateItemScore(item.count, item.target, item.weight),
+    status: item.count >= item.target ? "good" : item.count >= item.target * 0.5 ? "warning" : "error",
+  }));
+
+  const geoTotalScore = geoScoreItems.reduce((sum, item) => sum + item.score, 0);
+
   // SEO 检查项
   const seoChecks: SeoCheckItem[] = [
     {
@@ -595,28 +672,147 @@ ${keyword}是一个需要长期投入的过程。${brandName ? `选择${brandNam
               </Card>
             </TabsContent>
 
-            <TabsContent value="preview" className="mt-0">
+            <TabsContent value="preview" className="mt-0 space-y-4">
+              {/* GEO 总评分 */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    搜索结果预览
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      GEO 评分
+                    </span>
+                    <span className={cn(
+                      "text-2xl font-bold",
+                      geoTotalScore >= 80 ? "text-green-500" : geoTotalScore >= 50 ? "text-yellow-500" : "text-red-500"
+                    )}>
+                      {geoTotalScore}
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-4 border rounded-lg bg-background">
-                    <div className="text-blue-600 text-lg hover:underline cursor-pointer truncate">
-                      {title || "文章标题将显示在这里"}
+                  <Progress 
+                    value={geoTotalScore} 
+                    className={cn(
+                      "h-2 mb-4",
+                      geoTotalScore >= 80 ? "[&>div]:bg-green-500" : geoTotalScore >= 50 ? "[&>div]:bg-yellow-500" : "[&>div]:bg-red-500"
+                    )}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    GEO (Generative Engine Optimization) 评估内容在 AI 搜索引擎中的可见性
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* GEO 评分详情 */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    评分详情
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {geoScoreItems.map((item) => (
+                    <div key={item.key} className="space-y-1.5">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          {item.status === "good" ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          ) : item.status === "warning" ? (
+                            <AlertCircle className="h-4 w-4 text-yellow-500" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          )}
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {item.score}/{item.weight}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Progress 
+                          value={(item.score / item.weight) * 100} 
+                          className={cn(
+                            "h-1.5 flex-1",
+                            item.status === "good" ? "[&>div]:bg-green-500" : 
+                            item.status === "warning" ? "[&>div]:bg-yellow-500" : "[&>div]:bg-red-500"
+                          )}
+                        />
+                        <span className="text-xs text-muted-foreground w-16 text-right">
+                          {item.count}/{item.target}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground pl-6">{item.description}</p>
                     </div>
-                    <div className="text-green-700 text-sm mt-1">
-                      {"example.com › blog › article"}
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* GEO 优化建议 */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4" />
+                    GEO 优化建议
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {geoScoreItems.filter(item => item.status !== "good").slice(0, 4).map((item) => (
+                    <div key={item.key} className="flex items-start gap-2 text-sm">
+                      <ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-medium">{item.label}：</span>
+                        <span className="text-muted-foreground">
+                          {item.key === "citations" && "添加更多权威来源引用，如「研究表明」「数据显示」"}
+                          {item.key === "statistics" && "加入具体数字和统计数据，增强可信度"}
+                          {item.key === "expertise" && "更多使用目标关键词，展示专业深度"}
+                          {item.key === "structure" && "使用更多标题和列表，优化内容结构"}
+                          {item.key === "qaFormat" && "添加问答式内容，覆盖用户常见问题"}
+                          {item.key === "depth" && "扩展内容长度，全面覆盖主题各方面"}
+                          {item.key === "readability" && "拆分过长段落，提高内容可读性"}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                      {content.slice(0, 160) || "文章描述将显示在这里，建议控制在 160 字符以内，包含核心关键词以提高点击率..."}
+                  ))}
+                  {geoScoreItems.filter(item => item.status !== "good").length === 0 && (
+                    <div className="text-sm text-green-600 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      内容已针对 AI 搜索引擎充分优化
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* AI 搜索预览 */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    AI 搜索回答预览
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 border rounded-lg bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center shrink-0">
+                        <Sparkles className="h-3.5 w-3.5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm leading-relaxed">
+                          {content.length > 50 
+                            ? content.replace(/^##?\s.+$/gm, '').replace(/\n+/g, ' ').slice(0, 200) + "..."
+                            : "您的内容将被 AI 搜索引擎提取并展示给用户。优质的 GEO 内容能够增加被引用的概率。"}
+                        </p>
+                        {brandName && (
+                          <p className="text-xs text-muted-foreground mt-2">
+                            来源：{brandName}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-3">
-                    这是您的内容在 Google 搜索结果中的预览效果
+                    这是您的内容可能在 ChatGPT、Perplexity 等 AI 搜索中被引用的效果
                   </p>
                 </CardContent>
               </Card>
