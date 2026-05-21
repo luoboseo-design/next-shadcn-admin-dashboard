@@ -393,8 +393,18 @@ export default function SocialMonitorPage() {
                         {serviceInfo.label}
                       </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span className="truncate">{task.websiteUrl}</span>
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="truncate max-w-[200px]">{task.websiteUrl}</span>
+                      {task.keywords.length > 0 && (
+                        <>
+                          <span>·</span>
+                          <span className="flex items-center gap-1.5">
+                            {task.keywords.map((kw) => (
+                              <Badge key={kw} variant="secondary" className="text-xs h-5">{kw}</Badge>
+                            ))}
+                          </span>
+                        </>
+                      )}
                       <span>·</span>
                       <span className="flex items-center gap-1 shrink-0">
                         <Calendar className="h-3 w-3" />
@@ -483,16 +493,6 @@ export default function SocialMonitorPage() {
                     {status === "completed" ? "已完成" : "进行中"}
                   </Badge>
                 </div>
-
-                {/* 关键词 */}
-                {task.keywords.length > 0 && (
-                  <div className="flex items-center gap-2 mt-3 ml-14">
-                    <span className="text-xs text-muted-foreground">关键词：</span>
-                    {task.keywords.map((kw) => (
-                      <Badge key={kw} variant="secondary" className="text-xs">{kw}</Badge>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* 展开详情 */}
