@@ -218,7 +218,7 @@ export default function DiagnosePage() {
     updateFormData({
       brandName: brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1),
       language: isChineseSite ? "中文" : "英文",
-      country: isChineseSite ? "中国" : "全球",
+      country: isChineseSite ? "中��" : "全球",
       industry: "互联网/科技",
       businessModel: "SaaS/软件服务",
       coreProducts: `${brandGuess}平台、${brandGuess}服务`,
@@ -692,7 +692,7 @@ export default function DiagnosePage() {
                       已选 {formData.selectedKeywords.length} 个
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
+                  <div className="flex flex-wrap gap-2">
                     {formData.suggestedKeywords.map((keyword, index) => (
                       <label
                         key={index}
@@ -711,45 +711,21 @@ export default function DiagnosePage() {
                         {keyword}
                       </label>
                     ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="添加自定义关键词"
-                      className="h-8 text-sm"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                          const newKeyword = e.currentTarget.value.trim();
-                          if (!formData.suggestedKeywords.includes(newKeyword)) {
-                            updateFormData({
-                              suggestedKeywords: [...formData.suggestedKeywords, newKeyword],
-                              selectedKeywords: [...formData.selectedKeywords, newKeyword],
-                            });
-                          }
-                          e.currentTarget.value = '';
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newKeyword = prompt('输入自定义关键词');
+                        if (newKeyword?.trim() && !formData.suggestedKeywords.includes(newKeyword.trim())) {
+                          updateFormData({
+                            suggestedKeywords: [...formData.suggestedKeywords, newKeyword.trim()],
+                            selectedKeywords: [...formData.selectedKeywords, newKeyword.trim()],
+                          });
                         }
                       }}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs shrink-0"
-                      onClick={(e) => {
-                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                        if (input?.value.trim()) {
-                          const newKeyword = input.value.trim();
-                          if (!formData.suggestedKeywords.includes(newKeyword)) {
-                            updateFormData({
-                              suggestedKeywords: [...formData.suggestedKeywords, newKeyword],
-                              selectedKeywords: [...formData.selectedKeywords, newKeyword],
-                            });
-                          }
-                          input.value = '';
-                        }
-                      }}
+                      className="flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all"
                     >
-                      <Plus className="h-3 w-3 mr-1" />
-                      添加
-                    </Button>
+                      <Plus className="h-4 w-4 text-muted-foreground" />
+                    </button>
                   </div>
                 </div>
 
@@ -761,7 +737,7 @@ export default function DiagnosePage() {
                       已选 {formData.selectedLongTails.length} 个
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
+                  <div className="flex flex-wrap gap-2">
                     {formData.suggestedLongTails.map((keyword, index) => (
                       <label
                         key={index}
@@ -780,45 +756,21 @@ export default function DiagnosePage() {
                         {keyword}
                       </label>
                     ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="添加自定义长尾词"
-                      className="h-8 text-sm"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                          const newKeyword = e.currentTarget.value.trim();
-                          if (!formData.suggestedLongTails.includes(newKeyword)) {
-                            updateFormData({
-                              suggestedLongTails: [...formData.suggestedLongTails, newKeyword],
-                              selectedLongTails: [...formData.selectedLongTails, newKeyword],
-                            });
-                          }
-                          e.currentTarget.value = '';
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newKeyword = prompt('输入自定义长尾词');
+                        if (newKeyword?.trim() && !formData.suggestedLongTails.includes(newKeyword.trim())) {
+                          updateFormData({
+                            suggestedLongTails: [...formData.suggestedLongTails, newKeyword.trim()],
+                            selectedLongTails: [...formData.selectedLongTails, newKeyword.trim()],
+                          });
                         }
                       }}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs shrink-0"
-                      onClick={(e) => {
-                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                        if (input?.value.trim()) {
-                          const newKeyword = input.value.trim();
-                          if (!formData.suggestedLongTails.includes(newKeyword)) {
-                            updateFormData({
-                              suggestedLongTails: [...formData.suggestedLongTails, newKeyword],
-                              selectedLongTails: [...formData.selectedLongTails, newKeyword],
-                            });
-                          }
-                          input.value = '';
-                        }
-                      }}
+                      className="flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all"
                     >
-                      <Plus className="h-3 w-3 mr-1" />
-                      添加
-                    </Button>
+                      <Plus className="h-4 w-4 text-muted-foreground" />
+                    </button>
                   </div>
                 </div>
 
@@ -830,7 +782,7 @@ export default function DiagnosePage() {
                       已选 {formData.selectedQueries.length} 个
                     </span>
                   </div>
-                  <div className="space-y-1.5 mb-2">
+                  <div className="space-y-1.5">
                     {formData.suggestedQueries.map((query, index) => (
                       <label
                         key={index}
@@ -849,45 +801,22 @@ export default function DiagnosePage() {
                         {query}
                       </label>
                     ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="添加自定义问答，如：XX产品怎么样？"
-                      className="h-8 text-sm"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                          const newQuery = e.currentTarget.value.trim();
-                          if (!formData.suggestedQueries.includes(newQuery)) {
-                            updateFormData({
-                              suggestedQueries: [...formData.suggestedQueries, newQuery],
-                              selectedQueries: [...formData.selectedQueries, newQuery],
-                            });
-                          }
-                          e.currentTarget.value = '';
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newQuery = prompt('输入自定义问答');
+                        if (newQuery?.trim() && !formData.suggestedQueries.includes(newQuery.trim())) {
+                          updateFormData({
+                            suggestedQueries: [...formData.suggestedQueries, newQuery.trim()],
+                            selectedQueries: [...formData.selectedQueries, newQuery.trim()],
+                          });
                         }
                       }}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs shrink-0"
-                      onClick={(e) => {
-                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                        if (input?.value.trim()) {
-                          const newQuery = input.value.trim();
-                          if (!formData.suggestedQueries.includes(newQuery)) {
-                            updateFormData({
-                              suggestedQueries: [...formData.suggestedQueries, newQuery],
-                              selectedQueries: [...formData.selectedQueries, newQuery],
-                            });
-                          }
-                          input.value = '';
-                        }
-                      }}
+                      className="flex items-center justify-center gap-2 w-full p-2.5 rounded border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all text-sm text-muted-foreground"
                     >
-                      <Plus className="h-3 w-3 mr-1" />
-                      添加
-                    </Button>
+                      <Plus className="h-4 w-4" />
+                      添加自定义问答
+                    </button>
                   </div>
                 </div>
               </div>
@@ -916,7 +845,7 @@ export default function DiagnosePage() {
             </Button>
           ) : (
             <Button onClick={handleComplete}>
-              应用建议并创建任务
+              应用建议��创建任务
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           )}
