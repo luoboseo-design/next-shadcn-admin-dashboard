@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { ChevronDown, ShieldCheck, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
+import { ArrowLeft, ChevronDown, ShieldCheck } from "lucide-react";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
@@ -20,23 +22,27 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { adminSidebarItems } from "@/navigation/sidebar/admin-sidebar-items";
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const path = usePathname();
-  const [openMenus, setOpenMenus] = useState<string[]>([]);
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
   const toggleMenu = (title: string) => {
-    setOpenMenus((prev) => 
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    );
+    setOpenMenus((prev) => ({
+      ...prev,
+      [title]: prev[title] === undefined ? false : !prev[title],
+    }));
   };
 
-  // Auto-expand menus that contain the current path
+  // Check if menu should be open
   const isMenuOpen = (item: { title: string; url: string; subItems?: { url: string }[] }) => {
-    if (openMenus.includes(item.title)) return true;
+    // If user has explicitly toggled, use that state
+    if (openMenus[item.title] !== undefined) {
+      return openMenus[item.title];
+    }
+    // Default: auto-expand if current path matches
     if (item.subItems?.some((sub) => path.startsWith(sub.url))) return true;
     return false;
   };
@@ -69,11 +75,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 
                 if (hasSubItems) {
                   return (
-                    <Collapsible
-                      key={item.title}
-                      open={isMenuOpen(item)}
-                      onOpenChange={() => toggleMenu(item.title)}
-                    >
+                    <Collapsible key={item.title} open={isMenuOpen(item)} onOpenChange={() => toggleMenu(item.title)}>
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton tooltip={item.title}>
