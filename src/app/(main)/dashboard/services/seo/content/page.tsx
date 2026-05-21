@@ -413,7 +413,7 @@ export default function ContentEditorPage() {
                       {title || "文章标题将显示在这里"}
                     </div>
                     <div className="text-green-700 text-sm mt-1">
-                      example.com › blog › article
+                      {"example.com › blog › article"}
                     </div>
                     <div className="text-sm text-muted-foreground mt-2 line-clamp-2">
                       {content.slice(0, 160) || "文章描述将显示在这里，建议控制在 160 字符以内，包含核心关键词以提高点击率..."}
