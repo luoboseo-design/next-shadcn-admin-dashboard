@@ -81,7 +81,7 @@ export default function TaskDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {task.status === "awaiting" && <AcceptanceDialog task={task} />}
+          {task.status === "completed" && <AcceptanceDialog task={task} />}
           <Button asChild>
             <Link href="/dashboard/services/seo">
               <Plus className="h-4 w-4 mr-2" />
