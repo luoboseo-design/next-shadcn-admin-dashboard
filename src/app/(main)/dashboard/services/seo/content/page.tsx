@@ -56,11 +56,15 @@ export default function ContentEditorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("write");
 
+  // 转义正则特殊字符
+  const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
   // 计算内容统计
   const wordCount = content.length;
   const readingTime = Math.ceil(wordCount / 500);
-  const keywordDensity = keywords.length > 0 && wordCount > 0
-    ? ((content.match(new RegExp(keywords.join("|"), "gi"))?.length || 0) / wordCount * 100).toFixed(1)
+  const keywordPattern = keywords.map(escapeRegex).join("|");
+  const keywordDensity = keywords.length > 0 && wordCount > 0 && keywordPattern
+    ? ((content.match(new RegExp(keywordPattern, "gi"))?.length || 0) / wordCount * 100).toFixed(1)
     : "0";
 
   // SEO 检查项
@@ -379,7 +383,7 @@ export default function ContentEditorPage() {
                 <CardContent>
                   <div className="space-y-3">
                     {keywords.map((kw) => {
-                      const escapedKw = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                      const escapedKw = escapeRegex(kw);
                       const count = (content.match(new RegExp(escapedKw, "gi")) || []).length;
                       return (
                         <div key={kw} className="flex items-center justify-between">
