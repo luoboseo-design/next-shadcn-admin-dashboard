@@ -99,59 +99,59 @@ const backlinkOrders = [
   },
 ];
 
-// 模拟客座文章订单数据
+// 模拟客座文章订单数据 - 套餐形式
 const guestPostOrders = [
   {
     id: "GA-001",
     name: "SaaS 行业趋势分析",
     title: "2024年SaaS行业十大趋势预测",
-    targetSite: "TechCrunch",
+    packageName: "5媒体套餐",
+    mediaCount: 5,
+    completedCount: 5,
     status: "published",
     progress: 100,
     createdAt: "2024-01-10",
-    publishedAt: "2024-01-20",
-    views: 12500,
-    backlinks: 3,
-    dr: 92,
+    publishedAt: "2024-01-24",
+    avgDr: 81,
   },
   {
     id: "GA-002",
     name: "AI 技术应用案例",
     title: "企业如何利用AI提升效率",
-    targetSite: "Forbes",
+    packageName: "3媒体套餐",
+    mediaCount: 3,
+    completedCount: 1,
     status: "review",
-    progress: 70,
+    progress: 66,
     createdAt: "2024-01-18",
     publishedAt: null,
-    views: 0,
-    backlinks: 0,
-    dr: 85,
+    avgDr: 85,
   },
   {
     id: "GA-003",
     name: "数字营销策略指南",
     title: "2024数字营销完整指南",
-    targetSite: "HubSpot Blog",
+    packageName: "10媒体套餐",
+    mediaCount: 10,
+    completedCount: 0,
     status: "writing",
     progress: 30,
     createdAt: "2024-01-22",
     publishedAt: null,
-    views: 0,
-    backlinks: 0,
-    dr: 78,
+    avgDr: 0,
   },
   {
     id: "GA-004",
     name: "远程工作最佳实践",
     title: "",
-    targetSite: "Entrepreneur",
+    packageName: "5媒体套餐",
+    mediaCount: 5,
+    completedCount: 0,
     status: "pending",
     progress: 0,
     createdAt: "2024-01-25",
     publishedAt: null,
-    views: 0,
-    backlinks: 0,
-    dr: 70,
+    avgDr: 0,
   },
 ];
 
@@ -537,13 +537,16 @@ export default function SEOMonitorPage() {
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                         <span className="font-mono">{order.id}</span>
+                        {order.title && (
+                          <>
+                            <span>·</span>
+                            <span className="truncate">{order.title}</span>
+                          </>
+                        )}
                         <span>·</span>
-                        <span className="truncate">{order.title}</span>
+                        <span className="text-primary/80 font-medium">{order.packageName}</span>
                         <span>·</span>
-                        <span className="flex items-center gap-1">
-                          <ExternalLink className="h-3 w-3" />
-                          {order.targetSite}
-                        </span>
+                        <span>{order.completedCount}/{order.mediaCount} 已发布</span>
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground sm:hidden">
                         <Badge variant="secondary" className={cn("text-xs h-5", status.color)}>
@@ -567,8 +570,8 @@ export default function SEOMonitorPage() {
                     </div>
 
                     <div className="w-20 hidden lg:block text-center">
-                      {order.dr > 0 ? (
-                        <span className="text-sm font-medium">{order.dr}</span>
+                      {order.avgDr > 0 ? (
+                        <span className="text-sm font-medium">{order.avgDr}</span>
                       ) : (
                         <span className="text-sm text-muted-foreground">-</span>
                       )}

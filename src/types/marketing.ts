@@ -89,8 +89,9 @@ export interface PublishResult {
   title: string;
   anchorText: string;
   accountInfo?: AccountInfo;
-  publishedAt?: Date;
+  publishedAt?: Date | null;
   errorMessage?: string;
+  dr?: number;
 }
 
 export type TaskType = "backlink" | "guest_post";
