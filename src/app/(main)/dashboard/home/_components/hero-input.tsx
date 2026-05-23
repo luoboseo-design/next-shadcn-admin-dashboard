@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 
-import { ArrowRight, Globe, Search, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, Bot, Globe, Search, Sparkles, Target, TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+type DiagnosisMode = "seo" | "geo";
 
 interface HeroInputProps {
   onSubmit: (url: string) => void;
@@ -14,6 +17,7 @@ interface HeroInputProps {
 export function HeroInput({ onSubmit }: HeroInputProps) {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
+  const [mode, setMode] = useState<DiagnosisMode>("seo");
 
   const validateUrl = (value: string): boolean => {
     try {
@@ -43,10 +47,30 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
     onSubmit(finalUrl);
   };
 
+  const seoFeatures = [
+    { icon: <Search className="h-5 w-5" />, title: "SEO 深度分析", description: "检测技术问题、内容质量和外链情况" },
+    { icon: <Sparkles className="h-5 w-5" />, title: "关键词排名", description: "分析目标关键词在搜索引擎中的排名" },
+    { icon: <TrendingUp className="h-5 w-5" />, title: "增长建议", description: "基于诊断结果提供针对性的优化方案" },
+  ];
+
+  const geoFeatures = [
+    {
+      icon: <Bot className="h-5 w-5" />,
+      title: "AI 引用检测",
+      description: "分析在 ChatGPT、Perplexity 等 AI 搜索中的可见度",
+    },
+    {
+      icon: <Target className="h-5 w-5" />,
+      title: "品牌提及分析",
+      description: "检测品牌在 AI 回答中的提及频率和语境",
+    },
+    { icon: <TrendingUp className="h-5 w-5" />, title: "优化建议", description: "提供提升 AI 搜索可见度的具体策略" },
+  ];
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
       {/* 标题区域 */}
-      <div className="text-center mb-10 max-w-3xl">
+      <div className="text-center mb-8 max-w-3xl">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
           <Sparkles className="h-4 w-4" />
           <span>AI 驱动的营销智能平台</span>
@@ -59,6 +83,30 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
           输入您的网站地址，AI 将深度分析 SEO 表现、AI 搜索引擎可见度、业务类型和目标客户， 为您提供专业的营销建议
         </p>
+      </div>
+
+      {/* SEO / GEO Tab 切换 */}
+      <div className="flex items-center gap-1 p-1 bg-muted rounded-lg mb-6">
+        <button
+          type="button"
+          onClick={() => setMode("seo")}
+          className={cn(
+            "relative px-6 py-2.5 text-sm font-medium rounded-md transition-all duration-200",
+            mode === "seo" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          SEO 诊断
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("geo")}
+          className={cn(
+            "relative px-6 py-2.5 text-sm font-medium rounded-md transition-all duration-200",
+            mode === "geo" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          GEO 诊断
+        </button>
       </div>
 
       {/* 输入框区域 */}
@@ -88,23 +136,16 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
         {error && <p className="text-sm text-destructive mt-3 text-center">{error}</p>}
       </form>
 
-      {/* 功能特点 */}
+      {/* 功能特点 - 根据模式切换 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl w-full">
-        <FeatureCard
-          icon={<Search className="h-5 w-5" />}
-          title="SEO 深度分析"
-          description="检测技术问题、内容质量和外链情况"
-        />
-        <FeatureCard
-          icon={<Sparkles className="h-5 w-5" />}
-          title="AI 引用检测"
-          description="分析在 ChatGPT、Perplexity 等 AI 搜索中的可见度"
-        />
-        <FeatureCard
-          icon={<TrendingUp className="h-5 w-5" />}
-          title="增长建议"
-          description="基于诊断结果提供针对性的营销方案"
-        />
+        {(mode === "seo" ? seoFeatures : geoFeatures).map((feature) => (
+          <FeatureCard
+            key={feature.title}
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+          />
+        ))}
       </div>
     </div>
   );
@@ -112,8 +153,8 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="flex flex-col items-center text-center p-6 rounded-xl bg-muted/50 border border-border/50">
-      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-3">
+    <div className="flex flex-col items-center text-center p-6 rounded-xl bg-muted/50 border border-border/50 transition-all hover:border-border hover:shadow-sm">
+      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-background border border-border mb-4">
         {icon}
       </div>
       <h3 className="font-semibold mb-1">{title}</h3>
