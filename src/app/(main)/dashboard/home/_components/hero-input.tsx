@@ -167,7 +167,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group relative flex flex-col p-5 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:border-border hover:bg-card"
+              className="group relative flex flex-col p-5 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:border-border hover:bg-card h-[160px]"
             >
               {/* 渐变背景 */}
               <div
@@ -182,7 +182,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
                   {feature.icon}
                 </div>
                 <h3 className="font-semibold mb-1.5">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed min-h-[2.5rem]">{feature.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{feature.description}</p>
               </div>
             </div>
           ))}
