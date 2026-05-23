@@ -85,31 +85,29 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
         </p>
       </div>
 
-      {/* SEO / GEO Tab 切换 */}
-      <div className="flex items-center gap-2 mb-6">
+      {/* SEO / GEO Tab 切换 - 文字下划线风格 */}
+      <div className="flex items-center gap-8 mb-4">
         <button
           type="button"
           onClick={() => setMode("seo")}
           className={cn(
-            "px-6 py-2.5 text-sm font-semibold rounded-full border-2 transition-all duration-200",
-            mode === "seo"
-              ? "bg-foreground text-background border-foreground"
-              : "bg-transparent text-muted-foreground border-border hover:border-foreground hover:text-foreground",
+            "relative pb-2 text-base font-medium transition-colors",
+            mode === "seo" ? "text-primary" : "text-muted-foreground hover:text-foreground",
           )}
         >
           SEO 诊断
+          {mode === "seo" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
         </button>
         <button
           type="button"
           onClick={() => setMode("geo")}
           className={cn(
-            "px-6 py-2.5 text-sm font-semibold rounded-full border-2 transition-all duration-200",
-            mode === "geo"
-              ? "bg-foreground text-background border-foreground"
-              : "bg-transparent text-muted-foreground border-border hover:border-foreground hover:text-foreground",
+            "relative pb-2 text-base font-medium transition-colors",
+            mode === "geo" ? "text-primary" : "text-muted-foreground hover:text-foreground",
           )}
         >
           GEO 诊断
+          {mode === "geo" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
         </button>
       </div>
 
