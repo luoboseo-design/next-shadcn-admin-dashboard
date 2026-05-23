@@ -110,23 +110,12 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
       <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-16">
         {/* 标题区域 */}
         <div className="text-center mb-12 max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/50 bg-muted/50 text-sm text-muted-foreground mb-8">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span>AI 驱动的营销智能平台</span>
-          </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-            <span className="bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
-              让 AI 诊断您的网站
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-muted-foreground/80 to-muted-foreground/50 bg-clip-text text-transparent">
-              发现增长机会
-            </span>
-          </h1>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            输入您的网站地址，AI 将深度分析 <span className="text-foreground font-medium">SEO 表现</span>、
-            <span className="text-foreground font-medium">AI 搜索引擎可见度</span>、
-            业务类型和目标客户，为您提供专业的营销建议
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4">让 AI 诊断您的网站</h1>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-muted-foreground/60 mb-6">
+            发现增长机会
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            输入您的网站地址，AI 将深度分析 SEO 表现、AI 搜索引擎可见度、业务类型和目标客户，为您提供专业的营销建议
           </p>
         </div>
 
