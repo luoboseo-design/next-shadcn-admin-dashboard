@@ -182,7 +182,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
                   {feature.icon}
                 </div>
                 <h3 className="font-semibold mb-1.5">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed min-h-[2.5rem]">{feature.description}</p>
               </div>
             </div>
           ))}
