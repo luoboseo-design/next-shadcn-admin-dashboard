@@ -108,17 +108,6 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
       </div>
 
       <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-16">
-        {/* 标题区域 */}
-        <div className="text-center mb-12 max-w-4xl">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4">让 AI 诊断您的网站</h1>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-muted-foreground/60 mb-6">
-            发现增长机会
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            输入您的网站地址，AI 将深度分析 SEO 表现、AI 搜索引擎可见度、业务类型和目标客户，为您提供专业的营销建议
-          </p>
-        </div>
-
         {/* 输入框区域 */}
         <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-12">
           {/* Tab 切换 */}
