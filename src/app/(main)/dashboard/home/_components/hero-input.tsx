@@ -85,34 +85,33 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
         </p>
       </div>
 
-      {/* SEO / GEO Tab 切换 - 文字下划线风格 */}
-      <div className="flex items-center gap-8 mb-4">
-        <button
-          type="button"
-          onClick={() => setMode("seo")}
-          className={cn(
-            "relative pb-2 text-base font-medium transition-colors",
-            mode === "seo" ? "text-primary" : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          SEO 诊断
-          {mode === "seo" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("geo")}
-          className={cn(
-            "relative pb-2 text-base font-medium transition-colors",
-            mode === "geo" ? "text-primary" : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          GEO 诊断
-          {mode === "geo" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
-        </button>
-      </div>
-
       {/* 输入框区域 */}
       <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
+        {/* SEO / GEO Tab 切换 - 左对齐与输入框对齐 */}
+        <div className="flex items-center gap-8 mb-3 pl-2">
+          <button
+            type="button"
+            onClick={() => setMode("seo")}
+            className={cn(
+              "relative pb-2 text-base font-medium transition-colors",
+              mode === "seo" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            SEO 诊断
+            {mode === "seo" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("geo")}
+            className={cn(
+              "relative pb-2 text-base font-medium transition-colors",
+              mode === "geo" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            GEO 诊断
+            {mode === "geo" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />}
+          </button>
+        </div>
         <div className="relative flex items-center gap-2 bg-card border border-border rounded-xl p-2 shadow-lg">
           <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-muted">
             <Globe className="h-5 w-5 text-muted-foreground" />
