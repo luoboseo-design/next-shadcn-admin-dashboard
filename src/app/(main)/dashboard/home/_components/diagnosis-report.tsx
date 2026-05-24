@@ -11,7 +11,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
-  ExternalLink,
+  ExternalLink as ExternalLinkIcon,
   FileCode,
   FileText,
   Gauge,
@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Search,
   Settings,
+  Share2,
   Smartphone,
   Sparkles,
   Target,
@@ -44,10 +45,32 @@ import type { DiagnosisReport as DiagnosisReportType, AuditItem } from "@/types/
 interface DiagnosisReportProps {
   report: DiagnosisReportType;
   onReset: () => void;
+  reportId?: string | null;
+  onViewReport?: () => void;
 }
 
-export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
+export function DiagnosisReport({ report, onReset, reportId, onViewReport }: DiagnosisReportProps) {
   const isSEO = report.mode === "seo";
+
+  const handleShare = async () => {
+    if (reportId) {
+      const url = `${window.location.origin}/dashboard/reports/${reportId}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `${isSEO ? "SEO" : "GEO"}诊断报告`,
+            text: `查看 ${report.url} 的诊断报告`,
+            url,
+          });
+        } catch {
+          // 用户取消
+        }
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("报告链接已复制到剪贴板");
+      }
+    }
+  };
 
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
@@ -62,10 +85,26 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
             {isSEO ? "SEO 审计报告" : "GEO 诊断报告"}
           </h1>
         </div>
-        <Button variant="outline" onClick={onReset} className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          重新诊断
-        </Button>
+        <div className="flex items-center gap-2">
+          {reportId && (
+            <>
+              <Button variant="outline" onClick={handleShare} className="gap-2">
+                <Share2 className="h-4 w-4" />
+                分享报告
+              </Button>
+              {onViewReport && (
+                <Button variant="outline" onClick={onViewReport} className="gap-2">
+                  <ExternalLinkIcon className="h-4 w-4" />
+                  打开报告页
+                </Button>
+              )}
+            </>
+          )}
+          <Button variant="outline" onClick={onReset} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            重新诊断
+          </Button>
+        </div>
       </div>
 
       {isSEO ? (
@@ -1045,7 +1084,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
                 ) : (
                   <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                     即将推出
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLinkIcon className="h-3.5 w-3.5" />
                   </span>
                 )}
               </div>
