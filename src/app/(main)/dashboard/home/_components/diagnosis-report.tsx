@@ -252,49 +252,13 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
 
   return (
     <>
-      {/* 主评分区域 - 简洁专业设计 */}
+      {/* 主评分区域 */}
       <div className="grid grid-cols-12 gap-4">
-        {/* 综合评分 - 大卡片 */}
+        {/* 综合评分 - 半圆仪表盘 */}
         <Card className="col-span-12 md:col-span-4 border-border/50">
-          <CardContent className="pt-6 pb-6 flex flex-col items-center justify-center h-full">
-            <div className="text-sm text-muted-foreground mb-3 font-medium">综合 SEO 评分</div>
-            <div className="relative">
-              <svg className="w-32 h-32 transform -rotate-90">
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="56"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="none"
-                  className="text-muted/40"
-                />
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="56"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="none"
-                  strokeDasharray={`${(report.overallScore / 100) * 352} 352`}
-                  strokeLinecap="round"
-                  className={cn(
-                    report.overallScore >= 80 ? "text-green-500" :
-                    report.overallScore >= 60 ? "text-amber-500" : "text-red-500"
-                  )}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className={cn(
-                  "text-4xl font-bold tabular-nums",
-                  report.overallScore >= 80 ? "text-green-600 dark:text-green-500" :
-                  report.overallScore >= 60 ? "text-amber-600 dark:text-amber-500" : "text-red-600 dark:text-red-500"
-                )}>
-                  {report.overallScore}
-                </span>
-              </div>
-            </div>
-            <div className="mt-5 flex items-center gap-5 text-sm">
+          <CardContent className="pt-6 pb-4 flex flex-col items-center justify-center">
+            <SEOGaugeChart score={report.overallScore} />
+            <div className="mt-4 flex items-center gap-5 text-sm">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-green-500" />
                 <span className="text-muted-foreground text-xs">{stats.passed} 通过</span>
@@ -452,7 +416,7 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
                 title: "图片优化", 
                 subtitle: "图片 SEO 状态",
                 item: seoAudit.images,
-                tip: "建议：描述性 ALT 文本、优化文件大小"
+                tip: "建议：描��性 ALT 文本、优化文件大小"
               },
             ]}
           />
@@ -534,6 +498,150 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
         </div>
       )}
     </>
+  );
+}
+
+// SEO 半圆仪表盘组件 - 参考 ECharts gauge 设计
+function SEOGaugeChart({ score }: { score: number }) {
+  const size = 240;
+  const centerX = size / 2;
+  const centerY = size * 0.58;
+  const radius = 90;
+  const strokeWidth = 10;
+  
+  // 颜色分段：红(0-25) -> 黄(25-50) -> 蓝(50-75) -> 绿(75-100)
+  const colors = {
+    red: "#FF6E76",
+    yellow: "#FDDD60", 
+    blue: "#58D9F9",
+    green: "#7CFFB2"
+  };
+  
+  // 计算弧线路径 (半圆从180度到0度)
+  const createArc = (startPercent: number, endPercent: number) => {
+    const startAngle = Math.PI - (startPercent / 100) * Math.PI;
+    const endAngle = Math.PI - (endPercent / 100) * Math.PI;
+    
+    const x1 = centerX + radius * Math.cos(startAngle);
+    const y1 = centerY - radius * Math.sin(startAngle);
+    const x2 = centerX + radius * Math.cos(endAngle);
+    const y2 = centerY - radius * Math.sin(endAngle);
+    
+    const largeArc = (endPercent - startPercent) > 50 ? 1 : 0;
+    
+    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 0 ${x2} ${y2}`;
+  };
+  
+  // 生成刻度线
+  const ticks = [];
+  for (let i = 0; i <= 20; i++) {
+    const percent = (i / 20) * 100;
+    const angle = Math.PI - (percent / 100) * Math.PI;
+    const isMajor = i % 5 === 0;
+    const tickLength = isMajor ? 14 : 7;
+    const innerRadius = radius - strokeWidth / 2 - 4;
+    const outerRadius = innerRadius - tickLength;
+    
+    const x1 = centerX + innerRadius * Math.cos(angle);
+    const y1 = centerY - innerRadius * Math.sin(angle);
+    const x2 = centerX + outerRadius * Math.cos(angle);
+    const y2 = centerY - outerRadius * Math.sin(angle);
+    
+    // 确定刻度颜色
+    let tickColor = colors.red;
+    if (percent > 75) tickColor = colors.green;
+    else if (percent > 50) tickColor = colors.blue;
+    else if (percent > 25) tickColor = colors.yellow;
+    
+    ticks.push(
+      <line
+        key={i}
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+        stroke={tickColor}
+        strokeWidth={isMajor ? 3 : 1.5}
+        strokeLinecap="round"
+      />
+    );
+  }
+  
+  // 指针颜色
+  let pointerColor = colors.red;
+  if (score > 75) pointerColor = colors.green;
+  else if (score > 50) pointerColor = colors.blue;
+  else if (score > 25) pointerColor = colors.yellow;
+  
+  // 计算指针角度（从左到右，0分在左边180度，100分在右边0度）
+  const pointerAngleDeg = 180 - (score / 100) * 180;
+  
+  // 等级标签位置
+  const labels = [
+    { text: "D", percent: 12.5 },
+    { text: "C", percent: 37.5 },
+    { text: "B", percent: 62.5 },
+    { text: "A", percent: 87.5 },
+  ];
+  
+  return (
+    <div className="relative flex flex-col items-center">
+      <svg width={size} height={size * 0.5} viewBox={`0 0 ${size} ${size * 0.5}`} className="overflow-visible">
+        {/* 弧线分段 */}
+        <path d={createArc(0, 25)} fill="none" stroke={colors.red} strokeWidth={strokeWidth} strokeLinecap="round" />
+        <path d={createArc(25, 50)} fill="none" stroke={colors.yellow} strokeWidth={strokeWidth} strokeLinecap="round" />
+        <path d={createArc(50, 75)} fill="none" stroke={colors.blue} strokeWidth={strokeWidth} strokeLinecap="round" />
+        <path d={createArc(75, 100)} fill="none" stroke={colors.green} strokeWidth={strokeWidth} strokeLinecap="round" />
+        
+        {/* 刻度线 */}
+        {ticks}
+        
+        {/* Grade 标签 */}
+        {labels.map((label) => {
+          const angle = Math.PI - (label.percent / 100) * Math.PI;
+          const labelRadius = radius + 20;
+          const x = centerX + labelRadius * Math.cos(angle);
+          const y = centerY - labelRadius * Math.sin(angle);
+          return (
+            <text
+              key={label.text}
+              x={x}
+              y={y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-muted-foreground text-xs font-medium"
+            >
+              {label.text}
+            </text>
+          );
+        })}
+        
+        {/* 三角形指针 */}
+        <g transform={`rotate(${pointerAngleDeg}, ${centerX}, ${centerY})`}>
+          <polygon
+            points={`${centerX},${centerY - 50} ${centerX - 8},${centerY} ${centerX + 8},${centerY}`}
+            fill={pointerColor}
+          />
+        </g>
+        
+        {/* 中心点 */}
+        <circle cx={centerX} cy={centerY} r="8" fill={pointerColor} />
+        <circle cx={centerX} cy={centerY} r="4" className="fill-background" />
+      </svg>
+      
+      {/* 分数显示 */}
+      <div className="text-center mt-1">
+        <div className={cn(
+          "text-4xl font-bold tabular-nums leading-none",
+          score > 75 ? "text-[#7CFFB2]" :
+          score > 50 ? "text-[#58D9F9]" :
+          score > 25 ? "text-[#FDDD60]" : "text-[#FF6E76]"
+        )}>
+          {score}
+        </div>
+        <div className="text-xs text-muted-foreground mt-1">综合评分</div>
+      </div>
+    </div>
   );
 }
 
