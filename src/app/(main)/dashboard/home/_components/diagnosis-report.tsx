@@ -427,7 +427,7 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
           {/* 外链审计 */}
           <AuditSection
             title="外链审计"
-            icon={<ExternalLink className="h-5 w-5" />}
+            icon={<ExternalLinkIcon className="h-5 w-5" />}
             expanded={expandedSections.includes("backlinks")}
             onToggle={() => toggleSection("backlinks")}
             items={[
