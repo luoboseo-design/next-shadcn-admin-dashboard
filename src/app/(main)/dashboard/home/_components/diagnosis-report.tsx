@@ -939,33 +939,125 @@ function GEOReportContent({ report }: { report: DiagnosisReportType }) {
         </Card>
       )}
 
-      {/* 服务推荐 */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            优化服务推荐
-          </CardTitle>
-          <CardDescription>基于诊断结果推荐的优化服务</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            {report.recommendations.slice(0, 4).map((rec) => (
-              <div key={rec.id} className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="font-semibold">{rec.title}</div>
-                  <Badge variant={rec.priority === "high" ? "default" : "secondary"}>
-                    {rec.priority === "high" ? "推荐" : "可选"}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
-                <div className="text-sm font-medium text-primary">{rec.estimatedImpact}</div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* 推荐服务 - 放在最后 */}
+      <RecommendedServices recommendations={report.recommendations} />
     </>
+  );
+}
+
+// 推荐服务组件
+function RecommendedServices({ recommendations }: { recommendations: DiagnosisReportType["recommendations"] }) {
+  // 服务数据，按照参考设计
+  const services = [
+    {
+      id: "seo-backlink",
+      title: "SEO 外链建设服务",
+      description: "通过高质量外链提升网站权重，预计可提升 DA 15-25 分",
+      impact: "+40% 自然流量",
+      priority: "high" as const,
+      available: true,
+      href: "/dashboard/services/seo/backlinks",
+    },
+    {
+      id: "geo-optimization",
+      title: "AI 搜索优化 (GEO)",
+      description: "优化内容以提升在 AI 搜索引擎中的可见度和引用率",
+      impact: "+200% AI 引用量",
+      priority: "high" as const,
+      available: false,
+      href: "/dashboard/services/geo",
+    },
+    {
+      id: "social-distribution",
+      title: "新媒体分发服务",
+      description: "一键将内容分发到多个社交平台，扩大品牌影响力",
+      impact: "+150% 社交曝光",
+      priority: "medium" as const,
+      available: false,
+      href: "/dashboard/services/social",
+    },
+    {
+      id: "lead-intelligence",
+      title: "获客情报中心",
+      description: "精准获取目标客户信息，实现高效的邮件营销触达",
+      impact: "+80% 获客效率",
+      priority: "medium" as const,
+      available: false,
+      href: "/dashboard/services/leads",
+    },
+  ];
+
+  return (
+    <Card className="border-green-200 dark:border-green-800/50 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-950/20">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-green-500 text-white">
+            <TrendingUp className="h-4 w-4" />
+          </div>
+          <span className="text-green-700 dark:text-green-400">推荐服务</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid md:grid-cols-2 gap-4">
+          {services.map((service) => (
+            <div
+              key={service.id}
+              className={cn(
+                "p-5 rounded-xl border-2 bg-card transition-all hover:shadow-lg",
+                service.priority === "high" 
+                  ? "border-green-300 dark:border-green-700" 
+                  : "border-border"
+              )}
+            >
+              {/* 标题和徽章 */}
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="font-semibold text-base">{service.title}</h3>
+                <Badge 
+                  variant="outline"
+                  className={cn(
+                    "text-xs font-medium",
+                    service.priority === "high"
+                      ? "border-green-500 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/50"
+                      : "border-primary text-primary"
+                  )}
+                >
+                  {service.priority === "high" ? "强烈推荐" : "推荐"}
+                </Badge>
+              </div>
+
+              {/* 描述 */}
+              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                {service.description}
+              </p>
+
+              {/* 预期效果和按钮 */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-muted-foreground">预期效果: </span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    {service.impact}
+                  </span>
+                </div>
+                {service.available ? (
+                  <a
+                    href={service.href}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white text-sm font-medium transition-colors"
+                  >
+                    立即使用
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                    即将推出
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

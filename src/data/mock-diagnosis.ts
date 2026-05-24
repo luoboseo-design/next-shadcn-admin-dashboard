@@ -58,12 +58,51 @@ function generateSEOAudit(): SEOAuditResult {
   };
 }
 
+// AI分析结果类型
+interface AIAnalysisResult {
+  brandName?: string;
+  language?: string;
+  country?: string;
+  industry?: string;
+  businessModel?: string;
+  coreProducts?: string;
+  targetCustomers?: string;
+  competitors?: string[];
+  suggestedKeywords?: string[];
+}
+
 // 生成GEO审计结果
-function generateGEOAudit(businessType: string, domain: string): GEOAuditResult {
+function generateGEOAudit(businessType: string, domain: string, aiAnalysis?: AIAnalysisResult | null): GEOAuditResult {
   const domainName = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
   const brandGuess = domainName.split('.')[0];
-  const brandName = brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1);
-  const isChineseSite = Math.random() > 0.5;
+  
+  // 优先使用AI分析结果
+  const brandName = aiAnalysis?.brandName || (brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1));
+  const language = aiAnalysis?.language || "中文";
+  const country = aiAnalysis?.country || "中国";
+  const industry = aiAnalysis?.industry || businessType;
+  const businessModel = aiAnalysis?.businessModel || "未知";
+  const coreProducts = aiAnalysis?.coreProducts || `${brandName}平台、${brandName}服务`;
+  const targetCustomers = aiAnalysis?.targetCustomers || "企业用户";
+  
+  const isChineseSite = language === "中文" || country === "中国";
+
+  // 生成竞争对手列表
+  const competitors = aiAnalysis?.competitors && aiAnalysis.competitors.length > 0
+    ? aiAnalysis.competitors.map((name, i) => ({
+        name,
+        domain: `${name.toLowerCase().replace(/\s+/g, '-')}.com`,
+        strength: ["市场份额大", "价格优势", "技术领先", "品牌知名度高"][i % 4],
+        aiVisibility: (["high", "medium", "low"] as const)[i % 3],
+      }))
+    : [
+        { name: "竞品A", domain: "competitor-a.com", strength: "市场份额大", aiVisibility: "high" as const },
+        { name: "竞品B", domain: "competitor-b.cn", strength: "价格优势", aiVisibility: "medium" as const },
+        { name: "竞品C", domain: "competitor-c.com", strength: "技术领先", aiVisibility: "low" as const },
+      ];
+
+  // 生成关键词建议
+  const suggestedKeywords = aiAnalysis?.suggestedKeywords || [brandName, `${brandName}怎么样`, `${brandName}推荐`];
 
   return {
     citationReadiness: generateAuditItem(2, 8),
@@ -73,35 +112,25 @@ function generateGEOAudit(businessType: string, domain: string): GEOAuditResult 
     structuredContent: generateAuditItem(3, 8),
     entityOptimization: generateAuditItem(2, 7),
     aiEngineVisibility: {
-      chatgpt: generateAIEngineStatus(businessType),
-      perplexity: generateAIEngineStatus(businessType),
-      claude: generateAIEngineStatus(businessType),
-      gemini: generateAIEngineStatus(businessType),
-      deepseek: isChineseSite ? generateAIEngineStatus(businessType) : undefined,
-      doubao: isChineseSite ? generateAIEngineStatus(businessType) : undefined,
+      chatgpt: generateAIEngineStatus(industry),
+      perplexity: generateAIEngineStatus(industry),
+      claude: generateAIEngineStatus(industry),
+      gemini: generateAIEngineStatus(industry),
+      deepseek: isChineseSite ? generateAIEngineStatus(industry) : undefined,
+      doubao: isChineseSite ? generateAIEngineStatus(industry) : undefined,
     },
     businessProfile: {
       brandName,
-      language: isChineseSite ? "中文" : "英文",
-      country: isChineseSite ? "中国" : "全球",
-      industry: businessType,
-      businessModel: ["SaaS 服务", "电子商务", "内容平台", "企业服务"][Math.floor(Math.random() * 4)],
-      coreProducts: `${brandName}平台、${brandName}服务`,
-      targetCustomers: isChineseSite ? "中国企业用户" : "全球企业用户",
+      language,
+      country,
+      industry,
+      businessModel,
+      coreProducts,
+      targetCustomers,
     },
-    competitors: [
-      { name: "竞品A", domain: "competitor-a.com", strength: "市场份额大", aiVisibility: "high" },
-      { name: "竞品B", domain: "competitor-b.cn", strength: "价格优势", aiVisibility: "medium" },
-      { name: "竞品C", domain: "competitor-c.com", strength: "技术领先", aiVisibility: "low" },
-    ],
+    competitors,
     keywordSuggestions: {
-      keywords: [
-        brandName,
-        `${brandName}怎么样`,
-        `${brandName}好不好`,
-        `${brandName}推荐`,
-        `${brandName}替代品`,
-      ],
+      keywords: suggestedKeywords.slice(0, 5),
       longTails: [
         `${brandName}哪个版本好`,
         `${brandName}新手入门`,
@@ -121,7 +150,7 @@ function generateGEOAudit(businessType: string, domain: string): GEOAuditResult 
 }
 
 // 生成模拟诊断报告
-export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo"): DiagnosisReport {
+export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo", aiAnalysis?: AIAnalysisResult | null): DiagnosisReport {
   const domain = new URL(url).hostname;
   
   // 随机生成评分
@@ -131,8 +160,8 @@ export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo"):
   const contentScore = Math.floor(Math.random() * 35) + 50; // 50-85
   const overallScore = Math.floor((seoScore + geoScore + technicalScore + contentScore) / 4);
 
-  // 业务类型识别
-  const businessTypes = [
+  // 业务类型识别 - 优先使用AI分析结果
+  const businessType = aiAnalysis?.industry || [
     "电子商务",
     "SaaS 软件服务",
     "企业官网",
@@ -141,8 +170,7 @@ export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo"):
     "金融科技",
     "医疗健康",
     "旅游服务",
-  ];
-  const businessType = businessTypes[Math.floor(Math.random() * businessTypes.length)];
+  ][Math.floor(Math.random() * 8)];
 
   // 目标受众
   const allAudiences = [
@@ -362,7 +390,7 @@ export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo"):
     recommendations,
     aiCitations,
     seoAudit: mode === "seo" ? generateSEOAudit() : undefined,
-    geoAudit: mode === "geo" ? generateGEOAudit(businessType, url) : undefined,
+    geoAudit: mode === "geo" ? generateGEOAudit(businessType, url, aiAnalysis) : undefined,
     createdAt: new Date(),
   };
 }

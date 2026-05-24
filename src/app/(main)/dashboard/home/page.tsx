@@ -11,6 +11,26 @@ import { HeroInput } from "./_components/hero-input";
 
 type DiagnosisState = "idle" | "loading" | "complete";
 
+// AI分析网站业务画像
+async function analyzeWebsite(url: string) {
+  try {
+    const response = await fetch("/api/analyze-website", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    
+    if (!response.ok) {
+      throw new Error("Analysis failed");
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("[v0] Website analysis error:", error);
+    return null;
+  }
+}
+
 export default function HomePage() {
   const [state, setState] = useState<DiagnosisState>("idle");
   const [report, setReport] = useState<DiagnosisReportType | null>(null);
@@ -20,10 +40,14 @@ export default function HomePage() {
     setState("loading");
     setCurrentMode(mode);
 
-    // 模拟诊断过程（总共约12秒）
-    await new Promise((resolve) => setTimeout(resolve, 12000));
+    // 并行执行：AI分析网站 + 等待动画时间
+    const [aiAnalysis] = await Promise.all([
+      analyzeWebsite(url),
+      new Promise((resolve) => setTimeout(resolve, 12000)), // 动画时间
+    ]);
 
-    const diagnosisReport = generateMockDiagnosis(url, mode);
+    // 生成诊断报告，使用真实的AI分析结果
+    const diagnosisReport = generateMockDiagnosis(url, mode, aiAnalysis);
     setReport(diagnosisReport);
     setState("complete");
   };
