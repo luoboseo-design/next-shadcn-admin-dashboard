@@ -8,25 +8,33 @@ import {
   ArrowRight,
   Bot,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   ExternalLink,
+  FileCode,
   FileText,
+  Gauge,
   Globe,
+  Image,
   Info,
   Link2,
   RefreshCw,
   Search,
+  Settings,
+  Smartphone,
   Sparkles,
   Target,
   TrendingUp,
+  Type,
   Users,
   Zap,
 } from "lucide-react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { categoryLabels, severityColors, severityLabels } from "@/data/mock-diagnosis";
 import { cn } from "@/lib/utils";
 import type { DiagnosisReport as DiagnosisReportType, AuditItem } from "@/types/marketing";
@@ -40,20 +48,17 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
   const isSEO = report.mode === "seo";
 
   return (
-    <div className="flex-1 p-4 md:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
+    <div className="flex-1 p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* 顶部概览 */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
             <Globe className="h-4 w-4" />
-            <span>{report.url}</span>
-            <Badge variant="outline" className={cn(
-              isSEO ? "border-primary text-primary" : "border-violet-500 text-violet-500"
-            )}>
-              {isSEO ? "SEO 诊断" : "GEO 诊断"}
-            </Badge>
+            <span className="font-mono">{report.url}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold">诊断报告</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            {isSEO ? "SEO 审计报告" : "GEO 诊断报告"}
+          </h1>
         </div>
         <Button variant="outline" onClick={onReset} className="gap-2">
           <RefreshCw className="h-4 w-4" />
@@ -67,18 +72,18 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
         <GEOReportContent report={report} />
       )}
 
-      {/* 问题诊断 - 通用 */}
+      {/* 问题诊断 */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-primary" />
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
             发现的问题
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {report.issues.map((issue) => (
-              <div key={issue.id} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <div key={issue.id} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors">
                 <div className="mt-0.5">
                   {issue.severity === "critical" && <AlertCircle className="h-5 w-5 text-red-500" />}
                   {issue.severity === "warning" && <AlertTriangle className="h-5 w-5 text-amber-500" />}
@@ -104,7 +109,7 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
+            <TrendingUp className="h-5 w-5 text-green-500" />
             推荐服务
           </CardTitle>
         </CardHeader>
@@ -113,7 +118,7 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
             {report.recommendations.map((rec) => (
               <div
                 key={rec.id}
-                className={cn("p-4 rounded-lg border", rec.priority === "high" && "border-primary bg-primary/5")}
+                className={cn("p-4 rounded-lg border transition-all hover:shadow-md", rec.priority === "high" && "border-primary bg-primary/5")}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold">{rec.title}</span>
@@ -149,128 +154,278 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
   );
 }
 
-// SEO 报告内容
+// SEO 报告内容 - 全新专业设计
 function SEOReportContent({ report }: { report: DiagnosisReportType }) {
   const seoAudit = report.seoAudit;
+  const [expandedSections, setExpandedSections] = useState<string[]>(["onpage", "technical"]);
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  // 计算各项审计的通过数
+  const getAuditStats = () => {
+    if (!seoAudit) return { passed: 0, warnings: 0, failed: 0, total: 0 };
+    const items = [
+      seoAudit.titleTag,
+      seoAudit.metaDescription,
+      seoAudit.headerStructure,
+      seoAudit.contentQuality,
+      seoAudit.keywordUsage,
+      seoAudit.internalLinks,
+      seoAudit.images,
+      seoAudit.technicalOnPage,
+    ];
+    return {
+      passed: items.filter(i => i.status === "pass").length,
+      warnings: items.filter(i => i.status === "warning").length,
+      failed: items.filter(i => i.status === "fail").length,
+      total: items.length,
+    };
+  };
+
+  const stats = getAuditStats();
 
   return (
     <>
-      {/* SEO 评分卡片 */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <ScoreCard title="综合评分" score={report.overallScore} large className="col-span-2 md:col-span-1" />
-        <ScoreCard title="SEO" score={report.seoScore} />
-        <ScoreCard title="技术" score={report.technicalScore} />
-        <ScoreCard title="内容" score={report.contentScore} />
-        <ScoreCard title="AI 引用" score={report.geoScore} />
+      {/* 主评分区域 - 大型综合评分 + 分项评分 */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* 综合评分 - 大卡片 */}
+        <Card className="col-span-12 md:col-span-4 bg-gradient-to-br from-background to-muted/30">
+          <CardContent className="pt-6 pb-6 flex flex-col items-center justify-center h-full">
+            <div className="text-sm text-muted-foreground mb-2 font-medium">综合 SEO 评分</div>
+            <div className="relative">
+              <svg className="w-32 h-32 transform -rotate-90">
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="56"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="none"
+                  className="text-muted/30"
+                />
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="56"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={`${(report.overallScore / 100) * 352} 352`}
+                  strokeLinecap="round"
+                  className={cn(
+                    report.overallScore >= 80 ? "text-green-500" :
+                    report.overallScore >= 60 ? "text-amber-500" : "text-red-500"
+                  )}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className={cn(
+                  "text-4xl font-bold",
+                  report.overallScore >= 80 ? "text-green-600" :
+                  report.overallScore >= 60 ? "text-amber-600" : "text-red-600"
+                )}>
+                  {report.overallScore}
+                </span>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="text-muted-foreground">{stats.passed} 通过</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-amber-500" />
+                <span className="text-muted-foreground">{stats.warnings} 警告</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <span className="text-muted-foreground">{stats.failed} 失败</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 分项评分卡片 */}
+        <div className="col-span-12 md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <SEOScoreCard 
+            title="页面 SEO" 
+            score={report.seoScore} 
+            icon={<FileText className="h-5 w-5" />}
+            description="标题、描述、标签"
+          />
+          <SEOScoreCard 
+            title="技术 SEO" 
+            score={report.technicalScore} 
+            icon={<Settings className="h-5 w-5" />}
+            description="速度、移动端、结构"
+          />
+          <SEOScoreCard 
+            title="内容质量" 
+            score={report.contentScore} 
+            icon={<Type className="h-5 w-5" />}
+            description="可读性、关键词、深度"
+          />
+          <SEOScoreCard 
+            title="用户体验" 
+            score={Math.round((report.technicalScore + report.contentScore) / 2)} 
+            icon={<Users className="h-5 w-5" />}
+            description="Core Web Vitals"
+          />
+        </div>
       </div>
 
-      {/* SEO 详细审计 */}
+      {/* Core Web Vitals - 独立重要区块 */}
       {seoAudit && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Search className="h-5 w-5 text-primary" />
-              SEO 详细审计
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Gauge className="h-5 w-5 text-blue-500" />
+                Core Web Vitals
+              </CardTitle>
+              <Badge variant="outline" className="text-xs">
+                Google 核心指标
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="onpage" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="onpage">页面元素</TabsTrigger>
-                <TabsTrigger value="content">内容质量</TabsTrigger>
-                <TabsTrigger value="technical">技术指标</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="onpage" className="mt-4 space-y-4">
-                <AuditItemCard 
-                  icon={<FileText className="h-4 w-4" />}
-                  title="Title Tag" 
-                  item={seoAudit.titleTag}
-                  description="50-60字符，包含目标关键词"
-                />
-                <AuditItemCard 
-                  icon={<FileText className="h-4 w-4" />}
-                  title="Meta Description" 
-                  item={seoAudit.metaDescription}
-                  description="150-160字符，包含CTA"
-                />
-                <AuditItemCard 
-                  icon={<FileText className="h-4 w-4" />}
-                  title="Header 结构" 
-                  item={seoAudit.headerStructure}
-                  description="H1唯一，层级清晰"
-                />
-              </TabsContent>
-
-              <TabsContent value="content" className="mt-4 space-y-4">
-                <AuditItemCard 
-                  icon={<FileText className="h-4 w-4" />}
-                  title="内容质量" 
-                  item={seoAudit.contentQuality}
-                  description="字数、可读性、E-E-A-T信号"
-                />
-                <AuditItemCard 
-                  icon={<Target className="h-4 w-4" />}
-                  title="关键词使用" 
-                  item={seoAudit.keywordUsage}
-                  description="关键词密度和位置分布"
-                />
-                <AuditItemCard 
-                  icon={<Link2 className="h-4 w-4" />}
-                  title="内链结构" 
-                  item={seoAudit.internalLinks}
-                  description="链接数量和锚文本相关性"
-                />
-                <AuditItemCard 
-                  icon={<FileText className="h-4 w-4" />}
-                  title="图片优化" 
-                  item={seoAudit.images}
-                  description="ALT文本、文件名、大小"
-                />
-              </TabsContent>
-
-              <TabsContent value="technical" className="mt-4 space-y-4">
-                <AuditItemCard 
-                  icon={<Zap className="h-4 w-4" />}
-                  title="技术页面元素" 
-                  item={seoAudit.technicalOnPage}
-                  description="URL、canonical、移动端、HTTPS"
-                />
-                
-                {/* Core Web Vitals */}
-                <div className="p-4 rounded-lg border">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Zap className="h-4 w-4 text-primary" />
-                    <span className="font-semibold">Core Web Vitals</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <CWVMetric 
-                      label="LCP" 
-                      value={seoAudit.coreWebVitals.lcp.toFixed(2)} 
-                      unit="s"
-                      good={seoAudit.coreWebVitals.lcp <= 2.5}
-                      threshold="< 2.5s"
-                    />
-                    <CWVMetric 
-                      label="INP" 
-                      value={Math.round(seoAudit.coreWebVitals.inp)} 
-                      unit="ms"
-                      good={seoAudit.coreWebVitals.inp <= 200}
-                      threshold="< 200ms"
-                    />
-                    <CWVMetric 
-                      label="CLS" 
-                      value={seoAudit.coreWebVitals.cls.toFixed(3)} 
-                      unit=""
-                      good={seoAudit.coreWebVitals.cls <= 0.1}
-                      threshold="< 0.1"
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <CWVCard
+                metric="LCP"
+                fullName="Largest Contentful Paint"
+                value={seoAudit.coreWebVitals.lcp}
+                unit="s"
+                thresholds={{ good: 2.5, poor: 4 }}
+                description="最大内容绘制时间"
+              />
+              <CWVCard
+                metric="INP"
+                fullName="Interaction to Next Paint"
+                value={seoAudit.coreWebVitals.inp}
+                unit="ms"
+                thresholds={{ good: 200, poor: 500 }}
+                description="交互到下一次绘制"
+              />
+              <CWVCard
+                metric="CLS"
+                fullName="Cumulative Layout Shift"
+                value={seoAudit.coreWebVitals.cls}
+                unit=""
+                thresholds={{ good: 0.1, poor: 0.25 }}
+                description="累积布局偏移"
+              />
+            </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* SEO 审计详情 - 可折叠的专业审计列表 */}
+      {seoAudit && (
+        <div className="space-y-4">
+          {/* 页面元素审计 */}
+          <AuditSection
+            title="页面元素审计"
+            icon={<FileCode className="h-5 w-5" />}
+            expanded={expandedSections.includes("onpage")}
+            onToggle={() => toggleSection("onpage")}
+            items={[
+              { 
+                icon: <Type className="h-4 w-4" />,
+                title: "Title Tag", 
+                subtitle: "标题标签优化",
+                item: seoAudit.titleTag,
+                tip: "建议：50-60 字符，包含主要关键词"
+              },
+              { 
+                icon: <FileText className="h-4 w-4" />,
+                title: "Meta Description", 
+                subtitle: "元描述优化",
+                item: seoAudit.metaDescription,
+                tip: "建议：150-160 字符，包含 CTA"
+              },
+              { 
+                icon: <Type className="h-4 w-4" />,
+                title: "Header 结构", 
+                subtitle: "标题层级结构",
+                item: seoAudit.headerStructure,
+                tip: "建议：H1 唯一，层级递进清晰"
+              },
+            ]}
+          />
+
+          {/* 内容审计 */}
+          <AuditSection
+            title="内容质量审计"
+            icon={<FileText className="h-5 w-5" />}
+            expanded={expandedSections.includes("content")}
+            onToggle={() => toggleSection("content")}
+            items={[
+              { 
+                icon: <Type className="h-4 w-4" />,
+                title: "内容质量", 
+                subtitle: "文字质量与深度",
+                item: seoAudit.contentQuality,
+                tip: "建议：字数充足、可读性高、E-E-A-T 信号"
+              },
+              { 
+                icon: <Target className="h-4 w-4" />,
+                title: "关键词优化", 
+                subtitle: "关键词使用策略",
+                item: seoAudit.keywordUsage,
+                tip: "建议：关键词密度 1-2%，自然分布"
+              },
+              { 
+                icon: <Link2 className="h-4 w-4" />,
+                title: "内链结构", 
+                subtitle: "内部链接策略",
+                item: seoAudit.internalLinks,
+                tip: "建议：相关锚文本，合理链接密度"
+              },
+              { 
+                icon: <Image className="h-4 w-4" />,
+                title: "图片优化", 
+                subtitle: "图片 SEO 状态",
+                item: seoAudit.images,
+                tip: "建议：描述性 ALT 文本、优化文件大小"
+              },
+            ]}
+          />
+
+          {/* 技术审计 */}
+          <AuditSection
+            title="技术 SEO 审计"
+            icon={<Settings className="h-5 w-5" />}
+            expanded={expandedSections.includes("technical")}
+            onToggle={() => toggleSection("technical")}
+            items={[
+              { 
+                icon: <Globe className="h-4 w-4" />,
+                title: "URL 结构", 
+                subtitle: "URL 规范化",
+                item: seoAudit.technicalOnPage,
+                tip: "建议：简洁 URL、canonical 标签、HTTPS"
+              },
+              { 
+                icon: <Smartphone className="h-4 w-4" />,
+                title: "移动端适配", 
+                subtitle: "响应式设计",
+                item: {
+                  score: seoAudit.technicalOnPage.score,
+                  status: seoAudit.technicalOnPage.status,
+                  findings: ["移动端友好性检测"],
+                  recommendations: ["确保响应式设计"]
+                },
+                tip: "建议：移动优先设计、触控友好"
+              },
+            ]}
+          />
+        </div>
       )}
 
       {/* 业务类型和受众 */}
@@ -307,6 +462,229 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
         </Card>
       </div>
     </>
+  );
+}
+
+// SEO 评分卡片组件
+function SEOScoreCard({ 
+  title, 
+  score, 
+  icon, 
+  description 
+}: { 
+  title: string; 
+  score: number; 
+  icon: React.ReactNode;
+  description: string;
+}) {
+  const getColor = (s: number) => {
+    if (s >= 80) return { text: "text-green-600", bg: "bg-green-500", light: "bg-green-100 dark:bg-green-900/30" };
+    if (s >= 60) return { text: "text-amber-600", bg: "bg-amber-500", light: "bg-amber-100 dark:bg-amber-900/30" };
+    return { text: "text-red-600", bg: "bg-red-500", light: "bg-red-100 dark:bg-red-900/30" };
+  };
+
+  const colors = getColor(score);
+
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="pt-4 pb-4">
+        <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center mb-3", colors.light)}>
+          <span className={colors.text}>{icon}</span>
+        </div>
+        <div className="text-sm text-muted-foreground mb-1">{title}</div>
+        <div className={cn("text-3xl font-bold mb-1", colors.text)}>{score}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
+        <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
+          <div 
+            className={cn("h-full rounded-full transition-all", colors.bg)} 
+            style={{ width: `${score}%` }}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Core Web Vitals 卡片
+function CWVCard({
+  metric,
+  fullName,
+  value,
+  unit,
+  thresholds,
+  description,
+}: {
+  metric: string;
+  fullName: string;
+  value: number;
+  unit: string;
+  thresholds: { good: number; poor: number };
+  description: string;
+}) {
+  const isGood = value <= thresholds.good;
+  const isPoor = value > thresholds.poor;
+  const status = isGood ? "good" : isPoor ? "poor" : "needs-improvement";
+  
+  const statusConfig = {
+    good: { 
+      color: "text-green-600", 
+      bg: "bg-green-100 dark:bg-green-900/30", 
+      border: "border-green-200 dark:border-green-800",
+      label: "良好"
+    },
+    "needs-improvement": { 
+      color: "text-amber-600", 
+      bg: "bg-amber-100 dark:bg-amber-900/30", 
+      border: "border-amber-200 dark:border-amber-800",
+      label: "需改进"
+    },
+    poor: { 
+      color: "text-red-600", 
+      bg: "bg-red-100 dark:bg-red-900/30", 
+      border: "border-red-200 dark:border-red-800",
+      label: "较差"
+    },
+  };
+
+  const config = statusConfig[status];
+  const displayValue = unit === "s" ? value.toFixed(2) : unit === "ms" ? Math.round(value) : value.toFixed(3);
+
+  return (
+    <div className={cn("p-4 rounded-lg border-2 transition-all", config.border, config.bg)}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-muted-foreground">{metric}</span>
+        <Badge variant="outline" className={cn("text-xs", config.color)}>
+          {config.label}
+        </Badge>
+      </div>
+      <div className={cn("text-3xl font-bold mb-1", config.color)}>
+        {displayValue}{unit}
+      </div>
+      <div className="text-xs text-muted-foreground mb-2">{description}</div>
+      <div className="text-xs text-muted-foreground">
+        目标: {"<"} {thresholds.good}{unit}
+      </div>
+    </div>
+  );
+}
+
+// 审计区块组件
+function AuditSection({
+  title,
+  icon,
+  expanded,
+  onToggle,
+  items,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  expanded: boolean;
+  onToggle: () => void;
+  items: Array<{
+    icon: React.ReactNode;
+    title: string;
+    subtitle: string;
+    item: AuditItem;
+    tip: string;
+  }>;
+}) {
+  const passedCount = items.filter(i => i.item.status === "pass").length;
+
+  return (
+    <Card>
+      <button
+        onClick={onToggle}
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-primary">{icon}</span>
+          <span className="font-semibold">{title}</span>
+          <Badge variant="outline" className="text-xs">
+            {passedCount}/{items.length} 通过
+          </Badge>
+        </div>
+        {expanded ? (
+          <ChevronDown className="h-5 w-5 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        )}
+      </button>
+      {expanded && (
+        <CardContent className="pt-0 pb-4">
+          <div className="space-y-3">
+            {items.map((item, index) => (
+              <AuditItemRow key={index} {...item} />
+            ))}
+          </div>
+        </CardContent>
+      )}
+    </Card>
+  );
+}
+
+// 审计项目行
+function AuditItemRow({
+  icon,
+  title,
+  subtitle,
+  item,
+  tip,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  item: AuditItem;
+  tip: string;
+}) {
+  const statusConfig = {
+    pass: { 
+      icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
+      bg: "bg-green-50 dark:bg-green-900/10",
+      border: "border-green-100 dark:border-green-900/30",
+    },
+    warning: { 
+      icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
+      bg: "bg-amber-50 dark:bg-amber-900/10",
+      border: "border-amber-100 dark:border-amber-900/30",
+    },
+    fail: { 
+      icon: <AlertCircle className="h-5 w-5 text-red-500" />,
+      bg: "bg-red-50 dark:bg-red-900/10",
+      border: "border-red-100 dark:border-red-900/30",
+    },
+  };
+
+  const config = statusConfig[item.status];
+
+  return (
+    <div className={cn("p-4 rounded-lg border transition-all", config.bg, config.border)}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 text-muted-foreground">{icon}</div>
+          <div>
+            <div className="font-medium">{title}</div>
+            <div className="text-sm text-muted-foreground">{subtitle}</div>
+            {item.findings.length > 0 && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                {item.findings[0]}
+              </div>
+            )}
+            <div className="mt-2 text-xs text-muted-foreground/80">{tip}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className={cn(
+              "text-lg font-bold",
+              item.score >= 8 ? "text-green-600" : item.score >= 5 ? "text-amber-600" : "text-red-600"
+            )}>
+              {item.score}/10
+            </div>
+          </div>
+          {config.icon}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -491,7 +869,7 @@ function GEOReportContent({ report }: { report: DiagnosisReportType }) {
   );
 }
 
-// 评分卡片
+// 评分卡片 - GEO用
 function ScoreCard({
   title,
   score,
@@ -528,7 +906,7 @@ function ScoreCard({
   );
 }
 
-// 审计项目卡片
+// 审计项目卡片 - GEO用
 function AuditItemCard({ 
   icon, 
   title, 
@@ -575,41 +953,11 @@ function AuditItemCard({
       </div>
       <p className="text-sm text-muted-foreground mb-2">{description}</p>
       {item.findings.length > 0 && (
-        <div className="text-sm">
-          <span className="font-medium">发现：</span>
-          <span className="text-muted-foreground">{item.findings.join("、")}</span>
-        </div>
+        <p className="text-sm">
+          <span className="text-muted-foreground">发现：</span>
+          {item.findings[0]}
+        </p>
       )}
-    </div>
-  );
-}
-
-// Core Web Vitals 指标
-function CWVMetric({ 
-  label, 
-  value, 
-  unit, 
-  good, 
-  threshold 
-}: { 
-  label: string; 
-  value: string | number; 
-  unit: string;
-  good: boolean;
-  threshold: string;
-}) {
-  return (
-    <div className="text-center p-3 rounded-lg bg-muted/50">
-      <div className="text-sm text-muted-foreground mb-1">{label}</div>
-      <div className={cn(
-        "text-2xl font-bold",
-        good ? "text-green-600" : "text-red-600"
-      )}>
-        {value}{unit}
-      </div>
-      <div className="text-xs text-muted-foreground mt-1">
-        目标: {threshold}
-      </div>
     </div>
   );
 }
@@ -620,35 +968,23 @@ function AIEngineCard({
   status 
 }: { 
   name: string; 
-  status: { isIndexed: boolean; citationCount: number; visibility: string; sampleQueries: string[] };
+  status: { isIndexed: boolean; citationCount: number; visibility: string }; 
 }) {
-  const visibilityColors = {
-    high: "text-green-600 bg-green-100 dark:bg-green-900/30",
-    medium: "text-amber-600 bg-amber-100 dark:bg-amber-900/30",
-    low: "text-orange-600 bg-orange-100 dark:bg-orange-900/30",
-    none: "text-red-600 bg-red-100 dark:bg-red-900/30",
+  const visibilityConfig = {
+    high: { label: "高可见度", color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/30" },
+    medium: { label: "中等可见度", color: "text-amber-600", bg: "bg-amber-100 dark:bg-amber-900/30" },
+    low: { label: "低可见度", color: "text-orange-600", bg: "bg-orange-100 dark:bg-orange-900/30" },
+    none: { label: "未被索引", color: "text-red-600", bg: "bg-red-100 dark:bg-red-900/30" },
   };
 
-  const visibilityLabels = {
-    high: "高可见度",
-    medium: "中等可见度",
-    low: "低可见度",
-    none: "未被索引",
-  };
+  const config = visibilityConfig[status.visibility as keyof typeof visibilityConfig];
 
   return (
-    <div className={cn(
-      "p-4 rounded-lg border",
-      status.isIndexed ? "bg-violet-50/50 dark:bg-violet-950/20 border-violet-200 dark:border-violet-800" : "bg-muted/50"
-    )}>
+    <div className={cn("p-4 rounded-lg border", config.bg)}>
       <div className="font-semibold mb-2">{name}</div>
-      <Badge className={visibilityColors[status.visibility as keyof typeof visibilityColors]} variant="secondary">
-        {visibilityLabels[status.visibility as keyof typeof visibilityLabels]}
-      </Badge>
+      <div className={cn("text-sm font-medium mb-1", config.color)}>{config.label}</div>
       {status.isIndexed && (
-        <div className="mt-2 text-sm text-muted-foreground">
-          引用次数: <span className="font-medium text-foreground">{status.citationCount}</span>
-        </div>
+        <div className="text-xs text-muted-foreground">引用次数: {status.citationCount}</div>
       )}
     </div>
   );
