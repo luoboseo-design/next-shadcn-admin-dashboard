@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import {
@@ -501,146 +502,100 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
   );
 }
 
-// SEO 半圆仪表盘组件 - 参考 ECharts gauge 设计
+// 动态加载 ECharts 组件（避免 SSR 问题）
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
+
+// SEO 半圆仪表盘组件 - 使用 ECharts gauge
 function SEOGaugeChart({ score }: { score: number }) {
-  const size = 240;
-  const centerX = size / 2;
-  const centerY = size * 0.58;
-  const radius = 90;
-  const strokeWidth = 10;
-  
-  // 颜色分段：红(0-25) -> 黄(25-50) -> 蓝(50-75) -> 绿(75-100)
-  const colors = {
-    red: "#FF6E76",
-    yellow: "#FDDD60", 
-    blue: "#58D9F9",
-    green: "#7CFFB2"
+  const option = {
+    series: [
+      {
+        type: "gauge",
+        startAngle: 180,
+        endAngle: 0,
+        center: ["50%", "75%"],
+        radius: "100%",
+        min: 0,
+        max: 100,
+        splitNumber: 4,
+        axisLine: {
+          lineStyle: {
+            width: 12,
+            color: [
+              [0.25, "#FF6E76"],
+              [0.5, "#FDDD60"],
+              [0.75, "#58D9F9"],
+              [1, "#7CFFB2"],
+            ],
+          },
+        },
+        pointer: {
+          icon: "triangle",
+          length: "60%",
+          width: 12,
+          offsetCenter: [0, "-15%"],
+          itemStyle: {
+            color: "auto",
+          },
+        },
+        axisTick: {
+          length: 8,
+          lineStyle: {
+            color: "auto",
+            width: 2,
+          },
+        },
+        splitLine: {
+          length: 16,
+          lineStyle: {
+            color: "auto",
+            width: 3,
+          },
+        },
+        axisLabel: {
+          color: "#999",
+          fontSize: 12,
+          distance: -45,
+          rotate: "tangential",
+          formatter: function (value: number) {
+            if (value === 12.5) return "D";
+            if (value === 37.5) return "C";
+            if (value === 62.5) return "B";
+            if (value === 87.5) return "A";
+            return "";
+          },
+        },
+        title: {
+          offsetCenter: [0, "20%"],
+          fontSize: 12,
+          color: "#999",
+        },
+        detail: {
+          fontSize: 36,
+          offsetCenter: [0, "-5%"],
+          valueAnimation: true,
+          formatter: function (value: number) {
+            return Math.round(value);
+          },
+          color: "auto",
+        },
+        data: [
+          {
+            value: score,
+            name: "综合评分",
+          },
+        ],
+      },
+    ],
   };
-  
-  // 计算弧线路径 (半圆从180度到0度)
-  const createArc = (startPercent: number, endPercent: number) => {
-    const startAngle = Math.PI - (startPercent / 100) * Math.PI;
-    const endAngle = Math.PI - (endPercent / 100) * Math.PI;
-    
-    const x1 = centerX + radius * Math.cos(startAngle);
-    const y1 = centerY - radius * Math.sin(startAngle);
-    const x2 = centerX + radius * Math.cos(endAngle);
-    const y2 = centerY - radius * Math.sin(endAngle);
-    
-    const largeArc = (endPercent - startPercent) > 50 ? 1 : 0;
-    
-    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 0 ${x2} ${y2}`;
-  };
-  
-  // 生成刻度线
-  const ticks = [];
-  for (let i = 0; i <= 20; i++) {
-    const percent = (i / 20) * 100;
-    const angle = Math.PI - (percent / 100) * Math.PI;
-    const isMajor = i % 5 === 0;
-    const tickLength = isMajor ? 14 : 7;
-    const innerRadius = radius - strokeWidth / 2 - 4;
-    const outerRadius = innerRadius - tickLength;
-    
-    const x1 = centerX + innerRadius * Math.cos(angle);
-    const y1 = centerY - innerRadius * Math.sin(angle);
-    const x2 = centerX + outerRadius * Math.cos(angle);
-    const y2 = centerY - outerRadius * Math.sin(angle);
-    
-    // 确定刻度颜色
-    let tickColor = colors.red;
-    if (percent > 75) tickColor = colors.green;
-    else if (percent > 50) tickColor = colors.blue;
-    else if (percent > 25) tickColor = colors.yellow;
-    
-    ticks.push(
-      <line
-        key={i}
-        x1={x1}
-        y1={y1}
-        x2={x2}
-        y2={y2}
-        stroke={tickColor}
-        strokeWidth={isMajor ? 3 : 1.5}
-        strokeLinecap="round"
-      />
-    );
-  }
-  
-  // 指针颜色
-  let pointerColor = colors.red;
-  if (score > 75) pointerColor = colors.green;
-  else if (score > 50) pointerColor = colors.blue;
-  else if (score > 25) pointerColor = colors.yellow;
-  
-  // 计算指针角度（从左到右，0分在左边180度，100分在右边0度）
-  const pointerAngleDeg = 180 - (score / 100) * 180;
-  
-  // 等级标签位置
-  const labels = [
-    { text: "D", percent: 12.5 },
-    { text: "C", percent: 37.5 },
-    { text: "B", percent: 62.5 },
-    { text: "A", percent: 87.5 },
-  ];
-  
+
   return (
-    <div className="relative flex flex-col items-center">
-      <svg width={size} height={size * 0.5} viewBox={`0 0 ${size} ${size * 0.5}`} className="overflow-visible">
-        {/* 弧线分段 */}
-        <path d={createArc(0, 25)} fill="none" stroke={colors.red} strokeWidth={strokeWidth} strokeLinecap="round" />
-        <path d={createArc(25, 50)} fill="none" stroke={colors.yellow} strokeWidth={strokeWidth} strokeLinecap="round" />
-        <path d={createArc(50, 75)} fill="none" stroke={colors.blue} strokeWidth={strokeWidth} strokeLinecap="round" />
-        <path d={createArc(75, 100)} fill="none" stroke={colors.green} strokeWidth={strokeWidth} strokeLinecap="round" />
-        
-        {/* 刻度线 */}
-        {ticks}
-        
-        {/* Grade 标签 */}
-        {labels.map((label) => {
-          const angle = Math.PI - (label.percent / 100) * Math.PI;
-          const labelRadius = radius + 20;
-          const x = centerX + labelRadius * Math.cos(angle);
-          const y = centerY - labelRadius * Math.sin(angle);
-          return (
-            <text
-              key={label.text}
-              x={x}
-              y={y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="fill-muted-foreground text-xs font-medium"
-            >
-              {label.text}
-            </text>
-          );
-        })}
-        
-        {/* 三角形指针 */}
-        <g transform={`rotate(${pointerAngleDeg}, ${centerX}, ${centerY})`}>
-          <polygon
-            points={`${centerX},${centerY - 50} ${centerX - 8},${centerY} ${centerX + 8},${centerY}`}
-            fill={pointerColor}
-          />
-        </g>
-        
-        {/* 中心点 */}
-        <circle cx={centerX} cy={centerY} r="8" fill={pointerColor} />
-        <circle cx={centerX} cy={centerY} r="4" className="fill-background" />
-      </svg>
-      
-      {/* 分数显示 */}
-      <div className="text-center mt-1">
-        <div className={cn(
-          "text-4xl font-bold tabular-nums leading-none",
-          score > 75 ? "text-[#7CFFB2]" :
-          score > 50 ? "text-[#58D9F9]" :
-          score > 25 ? "text-[#FDDD60]" : "text-[#FF6E76]"
-        )}>
-          {score}
-        </div>
-        <div className="text-xs text-muted-foreground mt-1">综合评分</div>
-      </div>
+    <div className="w-full h-[180px]">
+      <ReactECharts
+        option={option}
+        style={{ height: "100%", width: "100%" }}
+        opts={{ renderer: "svg" }}
+      />
     </div>
   );
 }
