@@ -252,12 +252,12 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
 
   return (
     <>
-      {/* 主评分区域 - 大型综合评分 + 分项评分 */}
+      {/* 主评分区域 - 简洁专业设计 */}
       <div className="grid grid-cols-12 gap-4">
         {/* 综合评分 - 大卡片 */}
-        <Card className="col-span-12 md:col-span-4 bg-gradient-to-br from-background to-muted/30">
+        <Card className="col-span-12 md:col-span-4 border-border/50">
           <CardContent className="pt-6 pb-6 flex flex-col items-center justify-center h-full">
-            <div className="text-sm text-muted-foreground mb-2 font-medium">综合 SEO 评分</div>
+            <div className="text-sm text-muted-foreground mb-3 font-medium">综合 SEO 评分</div>
             <div className="relative">
               <svg className="w-32 h-32 transform -rotate-90">
                 <circle
@@ -265,16 +265,16 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
                   cy="64"
                   r="56"
                   stroke="currentColor"
-                  strokeWidth="8"
+                  strokeWidth="6"
                   fill="none"
-                  className="text-muted/30"
+                  className="text-muted/40"
                 />
                 <circle
                   cx="64"
                   cy="64"
                   r="56"
                   stroke="currentColor"
-                  strokeWidth="8"
+                  strokeWidth="6"
                   fill="none"
                   strokeDasharray={`${(report.overallScore / 100) * 352} 352`}
                   strokeLinecap="round"
@@ -286,26 +286,26 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className={cn(
-                  "text-4xl font-bold",
-                  report.overallScore >= 80 ? "text-green-600" :
-                  report.overallScore >= 60 ? "text-amber-600" : "text-red-600"
+                  "text-4xl font-bold tabular-nums",
+                  report.overallScore >= 80 ? "text-green-600 dark:text-green-500" :
+                  report.overallScore >= 60 ? "text-amber-600 dark:text-amber-500" : "text-red-600 dark:text-red-500"
                 )}>
                   {report.overallScore}
                 </span>
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-4 text-sm">
+            <div className="mt-5 flex items-center gap-5 text-sm">
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-muted-foreground">{stats.passed} 通过</span>
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-muted-foreground text-xs">{stats.passed} 通过</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <span className="text-muted-foreground">{stats.warnings} 警告</span>
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="text-muted-foreground text-xs">{stats.warnings} 警告</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-muted-foreground">{stats.failed} 失败</span>
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="text-muted-foreground text-xs">{stats.failed} 失败</span>
               </div>
             </div>
           </CardContent>
@@ -405,7 +405,7 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
               { 
                 icon: <FileText className="h-4 w-4" />,
                 title: "Meta Description", 
-                subtitle: "元描述优化",
+                subtitle: "��描述优化",
                 item: seoAudit.metaDescription,
                 tip: "建议：150-160 字符，包含 CTA"
               },
@@ -537,7 +537,7 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
   );
 }
 
-// SEO 评分卡片组件
+// SEO 评分卡片组件 - 简洁专业设计
 function SEOScoreCard({ 
   title, 
   score, 
@@ -549,26 +549,37 @@ function SEOScoreCard({
   icon: React.ReactNode;
   description: string;
 }) {
-  const getColor = (s: number) => {
-    if (s >= 80) return { text: "text-green-600", bg: "bg-green-500", light: "bg-green-100 dark:bg-green-900/30" };
-    if (s >= 60) return { text: "text-amber-600", bg: "bg-amber-500", light: "bg-amber-100 dark:bg-amber-900/30" };
-    return { text: "text-red-600", bg: "bg-red-500", light: "bg-red-100 dark:bg-red-900/30" };
+  const getScoreColor = (s: number) => {
+    if (s >= 80) return "text-green-600 dark:text-green-500";
+    if (s >= 60) return "text-amber-600 dark:text-amber-500";
+    return "text-red-600 dark:text-red-500";
   };
 
-  const colors = getColor(score);
+  const getBarColor = (s: number) => {
+    if (s >= 80) return "bg-green-500";
+    if (s >= 60) return "bg-amber-500";
+    return "bg-red-500";
+  };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="pt-4 pb-4">
-        <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center mb-3", colors.light)}>
-          <span className={colors.text}>{icon}</span>
+    <Card className="border-border/50 hover:border-border transition-colors">
+      <CardContent className="pt-5 pb-5">
+        {/* 图标 - 统一灰色 */}
+        <div className="w-9 h-9 rounded-lg bg-muted/80 flex items-center justify-center mb-3">
+          <span className="text-muted-foreground">{icon}</span>
         </div>
-        <div className="text-sm text-muted-foreground mb-1">{title}</div>
-        <div className={cn("text-3xl font-bold mb-1", colors.text)}>{score}</div>
-        <div className="text-xs text-muted-foreground">{description}</div>
-        <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
+        {/* 标题 */}
+        <div className="text-sm font-medium text-foreground mb-2">{title}</div>
+        {/* 分数 */}
+        <div className={cn("text-3xl font-bold tabular-nums", getScoreColor(score))}>
+          {score}
+        </div>
+        {/* 描述 */}
+        <div className="text-xs text-muted-foreground mt-1 mb-3">{description}</div>
+        {/* 进度条 - 细线设计 */}
+        <div className="h-1 bg-muted rounded-full overflow-hidden">
           <div 
-            className={cn("h-full rounded-full transition-all", colors.bg)} 
+            className={cn("h-full rounded-full transition-all duration-500", getBarColor(score))} 
             style={{ width: `${score}%` }}
           />
         </div>
