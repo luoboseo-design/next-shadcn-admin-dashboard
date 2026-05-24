@@ -107,51 +107,8 @@ export function DiagnosisReport({ report, onReset }: DiagnosisReportProps) {
         </CardContent>
       </Card>
 
-      {/* 服务推荐 */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-green-500" />
-            推荐服务
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            {report.recommendations.map((rec) => (
-              <div
-                key={rec.id}
-                className={cn("p-4 rounded-lg border transition-all hover:shadow-md", rec.priority === "high" && "border-primary bg-primary/5")}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">{rec.title}</span>
-                  <Badge variant={rec.priority === "high" ? "default" : "secondary"}>
-                    {rec.priority === "high" ? "强烈推荐" : "推荐"}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                    预期效果: {rec.estimatedImpact}
-                  </span>
-                  {rec.serviceType === "backlinks" ? (
-                    <Button size="sm" className="gap-1" asChild>
-                      <Link href="/dashboard/services/seo/backlinks">
-                        立即使用
-                        <ArrowRight className="h-3 w-3" />
-                      </Link>
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="outline" className="gap-1" disabled>
-                      即将推出
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* 推荐服务 - 放在最后 */}
+      <RecommendedServices mode={isSEO ? "seo" : "geo"} />
     </div>
   );
 }
@@ -938,17 +895,54 @@ function GEOReportContent({ report }: { report: DiagnosisReportType }) {
           </CardContent>
         </Card>
       )}
-
-      {/* 推荐服务 - 放在最后 */}
-      <RecommendedServices recommendations={report.recommendations} />
     </>
   );
 }
 
-// 推荐服务组件
-function RecommendedServices({ recommendations }: { recommendations: DiagnosisReportType["recommendations"] }) {
-  // 服务数据，按照参考设计
-  const services = [
+// 推荐服务组件 - 根据诊断模式显示不同的服务
+function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
+  // GEO诊断：主推GEO服务和社交媒体/发稿服务
+  const geoServices = [
+    {
+      id: "geo-optimization",
+      title: "AI 搜索优化 (GEO)",
+      description: "优化内容以提升在 AI 搜索引擎中的可见度和引用率",
+      impact: "+200% AI 引用量",
+      priority: "high" as const,
+      available: true,
+      href: "/dashboard/services/geo",
+    },
+    {
+      id: "social-distribution",
+      title: "新媒体分发服务",
+      description: "一键将内容分发到多个社交平台，扩大品牌影响力",
+      impact: "+150% 社交曝光",
+      priority: "high" as const,
+      available: false,
+      href: "/dashboard/services/social",
+    },
+    {
+      id: "content-publishing",
+      title: "软文发稿服务",
+      description: "专业媒体渠道发布优质内容，提升品牌曝光和权威性",
+      impact: "+300% 品牌曝光",
+      priority: "high" as const,
+      available: false,
+      href: "/dashboard/services/publishing",
+    },
+    {
+      id: "seo-backlink",
+      title: "SEO 外链建设服务",
+      description: "通过高质量外链提升网站权重，预计可提升 DA 15-25 分",
+      impact: "+40% 自然流量",
+      priority: "medium" as const,
+      available: true,
+      href: "/dashboard/services/seo/backlinks",
+    },
+  ];
+
+  // SEO诊断：主推SEO外链服务
+  const seoServices = [
     {
       id: "seo-backlink",
       title: "SEO 外链建设服务",
@@ -959,12 +953,21 @@ function RecommendedServices({ recommendations }: { recommendations: DiagnosisRe
       href: "/dashboard/services/seo/backlinks",
     },
     {
+      id: "content-publishing",
+      title: "软文发稿服务",
+      description: "专业媒体渠道发布优质内容，提升品牌曝光和权威性",
+      impact: "+300% 品牌曝光",
+      priority: "high" as const,
+      available: false,
+      href: "/dashboard/services/publishing",
+    },
+    {
       id: "geo-optimization",
       title: "AI 搜索优化 (GEO)",
       description: "优化内容以提升在 AI 搜索引擎中的可见度和引用率",
       impact: "+200% AI 引用量",
-      priority: "high" as const,
-      available: false,
+      priority: "medium" as const,
+      available: true,
       href: "/dashboard/services/geo",
     },
     {
@@ -976,16 +979,9 @@ function RecommendedServices({ recommendations }: { recommendations: DiagnosisRe
       available: false,
       href: "/dashboard/services/social",
     },
-    {
-      id: "lead-intelligence",
-      title: "获客情报中心",
-      description: "精准获取目标客户信息，实现高效的邮件营销触达",
-      impact: "+80% 获客效率",
-      priority: "medium" as const,
-      available: false,
-      href: "/dashboard/services/leads",
-    },
   ];
+
+  const services = mode === "geo" ? geoServices : seoServices;
 
   return (
     <Card className="border-green-200 dark:border-green-800/50 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-950/20">
