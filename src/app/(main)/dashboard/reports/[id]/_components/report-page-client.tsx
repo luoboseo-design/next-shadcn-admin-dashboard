@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { generateMockDiagnosis } from "@/data/mock-diagnosis";
 import type { DiagnosisReport, DiagnosisMode } from "@/types/marketing";
 
-import { DiagnosisReportView } from "./diagnosis-report-view";
+// 导入首页的诊断报告组件
+import { DiagnosisReportContent } from "@/app/(main)/dashboard/home/_components/diagnosis-report";
 
 interface ReportPageClientProps {
   reportId: string;
@@ -85,7 +86,7 @@ export function ReportPageClient({ reportId, initialData }: ReportPageClientProp
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 */}
       <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between px-4">
+        <div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-4 md:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" asChild>
               <Link href="/dashboard/home">
@@ -117,20 +118,18 @@ export function ReportPageClient({ reportId, initialData }: ReportPageClientProp
       </div>
 
       {/* 报告内容 */}
-      <div className="container px-4 py-8">
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">加载报告中...</p>
-          </div>
-        ) : report ? (
-          <DiagnosisReportView report={report} />
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground">报告数据加载失败</p>
-          </div>
-        )}
-      </div>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">加载报告中...</p>
+        </div>
+      ) : report ? (
+        <DiagnosisReportContent report={report} />
+      ) : (
+        <div className="text-center py-20">
+          <p className="text-muted-foreground">报告数据加载失败</p>
+        </div>
+      )}
     </div>
   );
 }

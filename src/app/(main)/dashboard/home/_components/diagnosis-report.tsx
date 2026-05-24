@@ -49,6 +49,68 @@ interface DiagnosisReportProps {
   onViewReport?: () => void;
 }
 
+// 独立报告内容组件 - 供报告页面复用
+export function DiagnosisReportContent({ report }: { report: DiagnosisReportType }) {
+  const isSEO = report.mode === "seo";
+
+  return (
+    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* 报告标题 */}
+      <div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+          <Globe className="h-4 w-4" />
+          <span className="font-mono">{report.url}</span>
+        </div>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          {isSEO ? "SEO 审计报告" : "GEO 诊断报告"}
+        </h1>
+      </div>
+
+      {isSEO ? (
+        <SEOReportContent report={report} />
+      ) : (
+        <GEOReportContent report={report} />
+      )}
+
+      {/* 问题诊断 */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
+            发现的问题
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {report.issues.map((issue) => (
+              <div key={issue.id} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors">
+                <div className="mt-0.5">
+                  {issue.severity === "critical" && <AlertCircle className="h-5 w-5 text-red-500" />}
+                  {issue.severity === "warning" && <AlertTriangle className="h-5 w-5 text-amber-500" />}
+                  {issue.severity === "info" && <Info className="h-5 w-5 text-blue-500" />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="font-semibold">{issue.title}</span>
+                    <Badge className={severityColors[issue.severity]} variant="secondary">
+                      {severityLabels[issue.severity]}
+                    </Badge>
+                    <Badge variant="outline">{categoryLabels[issue.category]}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{issue.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 推荐服务 - 放在最后 */}
+      <RecommendedServices mode={isSEO ? "seo" : "geo"} />
+    </div>
+  );
+}
+
 export function DiagnosisReport({ report, onReset, reportId, onViewReport }: DiagnosisReportProps) {
   const isSEO = report.mode === "seo";
 
