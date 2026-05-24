@@ -12,6 +12,7 @@ import {
   Search,
   Share2,
   Users,
+  Zap,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -58,6 +59,7 @@ export const sidebarItems: NavGroup[] = [
         subItems: [
           { title: "外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
           { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit },
+          { title: "Google秒收", url: "/dashboard/services/seo/google-index", icon: Zap },
         ],
       },
       {
