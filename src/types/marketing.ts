@@ -74,6 +74,31 @@ export interface GEOAuditResult {
     perplexity: AIEngineStatus;
     claude: AIEngineStatus;
     gemini: AIEngineStatus;
+    deepseek?: AIEngineStatus;
+    doubao?: AIEngineStatus;
+  };
+  // 业务画像
+  businessProfile: {
+    brandName: string;
+    language: string;
+    country: string;
+    industry: string;
+    businessModel: string;
+    coreProducts: string;
+    targetCustomers: string;
+  };
+  // 竞争对手分析
+  competitors: Array<{
+    name: string;
+    domain: string;
+    strength: string;
+    aiVisibility: "high" | "medium" | "low";
+  }>;
+  // 关键词建议
+  keywordSuggestions: {
+    keywords: string[];
+    longTails: string[];
+    queries: string[];
   };
 }
 

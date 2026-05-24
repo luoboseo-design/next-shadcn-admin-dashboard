@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Bot,
+  Building2,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
@@ -15,6 +16,7 @@ import {
   FileText,
   Gauge,
   Globe,
+  HelpCircle,
   Image,
   Info,
   Link2,
@@ -33,7 +35,7 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { categoryLabels, severityColors, severityLabels } from "@/data/mock-diagnosis";
 import { cn } from "@/lib/utils";
@@ -703,61 +705,90 @@ function AuditItemRow({
 // GEO 报告内容
 function GEOReportContent({ report }: { report: DiagnosisReportType }) {
   const geoAudit = report.geoAudit;
+  const businessProfile = geoAudit?.businessProfile;
 
   return (
     <>
-      {/* GEO 评分卡片 */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <ScoreCard title="综合评分" score={report.overallScore} large className="col-span-2 md:col-span-1" color="violet" />
-        <ScoreCard title="AI 引用" score={report.geoScore} color="violet" />
-        <ScoreCard title="内容" score={report.contentScore} color="violet" />
-        <ScoreCard title="SEO" score={report.seoScore} color="violet" />
-        <ScoreCard title="技术" score={report.technicalScore} color="violet" />
-      </div>
-
-      {/* AI 引擎可见度 */}
-      {geoAudit && (
+      {/* 业务画像 */}
+      {businessProfile && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Bot className="h-5 w-5 text-violet-500" />
-              AI 搜索引擎可见度
+              <Building2 className="h-5 w-5 text-primary" />
+              业务画像
             </CardTitle>
+            <CardDescription>AI 自动识别的网站业务信息</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <AIEngineCard 
-                name="ChatGPT" 
-                status={geoAudit.aiEngineVisibility.chatgpt}
-              />
-              <AIEngineCard 
-                name="Perplexity" 
-                status={geoAudit.aiEngineVisibility.perplexity}
-              />
-              <AIEngineCard 
-                name="Claude" 
-                status={geoAudit.aiEngineVisibility.claude}
-              />
-              <AIEngineCard 
-                name="Gemini" 
-                status={geoAudit.aiEngineVisibility.gemini}
-              />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="text-xs text-muted-foreground mb-1">品牌名称</div>
+                <div className="font-semibold">{businessProfile.brandName}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="text-xs text-muted-foreground mb-1">语言 / 市场</div>
+                <div className="font-semibold">{businessProfile.language} / {businessProfile.country}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="text-xs text-muted-foreground mb-1">行业类型</div>
+                <div className="font-semibold">{businessProfile.industry}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="text-xs text-muted-foreground mb-1">业务模式</div>
+                <div className="font-semibold">{businessProfile.businessModel}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50 sm:col-span-2">
+                <div className="text-xs text-muted-foreground mb-1">核心产品/服务</div>
+                <div className="font-semibold">{businessProfile.coreProducts}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50 sm:col-span-2">
+                <div className="text-xs text-muted-foreground mb-1">目标客户</div>
+                <div className="font-semibold">{businessProfile.targetCustomers}</div>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* GEO 详细审计 */}
+      {/* AI 搜索引擎可见度 */}
       {geoAudit && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-violet-500" />
-              GEO 内容优化审计
+              <Bot className="h-5 w-5 text-primary" />
+              AI 搜索引擎可见度
             </CardTitle>
+            <CardDescription>检测您的网站在各AI平台的引用情况</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <AIEngineCard name="ChatGPT" status={geoAudit.aiEngineVisibility.chatgpt} />
+              <AIEngineCard name="Perplexity" status={geoAudit.aiEngineVisibility.perplexity} />
+              <AIEngineCard name="Claude" status={geoAudit.aiEngineVisibility.claude} />
+              <AIEngineCard name="Gemini" status={geoAudit.aiEngineVisibility.gemini} />
+              {geoAudit.aiEngineVisibility.deepseek && (
+                <AIEngineCard name="DeepSeek" status={geoAudit.aiEngineVisibility.deepseek} />
+              )}
+              {geoAudit.aiEngineVisibility.doubao && (
+                <AIEngineCard name="豆包" status={geoAudit.aiEngineVisibility.doubao} />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* GEO 内容审计 */}
+      {geoAudit && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              GEO 内容审计
+            </CardTitle>
+            <CardDescription>评估内容被AI引用的就绪程度</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               <AuditItemCard 
                 icon={<FileText className="h-4 w-4" />}
                 title="引用就绪度" 
@@ -805,73 +836,130 @@ function GEOReportContent({ report }: { report: DiagnosisReportType }) {
         </Card>
       )}
 
-      {/* 业务类型和受众 */}
-      <div className="grid md:grid-cols-2 gap-4">
+      {/* 竞争对手分析 */}
+      {geoAudit && geoAudit.competitors && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Target className="h-5 w-5 text-violet-500" />
-              业务类型
+              <Users className="h-5 w-5 text-primary" />
+              竞争对手分析
             </CardTitle>
+            <CardDescription>主要竞争对手的AI可见度对比</CardDescription>
           </CardHeader>
           <CardContent>
-            <Badge variant="secondary" className="text-base px-4 py-2">
-              {report.businessType}
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-violet-500" />
-              目标受众
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {report.targetAudience.map((audience, i) => (
-                <Badge key={i} variant="outline">
-                  {audience}
-                </Badge>
+            <div className="space-y-3">
+              {geoAudit.competitors.map((competitor, i) => (
+                <div key={i} className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                      {competitor.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-medium">{competitor.name}</div>
+                      <div className="text-sm text-muted-foreground">{competitor.domain}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-sm text-muted-foreground">{competitor.strength}</div>
+                    <Badge 
+                      variant={competitor.aiVisibility === "high" ? "default" : "secondary"}
+                      className={cn(
+                        competitor.aiVisibility === "high" && "bg-green-500",
+                        competitor.aiVisibility === "medium" && "bg-amber-500",
+                        competitor.aiVisibility === "low" && "bg-red-500"
+                      )}
+                    >
+                      AI可见度: {competitor.aiVisibility === "high" ? "高" : competitor.aiVisibility === "medium" ? "中" : "低"}
+                    </Badge>
+                  </div>
+                </div>
               ))}
             </div>
           </CardContent>
         </Card>
-      </div>
+      )}
 
-      {/* AI 引用情况 - 详细 */}
+      {/* 关键词及问答建议 */}
+      {geoAudit && geoAudit.keywordSuggestions && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Search className="h-5 w-5 text-primary" />
+              关键词及问答建议
+            </CardTitle>
+            <CardDescription>AI推荐的优化关键词和常见问题</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* 核心关键词 */}
+            <div>
+              <div className="text-sm font-medium mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-primary" />
+                核心关键词
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {geoAudit.keywordSuggestions.keywords.map((keyword, i) => (
+                  <Badge key={i} variant="secondary" className="px-3 py-1.5">
+                    {keyword}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            
+            {/* 长尾关键词 */}
+            <div>
+              <div className="text-sm font-medium mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                长尾关键词
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {geoAudit.keywordSuggestions.longTails.map((keyword, i) => (
+                  <Badge key={i} variant="outline" className="px-3 py-1.5">
+                    {keyword}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            
+            {/* 问答覆盖 */}
+            <div>
+              <div className="text-sm font-medium mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                问答覆盖建议
+              </div>
+              <div className="space-y-2">
+                {geoAudit.keywordSuggestions.queries.map((query, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <HelpCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm">{query}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 服务推荐 */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-violet-500" />
-            AI 搜索引擎引用详情
+            <Sparkles className="h-5 w-5 text-primary" />
+            优化服务推荐
           </CardTitle>
+          <CardDescription>基于诊断结果推荐的优化服务</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {report.aiCitations.map((citation, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "p-4 rounded-lg border",
-                  citation.isReferenced
-                    ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
-                    : "bg-muted/50",
-                )}
-              >
-                <div className="font-semibold mb-1">{citation.source}</div>
-                <div className="text-sm text-muted-foreground mb-2 truncate">{citation.query}</div>
-                {citation.isReferenced ? (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span className="text-sm font-medium">{citation.rank ? `排名 #${citation.rank}` : "已被引用"}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm">未被引用</span>
-                  </div>
-                )}
+          <div className="grid md:grid-cols-2 gap-4">
+            {report.recommendations.slice(0, 4).map((rec) => (
+              <div key={rec.id} className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="font-semibold">{rec.title}</div>
+                  <Badge variant={rec.priority === "high" ? "default" : "secondary"}>
+                    {rec.priority === "high" ? "推荐" : "可选"}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
+                <div className="text-sm font-medium text-primary">{rec.estimatedImpact}</div>
               </div>
             ))}
           </div>

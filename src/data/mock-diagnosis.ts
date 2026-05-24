@@ -59,7 +59,12 @@ function generateSEOAudit(): SEOAuditResult {
 }
 
 // 生成GEO审计结果
-function generateGEOAudit(businessType: string): GEOAuditResult {
+function generateGEOAudit(businessType: string, domain: string): GEOAuditResult {
+  const domainName = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
+  const brandGuess = domainName.split('.')[0];
+  const brandName = brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1);
+  const isChineseSite = Math.random() > 0.5;
+
   return {
     citationReadiness: generateAuditItem(2, 8),
     quotableContent: generateAuditItem(3, 9),
@@ -72,6 +77,45 @@ function generateGEOAudit(businessType: string): GEOAuditResult {
       perplexity: generateAIEngineStatus(businessType),
       claude: generateAIEngineStatus(businessType),
       gemini: generateAIEngineStatus(businessType),
+      deepseek: isChineseSite ? generateAIEngineStatus(businessType) : undefined,
+      doubao: isChineseSite ? generateAIEngineStatus(businessType) : undefined,
+    },
+    businessProfile: {
+      brandName,
+      language: isChineseSite ? "中文" : "英文",
+      country: isChineseSite ? "中国" : "全球",
+      industry: businessType,
+      businessModel: ["SaaS 服务", "电子商务", "内容平台", "企业服务"][Math.floor(Math.random() * 4)],
+      coreProducts: `${brandName}平台、${brandName}服务`,
+      targetCustomers: isChineseSite ? "中国企业用户" : "全球企业用户",
+    },
+    competitors: [
+      { name: "竞品A", domain: "competitor-a.com", strength: "市场份额大", aiVisibility: "high" },
+      { name: "竞品B", domain: "competitor-b.cn", strength: "价格优势", aiVisibility: "medium" },
+      { name: "竞品C", domain: "competitor-c.com", strength: "技术领先", aiVisibility: "low" },
+    ],
+    keywordSuggestions: {
+      keywords: [
+        brandName,
+        `${brandName}怎么样`,
+        `${brandName}好不好`,
+        `${brandName}推荐`,
+        `${brandName}替代品`,
+      ],
+      longTails: [
+        `${brandName}哪个版本好`,
+        `${brandName}新手入门`,
+        `${brandName}高级技巧`,
+        `${brandName}常见问题`,
+        `${brandName}使用教程`,
+      ],
+      queries: [
+        `${brandName}和竞品相比有什么优势？`,
+        `${brandName}适合什么样的用户？`,
+        `如何快速上手${brandName}？`,
+        `${brandName}的核心功能有哪些？`,
+        `${brandName}的价格是多少？`,
+      ],
     },
   };
 }
@@ -318,7 +362,7 @@ export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo"):
     recommendations,
     aiCitations,
     seoAudit: mode === "seo" ? generateSEOAudit() : undefined,
-    geoAudit: mode === "geo" ? generateGEOAudit(businessType) : undefined,
+    geoAudit: mode === "geo" ? generateGEOAudit(businessType, url) : undefined,
     createdAt: new Date(),
   };
 }
@@ -338,18 +382,18 @@ export const seoDiagnosisSteps = [
   { id: 11, label: "生成 SEO 诊断报告", duration: 1000 },
 ];
 
-// GEO诊断步骤
+// GEO诊断步骤（与 /dashboard/services/geo/diagnose 页面流程一致）
 export const geoDiagnosisSteps = [
   { id: 1, label: "连接网站", duration: 800 },
-  { id: 2, label: "分析内容结构", duration: 1000 },
-  { id: 3, label: "检测可引用内容", duration: 1200 },
-  { id: 4, label: "分析事实密度", duration: 1000 },
-  { id: 5, label: "检测来源归因", duration: 1000 },
-  { id: 6, label: "审计实体优化", duration: 1200 },
-  { id: 7, label: "扫描 ChatGPT 引用", duration: 1500 },
-  { id: 8, label: "扫描 Perplexity 引用", duration: 1500 },
-  { id: 9, label: "扫描 Claude 引用", duration: 1500 },
-  { id: 10, label: "扫描 Gemini 引用", duration: 1500 },
+  { id: 2, label: "抓取网页内容", duration: 1000 },
+  { id: 3, label: "识别语言和市场", duration: 800 },
+  { id: 4, label: "分析品牌名称", duration: 800 },
+  { id: 5, label: "识别业务类型", duration: 1000 },
+  { id: 6, label: "分析目标客户", duration: 1000 },
+  { id: 7, label: "扫描 AI 搜索可见度", duration: 1500 },
+  { id: 8, label: "审计 GEO 内容优化", duration: 1200 },
+  { id: 9, label: "识别竞争对手", duration: 1000 },
+  { id: 10, label: "生成关键词建议", duration: 1000 },
   { id: 11, label: "生成 GEO 诊断报告", duration: 1000 },
 ];
 
