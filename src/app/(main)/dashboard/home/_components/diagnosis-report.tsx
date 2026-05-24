@@ -425,8 +425,6 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
               },
             ]}
           />
-        </div>
-      )}
 
           {/* 外链审计 */}
           <AuditSection
