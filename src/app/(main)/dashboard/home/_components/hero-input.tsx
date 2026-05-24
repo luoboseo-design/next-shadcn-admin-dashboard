@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ArrowRight, Bot, Globe, Search, Sparkles, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Bot, Search, Sparkles, Target, TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -139,10 +139,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
           {/* 输入框 */}
           <div className="relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-            <div className="relative flex items-center gap-3 bg-card border border-border rounded-xl p-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted/80">
-                <Globe className="h-4 w-4 text-muted-foreground" />
-              </div>
+            <div className="relative flex items-center gap-3 bg-card border border-border rounded-xl p-2 pl-4">
               <Input
                 type="text"
                 value={url}
