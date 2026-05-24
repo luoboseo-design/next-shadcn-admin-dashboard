@@ -21,24 +21,43 @@ interface ReportPageClientProps {
   };
 }
 
+// AI分析网站业务画像
+async function analyzeWebsite(url: string) {
+  try {
+    const response = await fetch("/api/analyze-website", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    
+    if (!response.ok) {
+      throw new Error("Analysis failed");
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Website analysis error:", error);
+    return null;
+  }
+}
+
 export function ReportPageClient({ reportId, initialData }: ReportPageClientProps) {
   const [report, setReport] = useState<DiagnosisReport | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 模拟从数据库加载完整报告数据
-    // TODO: 替换为真实的API调用
+    // 加载报告数据
+    // TODO: 替换为真实的数据库查询
     const loadReport = async () => {
       setIsLoading(true);
       
-      // 模拟网络延迟
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const url = initialData.url.startsWith("http") ? initialData.url : `https://${initialData.url}`;
+      
+      // 并行执行AI分析
+      const aiAnalysis = await analyzeWebsite(url);
       
       // 生成报告数据（实际开发时从数据库获取）
-      const fullReport = generateMockDiagnosis(
-        initialData.url.startsWith("http") ? initialData.url : `https://${initialData.url}`,
-        initialData.mode
-      );
+      const fullReport = generateMockDiagnosis(url, initialData.mode, aiAnalysis);
       
       setReport(fullReport);
       setIsLoading(false);

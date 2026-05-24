@@ -5,54 +5,57 @@ import type { DiagnosisMode } from "@/types/marketing";
 
 import { ReportPageClient } from "./_components/report-page-client";
 
-// 模拟从数据库获取报告数据
+// 从报告ID和URL参数解析报告信息
 // TODO: 替换为真实的数据库查询
-async function getReport(id: string) {
-  // 模拟数据 - 实际开发时从数据库获取
+async function getReport(id: string, urlParam?: string) {
   // 如果报告不存在，返回 null
   if (id === "not-found") {
     return null;
   }
 
-  // 从报告ID解析模式（用于演示）
-  // 实际开发时从数据库获取
+  // 从报告ID解析模式（格式：mode-domain-timestamp）
   let mode: DiagnosisMode = "geo";
-  let url = "https://example.com";
+  let url = urlParam || "https://example.com";
   
-  // 支持通过ID前缀区分报告类型
-  if (id.startsWith("seo-") || id.includes("-seo-")) {
+  // 通过ID前缀区分报告类型
+  if (id.startsWith("seo-")) {
     mode = "seo";
-  } else if (id.startsWith("geo-") || id.includes("-geo-")) {
+  } else if (id.startsWith("geo-")) {
     mode = "geo";
   }
   
-  // 支持从ID中提取域名（格式：mode-domain-timestamp）
-  const parts = id.split("-");
-  if (parts.length >= 2) {
-    const domain = parts.slice(1, -1).join("-");
-    if (domain && !domain.includes("_")) {
-      url = `https://${domain}`;
+  // 如果没有URL参数，尝试从ID中提取域名
+  if (!urlParam) {
+    const parts = id.split("-");
+    if (parts.length >= 2) {
+      // 移除第一个部分（mode）和最后一个部分（timestamp）
+      const domainParts = parts.slice(1, -1);
+      if (domainParts.length > 0) {
+        const domain = domainParts.join("."); // 将 example-com 转回 example.com
+        url = `https://${domain}`;
+      }
     }
   }
 
-  // 模拟报告数据
   return {
     id,
     url,
     mode,
     createdAt: new Date().toISOString(),
-    // 其他报告数据将在客户端组件中生成或从数据库获取
   };
 }
 
 // 动态生成页面元数据（SEO优化）
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ url?: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const report = await getReport(id);
+  const { url: urlParam } = await searchParams;
+  const report = await getReport(id, urlParam);
 
   if (!report) {
     return {
@@ -75,11 +78,14 @@ export async function generateMetadata({
 
 export default async function ReportPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ url?: string }>;
 }) {
   const { id } = await params;
-  const report = await getReport(id);
+  const { url: urlParam } = await searchParams;
+  const report = await getReport(id, urlParam);
 
   if (!report) {
     notFound();
