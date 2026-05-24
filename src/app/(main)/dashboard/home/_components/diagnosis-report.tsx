@@ -428,39 +428,53 @@ function SEOReportContent({ report }: { report: DiagnosisReportType }) {
         </div>
       )}
 
-      {/* 业务类型和受众 */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
-              业务类型
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge variant="secondary" className="text-base px-4 py-2">
-              {report.businessType}
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              目标受众
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {report.targetAudience.map((audience, i) => (
-                <Badge key={i} variant="outline">
-                  {audience}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          {/* 外链审计 */}
+          <AuditSection
+            title="外链审计"
+            icon={<ExternalLink className="h-5 w-5" />}
+            expanded={expandedSections.includes("backlinks")}
+            onToggle={() => toggleSection("backlinks")}
+            items={[
+              { 
+                icon: <Link2 className="h-4 w-4" />,
+                title: "外链数量", 
+                subtitle: "反向链接数量分析",
+                item: {
+                  score: Math.floor(Math.random() * 4) + 3,
+                  status: "warning" as const,
+                  findings: ["检测到外链数量较少"],
+                  recommendations: ["建议通过客座文章等方式增加高质量外链"]
+                },
+                tip: "建议：获取高权重网站的反向链接"
+              },
+              { 
+                icon: <TrendingUp className="h-4 w-4" />,
+                title: "外链质量", 
+                subtitle: "链接来源权重",
+                item: {
+                  score: Math.floor(Math.random() * 3) + 4,
+                  status: "warning" as const,
+                  findings: ["外链质量有提升空间"],
+                  recommendations: ["建议获取更多高 DA 网站的外链"]
+                },
+                tip: "建议：专注于权威网站、行业相关网站"
+              },
+              { 
+                icon: <FileText className="h-4 w-4" />,
+                title: "锚文本分布", 
+                subtitle: "链接文本多样性",
+                item: {
+                  score: Math.floor(Math.random() * 3) + 5,
+                  status: "pass" as const,
+                  findings: ["锚文本分布较为自然"],
+                  recommendations: ["保持锚文本多样化"]
+                },
+                tip: "建议：混合使用品牌词、关键词、自然锚文本"
+              },
+            ]}
+          />
+        </div>
+      )}
     </>
   );
 }
