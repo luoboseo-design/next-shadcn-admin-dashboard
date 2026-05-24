@@ -16,7 +16,8 @@ import {
   CheckCircle2, 
   AlertCircle,
   FileText,
-  Info
+  Info,
+  Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,28 @@ export default function GoogleIndexPage() {
   const [singleUrl, setSingleUrl] = useState("");
   const [batchUrls, setBatchUrls] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 处理文件导入
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (content) {
+        // 如果当前已有内容，追加新内容
+        if (batchUrls.trim()) {
+          setBatchUrls(batchUrls.trim() + "\n" + content.trim());
+        } else {
+          setBatchUrls(content.trim());
+        }
+      }
+    };
+    reader.readAsText(file);
+    // 清空input以便可以重复选择同一文件
+    e.target.value = "";
+  };
 
   // 解析批量URL
   const parsedUrls = useMemo(() => {
@@ -124,7 +147,21 @@ export default function GoogleIndexPage() {
 
               <TabsContent value="batch" className="mt-4 space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="batch-urls">批量 URL（每行一个）</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="batch-urls">批量 URL（每行一个）</Label>
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept=".txt"
+                        onChange={handleFileImport}
+                        className="hidden"
+                      />
+                      <span className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
+                        <Upload className="h-4 w-4" />
+                        导入 TXT
+                      </span>
+                    </label>
+                  </div>
                   <Textarea
                     id="batch-urls"
                     placeholder={`https://example.com/page1\nhttps://example.com/page2\nhttps://example.com/page3`}
