@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 type DiagnosisMode = "seo" | "geo";
 
 interface HeroInputProps {
-  onSubmit: (url: string) => void;
+  onSubmit: (url: string, mode: "seo" | "geo") => void;
 }
 
 export function HeroInput({ onSubmit }: HeroInputProps) {
@@ -44,7 +44,7 @@ export function HeroInput({ onSubmit }: HeroInputProps) {
     }
 
     const finalUrl = url.startsWith("http") ? url : `https://${url}`;
-    onSubmit(finalUrl);
+    onSubmit(finalUrl, mode);
   };
 
   const seoFeatures = [

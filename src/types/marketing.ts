@@ -2,6 +2,8 @@
 
 // ==================== 诊断相关 ====================
 
+export type DiagnosisMode = "seo" | "geo";
+
 export type IssueSeverity = "critical" | "warning" | "info";
 
 export interface DiagnosisIssue {
@@ -24,6 +26,7 @@ export interface ServiceRecommendation {
 export interface DiagnosisReport {
   id: string;
   url: string;
+  mode: DiagnosisMode;
   seoScore: number;
   geoScore: number;
   technicalScore: number;
@@ -34,7 +37,58 @@ export interface DiagnosisReport {
   issues: DiagnosisIssue[];
   recommendations: ServiceRecommendation[];
   aiCitations: AICitation[];
+  // SEO 专属字段
+  seoAudit?: SEOAuditResult;
+  // GEO 专属字段
+  geoAudit?: GEOAuditResult;
   createdAt: Date;
+}
+
+// SEO 审计结果
+export interface SEOAuditResult {
+  titleTag: AuditItem;
+  metaDescription: AuditItem;
+  headerStructure: AuditItem;
+  contentQuality: AuditItem;
+  keywordUsage: AuditItem;
+  internalLinks: AuditItem;
+  images: AuditItem;
+  technicalOnPage: AuditItem;
+  coreWebVitals: {
+    lcp: number; // Largest Contentful Paint
+    inp: number; // Interaction to Next Paint
+    cls: number; // Cumulative Layout Shift
+  };
+}
+
+// GEO 审计结果
+export interface GEOAuditResult {
+  citationReadiness: AuditItem;
+  quotableContent: AuditItem;
+  factualDensity: AuditItem;
+  sourceAttribution: AuditItem;
+  structuredContent: AuditItem;
+  entityOptimization: AuditItem;
+  aiEngineVisibility: {
+    chatgpt: AIEngineStatus;
+    perplexity: AIEngineStatus;
+    claude: AIEngineStatus;
+    gemini: AIEngineStatus;
+  };
+}
+
+export interface AuditItem {
+  score: number; // 0-10
+  status: "pass" | "warning" | "fail";
+  findings: string[];
+  recommendations: string[];
+}
+
+export interface AIEngineStatus {
+  isIndexed: boolean;
+  citationCount: number;
+  visibility: "high" | "medium" | "low" | "none";
+  sampleQueries: string[];
 }
 
 export interface AICitation {
