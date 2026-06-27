@@ -4,17 +4,30 @@ import { useEffect, useState } from "react";
 
 import { Check, Loader2 } from "lucide-react";
 
-import { diagnosisSteps } from "@/data/mock-diagnosis";
+import { seoDiagnosisSteps, geoDiagnosisSteps } from "@/data/mock-diagnosis";
 import { cn } from "@/lib/utils";
+import type { DiagnosisMode } from "@/types/marketing";
 
-export function DiagnosisLoading() {
+interface DiagnosisLoadingProps {
+  mode: DiagnosisMode;
+}
+
+export function DiagnosisLoading({ mode }: DiagnosisLoadingProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
+  const steps = mode === "seo" ? seoDiagnosisSteps : geoDiagnosisSteps;
+  const title = mode === "seo" ? "AI 正在进行 SEO 诊断" : "AI 正在进行 GEO 诊断";
+  const subtitle = mode === "seo" 
+    ? "正在深度分析您网站的搜索引擎优化状况"
+    : "正在检测您网站在 AI 搜索引擎中的可见度";
+
   useEffect(() => {
     let totalDelay = 0;
+    setCurrentStep(0);
+    setCompletedSteps([]);
 
-    diagnosisSteps.forEach((step, index) => {
+    steps.forEach((step, index) => {
       // 开始步骤
       setTimeout(() => {
         setCurrentStep(index);
@@ -26,7 +39,7 @@ export function DiagnosisLoading() {
         setCompletedSteps((prev) => [...prev, index]);
       }, totalDelay);
     });
-  }, []);
+  }, [steps]);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
@@ -36,11 +49,20 @@ export function DiagnosisLoading() {
           <div className="relative">
             <div className="w-32 h-32 rounded-full border-4 border-muted animate-pulse" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+              <div className={cn(
+                "w-24 h-24 rounded-full border-4 border-t-transparent animate-spin",
+                mode === "seo" ? "border-primary" : "border-violet-500"
+              )} />
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 text-primary animate-spin" />
+              <div className={cn(
+                "w-16 h-16 rounded-full flex items-center justify-center",
+                mode === "seo" ? "bg-primary/10" : "bg-violet-500/10"
+              )}>
+                <Loader2 className={cn(
+                  "h-8 w-8 animate-spin",
+                  mode === "seo" ? "text-primary" : "text-violet-500"
+                )} />
               </div>
             </div>
           </div>
@@ -48,13 +70,13 @@ export function DiagnosisLoading() {
 
         {/* 标题 */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2">AI 正在诊断您的网站</h2>
-          <p className="text-muted-foreground">请稍候，我们正在深度分析您的网站数据</p>
+          <h2 className="text-2xl font-bold mb-2">{title}</h2>
+          <p className="text-muted-foreground">{subtitle}</p>
         </div>
 
         {/* 步骤列表 */}
-        <div className="space-y-3">
-          {diagnosisSteps.map((step, index) => {
+        <div className="space-y-2">
+          {steps.map((step, index) => {
             const isCompleted = completedSteps.includes(index);
             const isCurrent = currentStep === index && !isCompleted;
 
@@ -64,7 +86,7 @@ export function DiagnosisLoading() {
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg transition-all duration-300",
                   isCompleted && "bg-green-50 dark:bg-green-950/20",
-                  isCurrent && "bg-primary/5 border border-primary/20",
+                  isCurrent && (mode === "seo" ? "bg-primary/5 border border-primary/20" : "bg-violet-500/5 border border-violet-500/20"),
                   !isCompleted && !isCurrent && "opacity-50",
                 )}
               >
@@ -72,7 +94,7 @@ export function DiagnosisLoading() {
                   className={cn(
                     "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300",
                     isCompleted && "bg-green-500 text-white",
-                    isCurrent && "bg-primary text-primary-foreground",
+                    isCurrent && (mode === "seo" ? "bg-primary text-primary-foreground" : "bg-violet-500 text-white"),
                     !isCompleted && !isCurrent && "bg-muted text-muted-foreground",
                   )}
                 >
@@ -88,7 +110,7 @@ export function DiagnosisLoading() {
                   className={cn(
                     "font-medium transition-colors duration-300",
                     isCompleted && "text-green-700 dark:text-green-400",
-                    isCurrent && "text-primary",
+                    isCurrent && (mode === "seo" ? "text-primary" : "text-violet-500"),
                   )}
                 >
                   {step.label}

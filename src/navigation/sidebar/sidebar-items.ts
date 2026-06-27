@@ -1,31 +1,18 @@
 import {
-  Banknote,
-  Calendar,
-  ChartBar,
+  Activity,
   ClipboardList,
+  CreditCard,
   FileEdit,
-  Fingerprint,
-  Forklift,
-  Gauge,
   Globe,
-  GraduationCap,
   Home,
-  Kanban,
-  LayoutDashboard,
   Link2,
-  ListTodo,
-  Lock,
   type LucideIcon,
-  Mail,
-  MessageSquare,
   Newspaper,
   Radar,
-  ReceiptText,
   Search,
   Share2,
-  ShoppingBag,
-  SquareArrowUpRight,
   Users,
+  Zap,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -51,6 +38,7 @@ export interface NavGroup {
   id: number;
   label?: string;
   items: NavMainItem[];
+  requireAuth?: boolean; // 是否需要登录才能看到
 }
 
 export const sidebarItems: NavGroup[] = [
@@ -71,7 +59,7 @@ export const sidebarItems: NavGroup[] = [
         subItems: [
           { title: "外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
           { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit },
-          { title: "排名优化", url: "/dashboard/services/seo/ranking", icon: Search, comingSoon: true },
+          { title: "Google秒收", url: "/dashboard/services/seo/google-index", icon: Zap },
         ],
       },
       {
@@ -100,6 +88,7 @@ export const sidebarItems: NavGroup[] = [
   {
     id: 2,
     label: "仪表盘",
+    requireAuth: true, // 需要登录才能看到
     items: [
       {
         title: "任务中心",
@@ -107,115 +96,43 @@ export const sidebarItems: NavGroup[] = [
         icon: ClipboardList,
       },
       {
-        title: "数据概览",
-        url: "/dashboard/default",
-        icon: LayoutDashboard,
+        title: "SEO 任务",
+        url: "/dashboard/seo-monitor",
+        icon: Link2,
+        isNew: true,
       },
       {
-        title: "CRM",
-        url: "/dashboard/crm",
-        icon: ChartBar,
+        title: "GEO 监控",
+        url: "/dashboard/geo-monitor",
+        icon: Activity,
+        isNew: true,
       },
       {
-        title: "财务",
-        url: "/dashboard/finance",
-        icon: Banknote,
+        title: "社交媒体",
+        url: "/dashboard/social-monitor",
+        icon: Share2,
+        isNew: true,
       },
       {
-        title: "分析",
-        url: "/dashboard/analytics",
-        icon: Gauge,
+        title: "发稿任务",
+        url: "/dashboard/news-monitor",
+        icon: Newspaper,
+        isNew: true,
       },
       {
-        title: "效率",
-        url: "/dashboard/productivity",
-        icon: ListTodo,
+        title: "内容撰写",
+        url: "/dashboard/content",
+        icon: FileEdit,
       },
       {
-        title: "电商",
-        url: "/dashboard/ecommerce",
-        icon: ShoppingBag,
+        title: "账单中心",
+        url: "/dashboard/billing",
+        icon: CreditCard,
       },
       {
-        title: "学院",
-        url: "/dashboard/academy",
-        icon: GraduationCap,
-      },
-      {
-        title: "物流",
-        url: "/dashboard/coming-soon",
-        icon: Forklift,
-        comingSoon: true,
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "页面",
-    items: [
-      {
-        title: "邮件",
-        url: "/dashboard/mail",
-        icon: Mail,
-      },
-      {
-        title: "聊天",
-        url: "/dashboard/coming-soon",
-        icon: MessageSquare,
-        comingSoon: true,
-      },
-      {
-        title: "日历",
-        url: "/dashboard/coming-soon",
-        icon: Calendar,
-        comingSoon: true,
-      },
-      {
-        title: "看板",
-        url: "/dashboard/coming-soon",
-        icon: Kanban,
-        comingSoon: true,
-      },
-      {
-        title: "发票",
-        url: "/dashboard/coming-soon",
-        icon: ReceiptText,
-        comingSoon: true,
-      },
-      {
-        title: "用户",
-        url: "/dashboard/coming-soon",
+        title: "账户设置",
+        url: "/dashboard/account",
         icon: Users,
-        comingSoon: true,
-      },
-      {
-        title: "权限",
-        url: "/dashboard/coming-soon",
-        icon: Lock,
-        comingSoon: true,
-      },
-      {
-        title: "认证",
-        url: "/auth",
-        icon: Fingerprint,
-        subItems: [
-          { title: "登录 v1", url: "/auth/v1/login", newTab: true },
-          { title: "登录 v2", url: "/auth/v2/login", newTab: true },
-          { title: "注册 v1", url: "/auth/v1/register", newTab: true },
-          { title: "注册 v2", url: "/auth/v2/register", newTab: true },
-        ],
-      },
-    ],
-  },
-  {
-    id: 4,
-    label: "其他",
-    items: [
-      {
-        title: "更多功能",
-        url: "/dashboard/coming-soon",
-        icon: SquareArrowUpRight,
-        comingSoon: true,
       },
     ],
   },

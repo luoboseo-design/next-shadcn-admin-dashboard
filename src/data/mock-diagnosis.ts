@@ -1,7 +1,156 @@
-import type { DiagnosisReport, DiagnosisIssue, ServiceRecommendation, AICitation } from "@/types/marketing";
+import type { DiagnosisReport, DiagnosisIssue, ServiceRecommendation, AICitation, SEOAuditResult, GEOAuditResult, DiagnosisMode, AuditItem, AIEngineStatus } from "@/types/marketing";
+
+// 生成审计项目
+function generateAuditItem(minScore: number, maxScore: number): AuditItem {
+  const score = Math.floor(Math.random() * (maxScore - minScore + 1)) + minScore;
+  const status = score >= 8 ? "pass" : score >= 5 ? "warning" : "fail";
+  
+  const findingsPool = {
+    pass: ["符合最佳实践", "优化良好"],
+    warning: ["需要轻微改进", "部分指标未达标"],
+    fail: ["严重问题", "需要立即修复"],
+  };
+  
+  const recommendationsPool = {
+    pass: ["继续保持当前策略"],
+    warning: ["建议优化以提升表现"],
+    fail: ["建议立即采取修复措施"],
+  };
+  
+  return {
+    score,
+    status,
+    findings: [findingsPool[status][Math.floor(Math.random() * findingsPool[status].length)]],
+    recommendations: [recommendationsPool[status][0]],
+  };
+}
+
+// 生成AI引擎状态
+function generateAIEngineStatus(businessType: string): AIEngineStatus {
+  const isIndexed = Math.random() > 0.4;
+  const citationCount = isIndexed ? Math.floor(Math.random() * 50) : 0;
+  const visibility = !isIndexed ? "none" : citationCount > 30 ? "high" : citationCount > 10 ? "medium" : "low";
+  
+  return {
+    isIndexed,
+    citationCount,
+    visibility,
+    sampleQueries: [`${businessType}推荐`, `最佳${businessType}`, `${businessType}排行`],
+  };
+}
+
+// 生成SEO审计结果
+function generateSEOAudit(): SEOAuditResult {
+  return {
+    titleTag: generateAuditItem(4, 10),
+    metaDescription: generateAuditItem(3, 9),
+    headerStructure: generateAuditItem(5, 10),
+    contentQuality: generateAuditItem(4, 9),
+    keywordUsage: generateAuditItem(3, 8),
+    internalLinks: generateAuditItem(2, 8),
+    images: generateAuditItem(3, 9),
+    technicalOnPage: generateAuditItem(5, 10),
+    coreWebVitals: {
+      lcp: Math.random() * 3 + 1, // 1-4 seconds
+      inp: Math.random() * 300 + 50, // 50-350ms
+      cls: Math.random() * 0.2, // 0-0.2
+    },
+  };
+}
+
+// AI分析结果类型
+interface AIAnalysisResult {
+  brandName?: string;
+  language?: string;
+  country?: string;
+  industry?: string;
+  businessModel?: string;
+  coreProducts?: string;
+  targetCustomers?: string;
+  competitors?: string[];
+  suggestedKeywords?: string[];
+}
+
+// 生成GEO审计结果
+function generateGEOAudit(businessType: string, domain: string, aiAnalysis?: AIAnalysisResult | null): GEOAuditResult {
+  const domainName = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
+  const brandGuess = domainName.split('.')[0];
+  
+  // 优先使用AI分析结果
+  const brandName = aiAnalysis?.brandName || (brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1));
+  const language = aiAnalysis?.language || "中文";
+  const country = aiAnalysis?.country || "中国";
+  const industry = aiAnalysis?.industry || businessType;
+  const businessModel = aiAnalysis?.businessModel || "未知";
+  const coreProducts = aiAnalysis?.coreProducts || `${brandName}平台、${brandName}服务`;
+  const targetCustomers = aiAnalysis?.targetCustomers || "企业用户";
+  
+  const isChineseSite = language === "中文" || country === "中国";
+
+  // 生成竞争对手列表
+  const competitors = aiAnalysis?.competitors && aiAnalysis.competitors.length > 0
+    ? aiAnalysis.competitors.map((name, i) => ({
+        name,
+        domain: `${name.toLowerCase().replace(/\s+/g, '-')}.com`,
+        strength: ["市场份额大", "价格优势", "技术领先", "品牌知名度高"][i % 4],
+        aiVisibility: (["high", "medium", "low"] as const)[i % 3],
+      }))
+    : [
+        { name: "竞品A", domain: "competitor-a.com", strength: "市场份额大", aiVisibility: "high" as const },
+        { name: "竞品B", domain: "competitor-b.cn", strength: "价格优势", aiVisibility: "medium" as const },
+        { name: "竞品C", domain: "competitor-c.com", strength: "技术领先", aiVisibility: "low" as const },
+      ];
+
+  // 生成关键词建议
+  const suggestedKeywords = aiAnalysis?.suggestedKeywords || [brandName, `${brandName}怎么样`, `${brandName}推荐`];
+
+  return {
+    citationReadiness: generateAuditItem(2, 8),
+    quotableContent: generateAuditItem(3, 9),
+    factualDensity: generateAuditItem(4, 9),
+    sourceAttribution: generateAuditItem(2, 7),
+    structuredContent: generateAuditItem(3, 8),
+    entityOptimization: generateAuditItem(2, 7),
+    aiEngineVisibility: {
+      chatgpt: generateAIEngineStatus(industry),
+      perplexity: generateAIEngineStatus(industry),
+      claude: generateAIEngineStatus(industry),
+      gemini: generateAIEngineStatus(industry),
+      deepseek: isChineseSite ? generateAIEngineStatus(industry) : undefined,
+      doubao: isChineseSite ? generateAIEngineStatus(industry) : undefined,
+    },
+    businessProfile: {
+      brandName,
+      language,
+      country,
+      industry,
+      businessModel,
+      coreProducts,
+      targetCustomers,
+    },
+    competitors,
+    keywordSuggestions: {
+      keywords: suggestedKeywords.slice(0, 5),
+      longTails: [
+        `${brandName}哪个版本好`,
+        `${brandName}新手入门`,
+        `${brandName}高级技巧`,
+        `${brandName}常见问题`,
+        `${brandName}使用教程`,
+      ],
+      queries: [
+        `${brandName}和竞品相比有什么优势？`,
+        `${brandName}适合什么样的用户？`,
+        `如何快速上手${brandName}？`,
+        `${brandName}的核心功能有哪些？`,
+        `${brandName}的价格是多少？`,
+      ],
+    },
+  };
+}
 
 // 生成模拟诊断报告
-export function generateMockDiagnosis(url: string): DiagnosisReport {
+export function generateMockDiagnosis(url: string, mode: DiagnosisMode = "seo", aiAnalysis?: AIAnalysisResult | null): DiagnosisReport {
   const domain = new URL(url).hostname;
   
   // 随机生成评分
@@ -11,8 +160,8 @@ export function generateMockDiagnosis(url: string): DiagnosisReport {
   const contentScore = Math.floor(Math.random() * 35) + 50; // 50-85
   const overallScore = Math.floor((seoScore + geoScore + technicalScore + contentScore) / 4);
 
-  // 业务类型识别
-  const businessTypes = [
+  // 业务类型识别 - 优先使用AI分析结果
+  const businessType = aiAnalysis?.industry || [
     "电子商务",
     "SaaS 软件服务",
     "企业官网",
@@ -21,8 +170,7 @@ export function generateMockDiagnosis(url: string): DiagnosisReport {
     "金融科技",
     "医疗健康",
     "旅游服务",
-  ];
-  const businessType = businessTypes[Math.floor(Math.random() * businessTypes.length)];
+  ][Math.floor(Math.random() * 8)];
 
   // 目标受众
   const allAudiences = [
@@ -39,69 +187,129 @@ export function generateMockDiagnosis(url: string): DiagnosisReport {
     .sort(() => Math.random() - 0.5)
     .slice(0, 3);
 
-  // 问题诊断
-  const allIssues: DiagnosisIssue[] = [
+  // SEO 专属问题
+  const seoIssues: DiagnosisIssue[] = [
     {
-      id: "issue-1",
-      title: "缺少结构化数据标记",
-      description: "网站未实现 Schema.org 结构化数据，影响搜索引擎理解页面内容",
+      id: "seo-1",
+      title: "Title Tag 长度不符合规范",
+      description: "标题标签超过60个字符，可能在搜索结果中被截断",
+      severity: "warning",
+      category: "seo",
+    },
+    {
+      id: "seo-2",
+      title: "Meta Description 缺失",
+      description: "部分页面缺少元描述，影响搜索结果点击率",
       severity: "critical",
       category: "seo",
     },
     {
-      id: "issue-2",
-      title: "移动端体验需优化",
-      description: "部分页面在移动设备上加载速度较慢，Core Web Vitals 指标不达标",
+      id: "seo-3",
+      title: "H1 标签使用不规范",
+      description: "检测到多个 H1 标签或 H1 中缺少目标关键词",
       severity: "warning",
-      category: "technical",
+      category: "seo",
     },
     {
-      id: "issue-3",
+      id: "seo-4",
       title: "内链结构不完善",
       description: "页面之间的内部链接较少，不利于权重传递和用户浏览",
       severity: "warning",
       category: "seo",
     },
     {
-      id: "issue-4",
-      title: "AI 搜索引擎可见性低",
-      description: "网站内容未针对 AI 搜索引擎优化，在 ChatGPT、Perplexity 等平台引用率低",
-      severity: "critical",
-      category: "geo",
-    },
-    {
-      id: "issue-5",
-      title: "内容更新频率低",
-      description: "网站内容更新不频繁，可能影响搜索引擎爬取频率",
+      id: "seo-5",
+      title: "图片 ALT 标签缺失",
+      description: "多数图片缺少描述性 ALT 文本，影响图片搜索和无障碍访问",
       severity: "info",
       category: "content",
     },
     {
-      id: "issue-6",
+      id: "seo-6",
       title: "外链数量不足",
       description: "高质量反向链接数量较少，域名权重有提升空间",
       severity: "critical",
       category: "seo",
     },
     {
-      id: "issue-7",
-      title: "元描述优化不足",
-      description: "部分页面缺少或元描述过长，影响搜索结果点击率",
+      id: "seo-7",
+      title: "Core Web Vitals 不达标",
+      description: "LCP 超过 2.5 秒，影响用户体验和搜索排名",
+      severity: "critical",
+      category: "technical",
+    },
+    {
+      id: "seo-8",
+      title: "缺少结构化数据标记",
+      description: "网站未实现 Schema.org 结构化数据，影响搜索引擎理解页面内容",
       severity: "warning",
       category: "seo",
     },
+  ];
+
+  // GEO 专属问题
+  const geoIssues: DiagnosisIssue[] = [
     {
-      id: "issue-8",
-      title: "图片 ALT 标签缺失",
-      description: "多数图片缺少描述性 ALT 文本，影响图片搜索和无障碍访问",
+      id: "geo-1",
+      title: "内容可引用性低",
+      description: "缺少清晰的定义性语句和可直接引用的声明",
+      severity: "critical",
+      category: "geo",
+    },
+    {
+      id: "geo-2",
+      title: "事实密度不足",
+      description: "内容缺少具体数据、统计和可验证的事实",
+      severity: "warning",
+      category: "content",
+    },
+    {
+      id: "geo-3",
+      title: "来源归因缺失",
+      description: "未引用权威来源或专家观点，降低内容可信度",
+      severity: "critical",
+      category: "geo",
+    },
+    {
+      id: "geo-4",
+      title: "Q&A 结构化内容不足",
+      description: "缺少问答格式的内容，不利于 AI 提取回答",
+      severity: "warning",
+      category: "geo",
+    },
+    {
+      id: "geo-5",
+      title: "实体消歧不清",
+      description: "品牌/产品名称缺少明确的描述性语境",
+      severity: "warning",
+      category: "geo",
+    },
+    {
+      id: "geo-6",
+      title: "AI 搜索引擎可见性低",
+      description: "网站内容未针对 AI 搜索引擎优化，在 ChatGPT、Perplexity 等平台引用率低",
+      severity: "critical",
+      category: "geo",
+    },
+    {
+      id: "geo-7",
+      title: "缺少专家信号",
+      description: "内容未展示作者专业背景或行业权威性",
+      severity: "info",
+      category: "content",
+    },
+    {
+      id: "geo-8",
+      title: "内容新鲜度不足",
+      description: "AI 引擎更偏好最新内容，建议定期更新",
       severity: "info",
       category: "content",
     },
   ];
 
-  const issues = allIssues
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 5);
+  const issues = mode === "seo" 
+    ? seoIssues.sort(() => Math.random() - 0.5).slice(0, 5)
+    : geoIssues.sort(() => Math.random() - 0.5).slice(0, 5);
 
   // 服务推荐
   const recommendations: ServiceRecommendation[] = [
@@ -170,6 +378,7 @@ export function generateMockDiagnosis(url: string): DiagnosisReport {
   return {
     id: `diag-${Date.now()}`,
     url,
+    mode,
     seoScore,
     geoScore,
     technicalScore,
@@ -180,20 +389,44 @@ export function generateMockDiagnosis(url: string): DiagnosisReport {
     issues,
     recommendations,
     aiCitations,
+    seoAudit: mode === "seo" ? generateSEOAudit() : undefined,
+    geoAudit: mode === "geo" ? generateGEOAudit(businessType, url, aiAnalysis) : undefined,
     createdAt: new Date(),
   };
 }
 
-// 诊断步骤（用于动画）
-export const diagnosisSteps = [
+// SEO诊断步骤
+export const seoDiagnosisSteps = [
   { id: 1, label: "连接网站", duration: 800 },
-  { id: 2, label: "分析页面结构", duration: 1200 },
-  { id: 3, label: "检测 SEO 指标", duration: 1500 },
-  { id: 4, label: "扫描 AI 引用情况", duration: 1800 },
-  { id: 5, label: "识别业务类型", duration: 1000 },
-  { id: 6, label: "分析目标受众", duration: 1200 },
-  { id: 7, label: "生成诊断报告", duration: 1000 },
+  { id: 2, label: "分析页面结构", duration: 1000 },
+  { id: 3, label: "审计 Title Tag", duration: 800 },
+  { id: 4, label: "审计 Meta Description", duration: 800 },
+  { id: 5, label: "检测 Header 结构", duration: 1000 },
+  { id: 6, label: "分析内容质量", duration: 1200 },
+  { id: 7, label: "检测关键词使用", duration: 1000 },
+  { id: 8, label: "审计内链结构", duration: 800 },
+  { id: 9, label: "检测图片优化", duration: 800 },
+  { id: 10, label: "测试 Core Web Vitals", duration: 1500 },
+  { id: 11, label: "生成 SEO 诊断报告", duration: 1000 },
 ];
+
+// GEO诊断步骤（与 /dashboard/services/geo/diagnose 页面流程一致）
+export const geoDiagnosisSteps = [
+  { id: 1, label: "连接网站", duration: 800 },
+  { id: 2, label: "抓取网页内容", duration: 1000 },
+  { id: 3, label: "识别语言和市场", duration: 800 },
+  { id: 4, label: "分析品牌名称", duration: 800 },
+  { id: 5, label: "识别业务类型", duration: 1000 },
+  { id: 6, label: "分析目标客户", duration: 1000 },
+  { id: 7, label: "扫描 AI 搜索可见度", duration: 1500 },
+  { id: 8, label: "审计 GEO 内容优化", duration: 1200 },
+  { id: 9, label: "识别竞争对手", duration: 1000 },
+  { id: 10, label: "生成关键词建议", duration: 1000 },
+  { id: 11, label: "生成 GEO 诊断报告", duration: 1000 },
+];
+
+// 诊断步骤（用于动画）- 保留旧版兼容
+export const diagnosisSteps = seoDiagnosisSteps;
 
 export const severityLabels: Record<string, string> = {
   critical: "严重",

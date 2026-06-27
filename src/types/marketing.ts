@@ -2,6 +2,8 @@
 
 // ==================== 诊断相关 ====================
 
+export type DiagnosisMode = "seo" | "geo";
+
 export type IssueSeverity = "critical" | "warning" | "info";
 
 export interface DiagnosisIssue {
@@ -24,6 +26,7 @@ export interface ServiceRecommendation {
 export interface DiagnosisReport {
   id: string;
   url: string;
+  mode: DiagnosisMode;
   seoScore: number;
   geoScore: number;
   technicalScore: number;
@@ -34,7 +37,83 @@ export interface DiagnosisReport {
   issues: DiagnosisIssue[];
   recommendations: ServiceRecommendation[];
   aiCitations: AICitation[];
+  // SEO 专属字段
+  seoAudit?: SEOAuditResult;
+  // GEO 专属字段
+  geoAudit?: GEOAuditResult;
   createdAt: Date;
+}
+
+// SEO 审计结果
+export interface SEOAuditResult {
+  titleTag: AuditItem;
+  metaDescription: AuditItem;
+  headerStructure: AuditItem;
+  contentQuality: AuditItem;
+  keywordUsage: AuditItem;
+  internalLinks: AuditItem;
+  images: AuditItem;
+  technicalOnPage: AuditItem;
+  coreWebVitals: {
+    lcp: number; // Largest Contentful Paint
+    inp: number; // Interaction to Next Paint
+    cls: number; // Cumulative Layout Shift
+  };
+}
+
+// GEO 审计结果
+export interface GEOAuditResult {
+  citationReadiness: AuditItem;
+  quotableContent: AuditItem;
+  factualDensity: AuditItem;
+  sourceAttribution: AuditItem;
+  structuredContent: AuditItem;
+  entityOptimization: AuditItem;
+  aiEngineVisibility: {
+    chatgpt: AIEngineStatus;
+    perplexity: AIEngineStatus;
+    claude: AIEngineStatus;
+    gemini: AIEngineStatus;
+    deepseek?: AIEngineStatus;
+    doubao?: AIEngineStatus;
+  };
+  // 业务画像
+  businessProfile: {
+    brandName: string;
+    language: string;
+    country: string;
+    industry: string;
+    businessModel: string;
+    coreProducts: string;
+    targetCustomers: string;
+  };
+  // 竞争对手分析
+  competitors: Array<{
+    name: string;
+    domain: string;
+    strength: string;
+    aiVisibility: "high" | "medium" | "low";
+  }>;
+  // 关键词建议
+  keywordSuggestions: {
+    keywords: string[];
+    longTails: string[];
+    queries: string[];
+  };
+}
+
+export interface AuditItem {
+  score: number; // 0-10
+  status: "pass" | "warning" | "fail";
+  findings: string[];
+  recommendations: string[];
+}
+
+export interface AIEngineStatus {
+  isIndexed: boolean;
+  citationCount: number;
+  visibility: "high" | "medium" | "low" | "none";
+  sampleQueries: string[];
 }
 
 export interface AICitation {
@@ -65,11 +144,8 @@ export interface Platform {
 
 export type TaskStatus =
   | "pending" // 待处理
-  | "analyzing" // AI 分析中
-  | "publishing" // 发布中
-  | "awaiting" // 待验收
-  | "completed" // 已完成
-  | "failed"; // 失败
+  | "running" // 运行中
+  | "completed"; // 已完成
 
 export type PublishResultStatus = "success" | "pending" | "failed";
 
@@ -89,12 +165,16 @@ export interface PublishResult {
   title: string;
   anchorText: string;
   accountInfo?: AccountInfo;
-  publishedAt?: Date;
+  publishedAt?: Date | null;
   errorMessage?: string;
+  dr?: number;
 }
+
+export type TaskType = "backlink" | "guest_post";
 
 export interface BacklinkTask {
   id: string;
+  name?: string;
   targetUrl: string;
   keywords: string[];
   anchorTexts: string[];
@@ -107,11 +187,17 @@ export interface BacklinkTask {
   totalPlatforms: number;
   completedPlatforms: number;
   successRate: number;
+  avgDa?: number;
+  taskType?: TaskType;
+  // 客座文章特有字段
+  articleTitle?: string;
+  targetSite?: string;
+  wordCount?: number;
+  totalViews?: number;
   pricing: TaskPricing;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
-  acceptedAt?: Date;
 }
 
 export interface TaskPricing {
