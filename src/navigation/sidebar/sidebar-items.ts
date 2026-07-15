@@ -1,5 +1,4 @@
 import {
-  Activity,
   ClipboardList,
   CreditCard,
   FileEdit,
@@ -48,38 +47,38 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         title: "首页",
-        url: "/dashboard/home",
+        url: "/",
         icon: Home,
         isNew: true,
       },
       {
         title: "SEO 服务",
-        url: "/dashboard/services/seo",
+        url: "/services/seo",
         icon: Search,
         subItems: [
-          { title: "外链代发", url: "/dashboard/services/seo/backlinks", icon: Link2 },
-          { title: "客座文章", url: "/dashboard/services/seo/guest-posts", icon: FileEdit },
-          { title: "Google秒收", url: "/dashboard/services/seo/google-index", icon: Zap },
+          { title: "外链代发", url: "/services/seo/backlinks", icon: Link2 },
+          { title: "客座文章", url: "/services/seo/guest-posts", icon: FileEdit },
+          { title: "Google秒收", url: "/services/seo/google-index", icon: Zap },
         ],
       },
       {
         title: "GEO 服务",
-        url: "/dashboard/services/geo",
+        url: "/services/geo",
         icon: Globe,
       },
       {
         title: "社交媒体",
-        url: "/dashboard/services/social",
+        url: "/services/social",
         icon: Share2,
       },
       {
         title: "发稿服务",
-        url: "/dashboard/services/press-release",
+        url: "/services/press-release",
         icon: Newspaper,
       },
       {
         title: "获客情报",
-        url: "/dashboard/services/leads",
+        url: "/services/leads",
         icon: Radar,
         comingSoon: true,
       },
@@ -94,30 +93,6 @@ export const sidebarItems: NavGroup[] = [
         title: "任务中心",
         url: "/dashboard/tasks",
         icon: ClipboardList,
-      },
-      {
-        title: "SEO 任务",
-        url: "/dashboard/seo-monitor",
-        icon: Link2,
-        isNew: true,
-      },
-      {
-        title: "GEO 监控",
-        url: "/dashboard/geo-monitor",
-        icon: Activity,
-        isNew: true,
-      },
-      {
-        title: "社交媒体",
-        url: "/dashboard/social-monitor",
-        icon: Share2,
-        isNew: true,
-      },
-      {
-        title: "发稿任务",
-        url: "/dashboard/news-monitor",
-        icon: Newspaper,
-        isNew: true,
       },
       {
         title: "内容撰写",

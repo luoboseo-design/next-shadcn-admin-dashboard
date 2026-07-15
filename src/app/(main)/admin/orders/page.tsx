@@ -16,152 +16,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { adminOrders } from "@/data/admin-orders";
+import { taskStatusColors, taskStatusLabels, serviceCategoryConfig, type ServiceCategory } from "@/data/mock-tasks";
 import { cn } from "@/lib/utils";
 
-// 模拟订单数据
-const mockOrders = [
-  {
-    id: "ORD-20240125-001",
-    userId: "U001",
-    userName: "张三",
-    service: "seo",
-    subService: "backlink",
-    serviceName: "外链代发",
-    package: "成长版",
-    quantity: 50,
-    amount: 180,
-    status: "running",
-    progress: 65,
-    createdAt: "2024-01-25 14:30",
-    updatedAt: "2024-01-25 16:45",
-  },
-  {
-    id: "ORD-20240125-002",
-    userId: "U002",
-    userName: "李四",
-    service: "geo",
-    subService: "keyword",
-    serviceName: "关键词优化",
-    package: "3关键词套餐",
-    quantity: 3,
-    amount: 600,
-    status: "pending",
-    progress: 0,
-    createdAt: "2024-01-25 13:15",
-    updatedAt: "2024-01-25 13:15",
-  },
-  {
-    id: "ORD-20240125-003",
-    userId: "U003",
-    userName: "王五",
-    service: "social",
-    subService: "reddit",
-    serviceName: "Reddit推广",
-    package: "10帖子套餐",
-    quantity: 10,
-    amount: 300,
-    status: "completed",
-    progress: 100,
-    createdAt: "2024-01-25 11:45",
-    updatedAt: "2024-01-25 15:30",
-  },
-  {
-    id: "ORD-20240125-004",
-    userId: "U004",
-    userName: "赵六",
-    service: "news",
-    subService: "press_release",
-    serviceName: "新闻稿发布",
-    package: "5媒体套餐",
-    quantity: 5,
-    amount: 1000,
-    status: "running",
-    progress: 40,
-    createdAt: "2024-01-25 10:20",
-    updatedAt: "2024-01-25 14:00",
-  },
-  {
-    id: "ORD-20240125-005",
-    userId: "U005",
-    userName: "钱七",
-    service: "seo",
-    subService: "guest_post",
-    serviceName: "客座文章",
-    package: "3媒体套餐",
-    quantity: 3,
-    amount: 1500,
-    status: "completed",
-    progress: 100,
-    createdAt: "2024-01-25 09:00",
-    updatedAt: "2024-01-25 12:00",
-  },
-  {
-    id: "ORD-20240124-001",
-    userId: "U007",
-    userName: "周九",
-    service: "seo",
-    subService: "backlink",
-    serviceName: "外链代发",
-    package: "企业版",
-    quantity: 500,
-    amount: 2400,
-    status: "running",
-    progress: 80,
-    createdAt: "2024-01-24 16:30",
-    updatedAt: "2024-01-25 10:00",
-  },
-  {
-    id: "ORD-20240124-002",
-    userId: "U003",
-    userName: "王五",
-    service: "geo",
-    subService: "authority",
-    serviceName: "权威建设",
-    package: "标准套餐",
-    quantity: 1,
-    amount: 500,
-    status: "completed",
-    progress: 100,
-    createdAt: "2024-01-24 14:00",
-    updatedAt: "2024-01-25 08:00",
-  },
-  {
-    id: "ORD-20240124-003",
-    userId: "U008",
-    userName: "吴十",
-    service: "social",
-    subService: "twitter",
-    serviceName: "Twitter/X推广",
-    package: "20推文套餐",
-    quantity: 20,
-    amount: 300,
-    status: "pending",
-    progress: 0,
-    createdAt: "2024-01-24 11:30",
-    updatedAt: "2024-01-24 11:30",
-  },
-];
-
-const statusLabels: Record<string, string> = {
-  pending: "待处理",
-  running: "运行中",
-  completed: "已完成",
-};
-
-const statusColors: Record<string, string> = {
-  pending: "bg-muted text-muted-foreground",
-  running: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  completed: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-};
-
-const serviceLabels: Record<string, string> = {
-  seo: "SEO 服务",
-  geo: "GEO 服务",
-  social: "社交媒体",
-  news: "发稿服务",
-};
-
-const serviceColors: Record<string, string> = {
+const serviceColors: Record<ServiceCategory, string> = {
   seo: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   geo: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
   social: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
@@ -173,21 +32,21 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [serviceFilter, setServiceFilter] = useState("all");
 
-  const filteredOrders = mockOrders.filter((order) => {
+  const filteredOrders = adminOrders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.userName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-    const matchesService = serviceFilter === "all" || order.service === serviceFilter;
+    const matchesService = serviceFilter === "all" || order.serviceCategory === serviceFilter;
     return matchesSearch && matchesStatus && matchesService;
   });
 
   const stats = {
-    total: mockOrders.length,
-    pending: mockOrders.filter((o) => o.status === "pending").length,
-    running: mockOrders.filter((o) => o.status === "running").length,
-    completed: mockOrders.filter((o) => o.status === "completed").length,
-    totalAmount: mockOrders.reduce((sum, o) => sum + o.amount, 0),
+    total: adminOrders.length,
+    pending: adminOrders.filter((o) => o.status === "pending").length,
+    running: adminOrders.filter((o) => o.status === "running").length,
+    completed: adminOrders.filter((o) => o.status === "completed").length,
+    totalAmount: adminOrders.reduce((sum, o) => sum + o.amount, 0),
   };
 
   return (
@@ -196,7 +55,7 @@ export default function AdminOrdersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">订单管理</h1>
-          <p className="text-muted-foreground mt-1">管理平台所有服务订单</p>
+          <p className="text-muted-foreground mt-1">管理平台所有服务订单（与用户任务中心数据一一对应）</p>
         </div>
         <Button variant="outline" size="sm">
           <Download className="h-4 w-4 mr-2" />
@@ -261,10 +120,11 @@ export default function AdminOrdersPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部服务</SelectItem>
-                <SelectItem value="seo">SEO 服务</SelectItem>
-                <SelectItem value="geo">GEO 服务</SelectItem>
-                <SelectItem value="social">社交媒体</SelectItem>
-                <SelectItem value="news">发稿服务</SelectItem>
+                {(Object.keys(serviceCategoryConfig) as ServiceCategory[]).map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {serviceCategoryConfig[key].label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -312,16 +172,19 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="py-3">
                       <div className="flex flex-col gap-1">
-                        <Badge variant="secondary" className={cn("text-xs w-fit", serviceColors[order.service])}>
-                          {serviceLabels[order.service]}
+                        <Badge
+                          variant="secondary"
+                          className={cn("text-xs w-fit", serviceColors[order.serviceCategory])}
+                        >
+                          {serviceCategoryConfig[order.serviceCategory].label}
                         </Badge>
                         <span className="text-xs text-muted-foreground">{order.serviceName}</span>
                       </div>
                     </td>
                     <td className="py-3">
-                      <span className="text-sm">{order.package}</span>
+                      <span className="text-sm">{order.packageName}</span>
                     </td>
-                    <td className="py-3 text-right font-medium">${order.amount}</td>
+                    <td className="py-3 text-right font-medium">${order.amount.toLocaleString()}</td>
                     <td className="py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
@@ -337,8 +200,8 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="py-3">
-                      <Badge variant="secondary" className={cn("text-xs", statusColors[order.status])}>
-                        {statusLabels[order.status]}
+                      <Badge variant="secondary" className={cn("text-xs", taskStatusColors[order.status])}>
+                        {taskStatusLabels[order.status]}
                       </Badge>
                     </td>
                     <td className="py-3 text-sm text-muted-foreground">{order.createdAt}</td>

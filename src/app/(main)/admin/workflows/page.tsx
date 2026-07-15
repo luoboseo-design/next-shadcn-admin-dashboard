@@ -318,14 +318,26 @@ export default function WorkflowsPage() {
                     </div>
                   </div>
 
-                  {/* 工作流步骤 */}
+                  {/* 工作流步骤（“账号获取”可点击跳转至账号中心） */}
                   <div className="mt-4 flex items-center gap-2 flex-wrap">
-                    {workflow.steps.map((step, index) => (
-                      <div key={index} className="flex items-center">
-                        <div className="px-3 py-1 bg-muted rounded-full text-xs">{step.name}</div>
-                        {index < workflow.steps.length - 1 && <div className="w-4 h-px bg-border mx-1" />}
-                      </div>
-                    ))}
+                    {workflow.steps.map((step, index) => {
+                      const isAccountStep = step.name === "账号获取";
+                      return (
+                        <div key={index} className="flex items-center">
+                          {isAccountStep ? (
+                            <Link
+                              href="/admin/accounts"
+                              className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                            >
+                              {step.name}
+                            </Link>
+                          ) : (
+                            <div className="px-3 py-1 bg-muted rounded-full text-xs">{step.name}</div>
+                          )}
+                          {index < workflow.steps.length - 1 && <div className="w-4 h-px bg-border mx-1" />}
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* 统计数据 */}

@@ -572,7 +572,7 @@ export default function AIAgentsPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  {"temperature" in selectedAgent.config && (
+                  {selectedAgent.config.temperature !== undefined && (
                     <div className="grid gap-2">
                       <div className="flex items-center justify-between">
                         <Label>Temperature</Label>

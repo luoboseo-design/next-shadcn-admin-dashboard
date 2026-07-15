@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Download, MoreHorizontal, Search, User, UserPlus } from "lucide-react";
+import { Download, MoreHorizontal, Search, UserPlus } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -27,145 +27,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getUserOrderStats } from "@/data/admin-orders";
+import { DEMO_USER_ID, platformUsers, userStatusLabels, type PlatformUserStatus } from "@/data/platform-users";
 import { cn } from "@/lib/utils";
 
-// 模拟用户数据
-const mockUsers = [
-  {
-    id: "U001",
-    name: "张明",
-    email: "zhangming@example.com",
-    phone: "138****1234",
-    avatar: "",
-    balance: 25000,
-    totalSpent: 156000,
-    orders: 89,
-    runningOrders: 5,
-    status: "active",
-    registeredAt: "2023-08-15",
-    lastLogin: "2024-01-25 14:30",
-  },
-  {
-    id: "U002",
-    name: "李华",
-    email: "lihua@example.com",
-    phone: "139****5678",
-    avatar: "",
-    balance: 18000,
-    totalSpent: 89000,
-    orders: 56,
-    runningOrders: 3,
-    status: "active",
-    registeredAt: "2023-10-22",
-    lastLogin: "2024-01-25 10:15",
-  },
-  {
-    id: "U003",
-    name: "王伟",
-    email: "wangwei@example.com",
-    phone: "137****9012",
-    avatar: "",
-    balance: 50000,
-    totalSpent: 450000,
-    orders: 235,
-    runningOrders: 12,
-    status: "active",
-    registeredAt: "2023-03-10",
-    lastLogin: "2024-01-25 09:00",
-  },
-  {
-    id: "U004",
-    name: "赵芳",
-    email: "zhaofang@example.com",
-    phone: "136****3456",
-    avatar: "",
-    balance: 8000,
-    totalSpent: 24000,
-    orders: 18,
-    runningOrders: 2,
-    status: "active",
-    registeredAt: "2024-01-05",
-    lastLogin: "2024-01-24 18:00",
-  },
-  {
-    id: "U005",
-    name: "钱进",
-    email: "qianjin@example.com",
-    phone: "135****7890",
-    avatar: "",
-    balance: 32000,
-    totalSpent: 280000,
-    orders: 156,
-    runningOrders: 8,
-    status: "active",
-    registeredAt: "2023-06-15",
-    lastLogin: "2024-01-25 16:45",
-  },
-  {
-    id: "U006",
-    name: "孙丽",
-    email: "sunli@example.com",
-    phone: "134****2345",
-    avatar: "",
-    balance: 0,
-    totalSpent: 5000,
-    orders: 5,
-    runningOrders: 0,
-    status: "inactive",
-    registeredAt: "2024-01-20",
-    lastLogin: "2024-01-22 08:30",
-  },
-  {
-    id: "U007",
-    name: "周强",
-    email: "zhouqiang@example.com",
-    phone: "133****6789",
-    avatar: "",
-    balance: 120000,
-    totalSpent: 890000,
-    orders: 458,
-    runningOrders: 25,
-    status: "active",
-    registeredAt: "2022-11-01",
-    lastLogin: "2024-01-25 11:20",
-  },
-  {
-    id: "U008",
-    name: "吴敏",
-    email: "wumin@example.com",
-    phone: "132****0123",
-    avatar: "",
-    balance: 6000,
-    totalSpent: 36000,
-    orders: 28,
-    runningOrders: 1,
-    status: "active",
-    registeredAt: "2024-01-08",
-    lastLogin: "2024-01-24 22:15",
-  },
-];
-
-const statusLabels: Record<string, string> = {
-  active: "正常",
-  inactive: "未激活",
-  banned: "已封禁",
-};
-
-const statusColors: Record<string, string> = {
+const statusColors: Record<PlatformUserStatus, string> = {
   active: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   inactive: "bg-muted text-muted-foreground",
   banned: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
-function getInitials(name: string) {
-  return name.slice(0, 1);
-}
+// 用户 + 派生的订单统计（与订单管理页同源）
+const usersWithStats = platformUsers.map((user) => ({
+  ...user,
+  ...getUserOrderStats(user.id),
+}));
 
 export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredUsers = mockUsers.filter((user) => {
+  const filteredUsers = usersWithStats.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -175,10 +57,10 @@ export default function AdminUsersPage() {
   });
 
   const stats = {
-    total: mockUsers.length,
-    active: mockUsers.filter((u) => u.status === "active").length,
-    totalBalance: mockUsers.reduce((sum, u) => sum + u.balance, 0),
-    runningOrders: mockUsers.reduce((sum, u) => sum + u.runningOrders, 0),
+    total: usersWithStats.length,
+    active: usersWithStats.filter((u) => u.status === "active").length,
+    totalBalance: usersWithStats.reduce((sum, u) => sum + u.balance, 0),
+    runningOrders: usersWithStats.reduce((sum, u) => sum + u.runningOrders, 0),
   };
 
   return (
@@ -224,7 +106,7 @@ export default function AdminUsersPage() {
                   <Input id="password" type="password" placeholder="设置初始密码" />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="balance">初始余额</Label>
+                  <Label htmlFor="balance">初始余额（USD）</Label>
                   <Input id="balance" type="number" placeholder="0" />
                 </div>
               </div>
@@ -316,13 +198,20 @@ export default function AdminUsersPage() {
                     <td className="py-3">
                       <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatar} />
+                          <AvatarImage src={user.avatar || undefined} />
                           <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                            {getInitials(user.name)}
+                            {user.name.slice(0, 1)}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{user.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-medium">{user.name}</p>
+                            {user.id === DEMO_USER_ID && (
+                              <Badge variant="outline" className="text-xs px-1.5 py-0">
+                                演示账户
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
@@ -330,7 +219,7 @@ export default function AdminUsersPage() {
                     <td className="py-3 text-sm">{user.phone}</td>
                     <td className="py-3 text-right font-medium">${user.balance.toLocaleString()}</td>
                     <td className="py-3 text-right">${user.totalSpent.toLocaleString()}</td>
-                    <td className="py-3 text-right">{user.orders}</td>
+                    <td className="py-3 text-right">{user.ordersCount}</td>
                     <td className="py-3 text-right">
                       {user.runningOrders > 0 ? (
                         <Badge
@@ -345,10 +234,10 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="py-3">
                       <Badge variant="secondary" className={cn("text-xs", statusColors[user.status])}>
-                        {statusLabels[user.status]}
+                        {userStatusLabels[user.status]}
                       </Badge>
                     </td>
-                    <td className="py-3 text-sm text-muted-foreground">{user.lastLogin}</td>
+                    <td className="py-3 text-sm text-muted-foreground">{user.lastLoginAt}</td>
                     <td className="py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

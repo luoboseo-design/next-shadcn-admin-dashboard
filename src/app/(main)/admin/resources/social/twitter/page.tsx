@@ -10,11 +10,12 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Twitter,
   Upload,
   XCircle,
 } from "lucide-react";
+import { siX } from "simple-icons";
 
+import { SimpleIcon } from "@/components/simple-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -350,7 +351,7 @@ export default function TwitterAccountsPage() {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
-                      <Twitter className="h-4 w-4 text-sky-500" />
+                      <SimpleIcon icon={siX} className="h-4 w-4 fill-current" />
                     </div>
                     <div>
                       <div className="font-medium flex items-center gap-1">
