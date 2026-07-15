@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 
-import {
-  Plus,
-  Search,
-  MoreHorizontal,
-  ExternalLink,
-  Upload,
-  Download,
-  RefreshCw,
-} from "lucide-react";
+import { Download, ExternalLink, MoreHorizontal, Plus, RefreshCw, Search, Upload } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,19 +26,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { blogResources, resourceStatusConfig } from "@/data/platform-resources";
 
 export default function SeoBlogsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [dofollowFilter, setDofollowFilter] = useState("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
 
   const filteredBlogs = blogResources.filter((blog) => {
@@ -55,7 +42,9 @@ export default function SeoBlogsPage() {
       blog.url.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || blog.status === statusFilter;
     const matchesCategory = categoryFilter === "all" || blog.category === categoryFilter;
-    return matchesSearch && matchesStatus && matchesCategory;
+    const matchesDofollow =
+      dofollowFilter === "all" || (dofollowFilter === "dofollow" ? blog.acceptsDofollow : !blog.acceptsDofollow);
+    return matchesSearch && matchesStatus && matchesCategory && matchesDofollow;
   });
 
   const stats = {
@@ -208,6 +197,16 @@ export default function SeoBlogsPage() {
                 className="pl-9"
               />
             </div>
+            <Select value={dofollowFilter} onValueChange={setDofollowFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="链接类型" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部链接</SelectItem>
+                <SelectItem value="dofollow">Dofollow</SelectItem>
+                <SelectItem value="nofollow">Nofollow</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="状态" />
@@ -250,7 +249,7 @@ export default function SeoBlogsPage() {
                   <th className="p-4 font-medium">分类</th>
                   <th className="p-4 font-medium">状态</th>
                   <th className="p-4 font-medium">最后使用</th>
-                  <th className="p-4 font-medium w-[50px]"></th>
+                  <th className="p-4 font-medium w-[50px]" />
                 </tr>
               </thead>
               <tbody>
