@@ -45,12 +45,22 @@ function TasksPageContent() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="all">全部任务</TabsTrigger>
-          <TabsTrigger value="seo">SEO 任务</TabsTrigger>
-          <TabsTrigger value="geo">GEO 监控</TabsTrigger>
-          <TabsTrigger value="social">社交媒体</TabsTrigger>
-          <TabsTrigger value="news">发稿任务</TabsTrigger>
+        <TabsList className="h-11 rounded-lg p-1">
+          <TabsTrigger value="all" className="h-9 rounded-md px-4">
+            全部任务
+          </TabsTrigger>
+          <TabsTrigger value="seo" className="h-9 rounded-md px-4">
+            SEO 任务
+          </TabsTrigger>
+          <TabsTrigger value="geo" className="h-9 rounded-md px-4">
+            GEO 监控
+          </TabsTrigger>
+          <TabsTrigger value="social" className="h-9 rounded-md px-4">
+            社交媒体
+          </TabsTrigger>
+          <TabsTrigger value="news" className="h-9 rounded-md px-4">
+            发稿任务
+          </TabsTrigger>
         </TabsList>
 
         {/* 全部任务总览 */}
