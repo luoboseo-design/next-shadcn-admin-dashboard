@@ -1,5 +1,6 @@
 import {
   Activity,
+  AtSign,
   BookOpen,
   Bot,
   CheckCircle,
@@ -9,6 +10,7 @@ import {
   Globe,
   Home,
   Key,
+  ListChecks,
   type LucideIcon,
   Newspaper,
   Package,
@@ -16,6 +18,7 @@ import {
   Server,
   Settings,
   Share2,
+  UserCog,
   Users,
   Workflow,
 } from "lucide-react";
@@ -96,6 +99,32 @@ export const adminSidebarItems: AdminNavGroup[] = [
           { title: "新闻站点", url: "/admin/resources/news/sites" },
           { title: "发稿渠道", url: "/admin/resources/news/channels" },
         ],
+      },
+    ],
+  },
+  {
+    id: 7,
+    label: "账号中心",
+    items: [
+      {
+        title: "账号总览",
+        url: "/admin/accounts",
+        icon: UserCog,
+      },
+      {
+        title: "身份资源",
+        url: "/admin/accounts/identity",
+        icon: AtSign,
+        subItems: [
+          { title: "邮箱池", url: "/admin/accounts/identity#email" },
+          { title: "代理 IP 池", url: "/admin/accounts/identity#proxy" },
+          { title: "接码平台", url: "/admin/accounts/identity#sms" },
+        ],
+      },
+      {
+        title: "注册队列",
+        url: "/admin/accounts/registration",
+        icon: ListChecks,
       },
     ],
   },
