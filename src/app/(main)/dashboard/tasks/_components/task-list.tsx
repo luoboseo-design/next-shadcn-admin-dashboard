@@ -28,7 +28,7 @@ export function TaskList({ tasks }: TaskListProps) {
   // 筛选任务
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
-      task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (task.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.targetUrl.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === "all" || task.serviceCategory === categoryFilter;

@@ -1,13 +1,33 @@
 "use client";
 
-import { CheckCircle2, ClipboardList, Clock, Loader2 } from "lucide-react";
+import { Suspense } from "react";
+
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockTasks, serviceCategoryConfig } from "@/data/mock-tasks";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { mockTasks } from "@/data/mock-tasks";
 
+import { GeoMonitorPanel } from "./_components/geo-monitor";
+import { NewsMonitorPanel } from "./_components/news-monitor";
+import { SeoMonitorPanel } from "./_components/seo-monitor";
+import { SocialMonitorPanel } from "./_components/social-monitor";
 import { TaskList } from "./_components/task-list";
 
-export default function TasksPage() {
+const VALID_TABS = ["all", "seo", "geo", "social", "news"] as const;
+type TabValue = (typeof VALID_TABS)[number];
+
+function TasksPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const tabParam = searchParams.get("tab");
+  const activeTab: TabValue = VALID_TABS.includes(tabParam as TabValue) ? (tabParam as TabValue) : "all";
+
+  const handleTabChange = (value: string) => {
+    router.replace(value === "all" ? "/dashboard/tasks" : `/dashboard/tasks?tab=${value}`, { scroll: false });
+  };
+
   // 计算统计数据
   const stats = {
     total: mockTasks.length,
@@ -24,44 +44,85 @@ export default function TasksPage() {
         <p className="text-muted-foreground mt-1">管理和追踪您的所有服务任务</p>
       </div>
 
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-muted-foreground">总任务数</div>
-            <div className="text-2xl font-bold mt-1">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-muted-foreground">进行中</div>
-            <div className="text-2xl font-bold mt-1 text-amber-500">{stats.inProgress}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-muted-foreground">待处理</div>
-            <div className="text-2xl font-bold mt-1 text-muted-foreground">{stats.pending}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-muted-foreground">已完成</div>
-            <div className="text-2xl font-bold mt-1 text-emerald-500">{stats.completed}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="all">全部任务</TabsTrigger>
+          <TabsTrigger value="seo">SEO 任务</TabsTrigger>
+          <TabsTrigger value="geo">GEO 监控</TabsTrigger>
+          <TabsTrigger value="social">社交媒体</TabsTrigger>
+          <TabsTrigger value="news">发稿任务</TabsTrigger>
+        </TabsList>
 
-      {/* 任务列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>任务列表</CardTitle>
-          <CardDescription>查看所有任务的执行状态和进度</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <TaskList tasks={mockTasks} />
-        </CardContent>
-      </Card>
+        {/* 全部任务总览 */}
+        <TabsContent value="all" className="space-y-6">
+          {/* 统计卡片 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-sm text-muted-foreground">总任务数</div>
+                <div className="text-2xl font-bold mt-1">{stats.total}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-sm text-muted-foreground">进行中</div>
+                <div className="text-2xl font-bold mt-1 text-amber-500">{stats.inProgress}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-sm text-muted-foreground">待处理</div>
+                <div className="text-2xl font-bold mt-1 text-muted-foreground">{stats.pending}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-sm text-muted-foreground">已完成</div>
+                <div className="text-2xl font-bold mt-1 text-emerald-500">{stats.completed}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 任务列表 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>任务列表</CardTitle>
+              <CardDescription>查看所有任务的执行状态和进度</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TaskList tasks={mockTasks} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SEO 任务监控 */}
+        <TabsContent value="seo">
+          <SeoMonitorPanel />
+        </TabsContent>
+
+        {/* GEO 监控 */}
+        <TabsContent value="geo">
+          <GeoMonitorPanel />
+        </TabsContent>
+
+        {/* 社交媒体报告 */}
+        <TabsContent value="social">
+          <SocialMonitorPanel />
+        </TabsContent>
+
+        {/* 发稿任务 */}
+        <TabsContent value="news">
+          <NewsMonitorPanel />
+        </TabsContent>
+      </Tabs>
     </div>
+  );
+}
+
+export default function TasksPage() {
+  return (
+    <Suspense>
+      <TasksPageContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,4 @@
 import {
-  Activity,
   ClipboardList,
   CreditCard,
   FileEdit,
@@ -94,30 +93,6 @@ export const sidebarItems: NavGroup[] = [
         title: "任务中心",
         url: "/dashboard/tasks",
         icon: ClipboardList,
-      },
-      {
-        title: "SEO 任务",
-        url: "/dashboard/seo-monitor",
-        icon: Link2,
-        isNew: true,
-      },
-      {
-        title: "GEO 监控",
-        url: "/dashboard/geo-monitor",
-        icon: Activity,
-        isNew: true,
-      },
-      {
-        title: "社交媒体",
-        url: "/dashboard/social-monitor",
-        icon: Share2,
-        isNew: true,
-      },
-      {
-        title: "发稿任务",
-        url: "/dashboard/news-monitor",
-        icon: Newspaper,
-        isNew: true,
       },
       {
         title: "内容撰写",
