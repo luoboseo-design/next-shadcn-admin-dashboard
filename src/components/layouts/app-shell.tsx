@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 
 import { AccountSwitcher } from "@/app/(main)/dashboard/_components/sidebar/account-switcher";
+import { AuthDialogProvider } from "@/components/auth/auth-dialog-provider";
 import { AppSidebar } from "@/app/(main)/dashboard/_components/sidebar/app-sidebar";
 import { LanguageSwitcher } from "@/app/(main)/dashboard/_components/sidebar/language-switcher";
 import { SearchDialog } from "@/app/(main)/dashboard/_components/sidebar/search-dialog";
@@ -28,6 +29,7 @@ export async function AppShell({ children }: Readonly<{ children: ReactNode }>) 
   ]);
 
   return (
+    <AuthDialogProvider>
     <SidebarProvider
       defaultOpen={defaultOpen}
       style={
@@ -75,5 +77,6 @@ export async function AppShell({ children }: Readonly<{ children: ReactNode }>) 
         </div>
       </SidebarInset>
     </SidebarProvider>
+    </AuthDialogProvider>
   );
 }

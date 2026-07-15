@@ -12,10 +12,12 @@ import { Link2, Package, BarChart3, Check, ArrowRight, Loader2 } from "lucide-re
 import { servicePackages } from "@/data/mock-tasks";
 import { platformTypeDetails } from "@/data/mock-platforms";
 import { cn } from "@/lib/utils";
+import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
 import type { PlatformType } from "@/types/marketing";
 
 export default function BacklinksServicePage() {
   const router = useRouter();
+  const { openAuthDialog } = useAuthDialog();
   const [selectedPackageId, setSelectedPackageId] = useState<string>("growth");
   const [selectedPlatforms, setSelectedPlatforms] = useState<PlatformType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,12 +33,20 @@ export default function BacklinksServicePage() {
     return Math.round(avgPrice * baseQuantity);
   };
 
-  const handleCreateTask = async () => {
+  const submitTask = async () => {
     setIsSubmitting(true);
     // 模拟提交
     await new Promise((resolve) => setTimeout(resolve, 1500));
     // 跳转到任务中心
     router.push("/dashboard/tasks");
+  };
+
+  const handleCreateTask = () => {
+    // 创建任务属于后台操作，需要登录后才能执行
+    openAuthDialog({
+      reason: "创建任务前请先登录，登录后将自动为您提交任务",
+      onSuccess: submitTask,
+    });
   };
 
   return (
