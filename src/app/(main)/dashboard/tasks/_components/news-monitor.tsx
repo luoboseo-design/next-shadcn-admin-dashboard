@@ -21,8 +21,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Filter,
-  Plus,
   MoreHorizontal,
   ExternalLink,
   Trash2,
@@ -170,20 +168,6 @@ export function NewsMonitorPanel() {
 
   return (
     <div className="space-y-6">
-      {/* 操作栏 */}
-      <div className="flex items-center justify-end gap-2">
-        <Button variant="outline" size="sm">
-          <Filter className="h-4 w-4 mr-1.5" />
-          筛选
-        </Button>
-        <Button size="sm" asChild>
-          <Link href="/dashboard/services/press-release">
-            <Plus className="h-4 w-4 mr-1.5" />
-            新建订单
-          </Link>
-        </Button>
-      </div>
-
       {/* 统计卡片 */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card p-4">

@@ -11,11 +11,9 @@ import {
   ChevronDown,
   ExternalLink,
   Eye,
-  Filter,
-  Globe,
+
   MessageSquare,
   Minus,
-  RefreshCw,
   Search,
   ThumbsUp,
   TrendingDown,
@@ -162,20 +160,6 @@ export function GeoMonitorPanel() {
 
   return (
     <div className="space-y-6">
-      {/* 操作栏 */}
-      <div className="flex items-center justify-end gap-2">
-        <Button variant="outline" size="sm" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          刷新数据
-        </Button>
-        <Button asChild size="sm">
-          <Link href="/dashboard/services/geo">
-            <Globe className="h-4 w-4 mr-2" />
-            创建新任务
-          </Link>
-        </Button>
-      </div>
-
       {/* 任务选择器 */}
       <Card>
         <CardContent className="py-4">

@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
-  Download,
   ChevronDown,
   ChevronRight,
   Search,
@@ -251,14 +250,6 @@ export function SocialMonitorPanel() {
 
   return (
     <div className="space-y-6">
-      {/* 操作栏 */}
-      <div className="flex items-center justify-end">
-        <Button variant="outline" size="sm" className="gap-2">
-          <Download className="h-4 w-4" />
-          导出报告
-        </Button>
-      </div>
-
       {/* 统计卡片 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>

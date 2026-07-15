@@ -2,8 +2,12 @@
 
 import { Suspense } from "react";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { Download, Filter, Globe, Plus, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockTasks } from "@/data/mock-tasks";
@@ -38,10 +42,62 @@ function TasksPageContent() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      {/* 页面标题 */}
-      <div>
-        <h1 className="text-2xl font-bold">任务中心</h1>
-        <p className="text-muted-foreground mt-1">管理和追踪您的所有服务任务</p>
+      {/* 页面标题 + 当前 Tab 操作按钮 */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">任务中心</h1>
+          <p className="text-muted-foreground mt-1">管理和追踪您的所有服务任务</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {activeTab === "seo" && (
+            <>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-1.5" />
+                筛选
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/dashboard/services/seo">
+                  <Plus className="h-4 w-4 mr-1.5" />
+                  新建订单
+                </Link>
+              </Button>
+            </>
+          )}
+          {activeTab === "geo" && (
+            <>
+              <Button variant="outline" size="sm" className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                刷新数据
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/dashboard/services/geo">
+                  <Globe className="h-4 w-4 mr-1.5" />
+                  创建新任务
+                </Link>
+              </Button>
+            </>
+          )}
+          {activeTab === "social" && (
+            <Button variant="outline" size="sm" className="gap-2">
+              <Download className="h-4 w-4" />
+              导出报告
+            </Button>
+          )}
+          {activeTab === "news" && (
+            <>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-1.5" />
+                筛选
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/dashboard/services/press-release">
+                  <Plus className="h-4 w-4 mr-1.5" />
+                  新建订单
+                </Link>
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">

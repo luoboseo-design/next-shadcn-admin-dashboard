@@ -11,11 +11,9 @@ import {
   ExternalLink,
   Eye,
   FileEdit,
-  Filter,
   Link2,
   Loader2,
   MoreHorizontal,
-  Plus,
   Trash2,
   TrendingUp,
 } from "lucide-react";
@@ -226,20 +224,6 @@ export function SeoMonitorPanel() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 操作栏 */}
-      <div className="flex items-center justify-end gap-2">
-        <Button variant="outline" size="sm">
-          <Filter className="h-4 w-4 mr-1.5" />
-          筛选
-        </Button>
-        <Link href="/dashboard/services/seo">
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-1.5" />
-            新建订单
-          </Button>
-        </Link>
-      </div>
-
       {/* Tabs 切换 */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="flex items-center justify-between">
