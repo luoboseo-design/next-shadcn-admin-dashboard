@@ -13,6 +13,7 @@ import { servicePackages } from "@/data/mock-tasks";
 import { platformTypeDetails } from "@/data/mock-platforms";
 import { cn } from "@/lib/utils";
 import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { AuthGate } from "@/components/auth/auth-gate";
 import { useIsAuthenticated } from "@/stores/auth-store";
 import type { PlatformType } from "@/types/marketing";
 
@@ -97,10 +98,12 @@ export default function BacklinksServicePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <CreateTaskForm 
-                    selectedPackageId={selectedPackageId}
-                    onPlatformChange={setSelectedPlatforms}
-                  />
+                  <AuthGate reason="填写任务信息前请先登录">
+                    <CreateTaskForm 
+                      selectedPackageId={selectedPackageId}
+                      onPlatformChange={setSelectedPlatforms}
+                    />
+                  </AuthGate>
                 </CardContent>
               </Card>
             </div>

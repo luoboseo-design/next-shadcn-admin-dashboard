@@ -7,6 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FileEdit, Package, BarChart3, Check, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import { GuestPostForm } from "./_components/guest-post-form";
 import { PlatformShowcase } from "./_components/platform-showcase";
 import {
@@ -18,6 +21,8 @@ import {
 
 export default function GuestPostsServicePage() {
   const router = useRouter();
+  const { openAuthDialog } = useAuthDialog();
+  const isAuthenticated = useIsAuthenticated();
   const [selectedPackageId, setSelectedPackageId] = useState<string>("growth");
   const [selectedDRTier, setSelectedDRTier] = useState<DRTier>("dr50");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,10 +39,21 @@ export default function GuestPostsServicePage() {
     return Math.round(basePrice * (1 - discount / 100));
   };
 
-  const handleCreateTask = async () => {
+  const submitTask = async () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     router.push("/dashboard/tasks");
+  };
+
+  const handleCreateTask = () => {
+    if (isAuthenticated) {
+      void submitTask();
+      return;
+    }
+    openAuthDialog({
+      reason: "创建任务前请先登录，登录后将自动为您提交任务",
+      onSuccess: submitTask,
+    });
   };
 
   const price = getPrice();
@@ -81,10 +97,12 @@ export default function GuestPostsServicePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <GuestPostForm
-                  selectedPackageId={selectedPackageId}
-                  onDRTierChange={setSelectedDRTier}
-                />
+                <AuthGate reason="填写任务信息前请先登录">
+                  <GuestPostForm
+                    selectedPackageId={selectedPackageId}
+                    onDRTierChange={setSelectedDRTier}
+                  />
+                </AuthGate>
               </CardContent>
             </Card>
 

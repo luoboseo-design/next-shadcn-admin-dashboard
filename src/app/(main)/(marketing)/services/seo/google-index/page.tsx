@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +31,8 @@ export default function GoogleIndexPage() {
   const [singleUrl, setSingleUrl] = useState("");
   const [batchUrls, setBatchUrls] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { openAuthDialog } = useAuthDialog();
+  const isAuthenticated = useIsAuthenticated();
 
   // 处理文件导入
   const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,14 +88,25 @@ export default function GoogleIndexPage() {
   // 计算价格
   const totalPrice = urlStats.valid.length * PRICE_PER_URL;
 
-  const handleSubmit = async () => {
-    if (urlStats.valid.length === 0) return;
+  const submitUrls = async () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     // 重置表单
     setSingleUrl("");
     setBatchUrls("");
+  };
+
+  const handleSubmit = () => {
+    if (urlStats.valid.length === 0) return;
+    if (isAuthenticated) {
+      void submitUrls();
+      return;
+    }
+    openAuthDialog({
+      reason: "提交 URL 前请先登录，登录后将自动为您提交",
+      onSuccess: submitUrls,
+    });
   };
 
   return (
@@ -116,7 +132,8 @@ export default function GoogleIndexPage() {
               输入需要快速收录的网页地址，支持单条或批量提交
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent>
+            <AuthGate reason="提交 URL 前请先登录" className="space-y-6">
             {/* 模式切换 */}
             <Tabs value={mode} onValueChange={(v) => setMode(v as "single" | "batch")}>
               <TabsList className="grid w-full grid-cols-2">
@@ -229,6 +246,7 @@ export default function GoogleIndexPage() {
                 <p>通常在提交后 24-48 小时内完成索引。</p>
               </div>
             </div>
+            </AuthGate>
           </CardContent>
         </Card>
 

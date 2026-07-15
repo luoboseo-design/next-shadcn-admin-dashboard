@@ -2,6 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import {
   Card,
   CardContent,
@@ -56,6 +59,8 @@ const platformStyles: Record<SocialPlatform, { bg: string; label: string }> = {
 
 export default function SocialMediaServicePage() {
   const router = useRouter();
+  const { openAuthDialog } = useAuthDialog();
+  const isAuthenticated = useIsAuthenticated();
   const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform>("reddit");
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType>("post");
   const [contentMode, setContentMode] = useState<"ai" | "custom">("ai");
@@ -93,11 +98,22 @@ export default function SocialMediaServicePage() {
   const totalPrice = selectedService ? selectedService.price * quantity : 0;
 
   // 提交订单
-  const handleSubmit = async () => {
-    if (!selectedService) return;
+  const submitOrder = async () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     router.push("/dashboard/tasks");
+  };
+
+  const handleSubmit = () => {
+    if (!selectedService) return;
+    if (isAuthenticated) {
+      void submitOrder();
+      return;
+    }
+    openAuthDialog({
+      reason: "提交订单前请先登录，登录后将自动为您提交",
+      onSuccess: submitOrder,
+    });
   };
 
   return (
@@ -267,7 +283,8 @@ export default function SocialMediaServicePage() {
               <CardTitle className="text-base">任务详情</CardTitle>
               <CardDescription>填写您的任务需求</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
+              <AuthGate reason="填写任务信息前请先登录" className="space-y-4">
               {/* 发帖服务 - AI模式显示主题和关键词 */}
               {selectedServiceType === "post" && contentMode === "ai" && (
                 <>
@@ -352,6 +369,7 @@ export default function SocialMediaServicePage() {
                   </div>
                 </>
               )}
+              </AuthGate>
             </CardContent>
           </Card>
         </div>

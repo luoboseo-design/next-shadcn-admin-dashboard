@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import {
   Search,
   Globe,
@@ -54,6 +56,8 @@ import {
 
 export default function PressReleasePage() {
   const router = useRouter();
+  const { openAuthDialog } = useAuthDialog();
+  const isAuthenticated = useIsAuthenticated();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState<string>("all");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
@@ -181,11 +185,22 @@ export default function PressReleasePage() {
     setSelectedLinkType("all");
   };
 
-  const handleSubmit = async () => {
-    if (selectedMediaIds.length === 0) return;
+  const submitOrder = async () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     router.push("/dashboard/tasks");
+  };
+
+  const handleSubmit = () => {
+    if (selectedMediaIds.length === 0) return;
+    if (isAuthenticated) {
+      void submitOrder();
+      return;
+    }
+    openAuthDialog({
+      reason: "提交发稿订单前请先登录，登录后将自动为您提交",
+      onSuccess: submitOrder,
+    });
   };
 
   const isAllSelected =

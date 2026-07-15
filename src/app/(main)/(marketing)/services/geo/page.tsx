@@ -3,6 +3,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import {
   Card,
   CardContent,
@@ -55,6 +58,8 @@ const serviceTypeIcons: Record<ServiceType, React.ReactNode> = {
 
 export default function GeoOptimizationPage() {
   const router = useRouter();
+  const { openAuthDialog } = useAuthDialog();
+  const isAuthenticated = useIsAuthenticated();
   
   // 服务类型选择
   const [serviceType, setServiceType] = useState<ServiceType>("keyword");
@@ -253,11 +258,22 @@ export default function GeoOptimizationPage() {
   }, [serviceType, selectedPlatforms, validKeywordCount, websiteUrl, validPageCount, selectedAuthorityService]);
 
   // 提交任务
-  const handleSubmit = async () => {
-    if (!isFormValid) return;
+  const submitTask = async () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     router.push("/dashboard/tasks");
+  };
+
+  const handleSubmit = () => {
+    if (!isFormValid) return;
+    if (isAuthenticated) {
+      void submitTask();
+      return;
+    }
+    openAuthDialog({
+      reason: "创建任务前请先登录，登录后将自动为您提交任务",
+      onSuccess: submitTask,
+    });
   };
 
   return (
@@ -443,7 +459,8 @@ export default function GeoOptimizationPage() {
                     输入你想要在 AI 平台排名靠前的关键词
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent>
+                  <AuthGate reason="填写任务信息前请先登录" className="space-y-3">
                   {keywords.map((keyword, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground w-6">{index + 1}.</span>
@@ -474,6 +491,7 @@ export default function GeoOptimizationPage() {
                     <Plus className="h-4 w-4" />
                     添加关键词
                   </Button>
+                  </AuthGate>
                 </CardContent>
               </Card>
 
@@ -615,7 +633,8 @@ export default function GeoOptimizationPage() {
                   </CardTitle>
                   <CardDescription>告诉我们你的网站和需要优化的页面</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent>
+                  <AuthGate reason="填写任务信息前请先登录" className="space-y-4">
                   <div className="space-y-2">
                     <Label>网站地址 <span className="text-destructive">*</span></Label>
                     <Input
@@ -659,6 +678,7 @@ export default function GeoOptimizationPage() {
                       </Button>
                     </div>
                   </div>
+                  </AuthGate>
                 </CardContent>
               </Card>
             </>
@@ -742,7 +762,8 @@ export default function GeoOptimizationPage() {
                       填写网站信息
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent>
+                    <AuthGate reason="填写任务信息前请先登录" className="space-y-4">
                     <div className="space-y-2">
                       <Label>网站地址 <span className="text-destructive">*</span></Label>
                       <Input
@@ -751,6 +772,7 @@ export default function GeoOptimizationPage() {
                         onChange={(e) => setWebsiteUrl(e.target.value)}
                       />
                     </div>
+                    </AuthGate>
                   </CardContent>
                 </Card>
               )}
@@ -763,12 +785,14 @@ export default function GeoOptimizationPage() {
               <CardTitle className="text-base">补充说明（可选）</CardTitle>
             </CardHeader>
             <CardContent>
-              <Textarea
-                placeholder="描述你的优化目标、竞争对手、特殊需求或其他备注..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
+              <AuthGate reason="填写任务信息前请先登录">
+                <Textarea
+                  placeholder="描述你的优化目标、竞争对手、特殊需求或其他备注..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                />
+              </AuthGate>
             </CardContent>
           </Card>
         </div>
