@@ -6,7 +6,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Download,
-  Instagram,
   MoreHorizontal,
   Plus,
   RefreshCw,
@@ -14,7 +13,9 @@ import {
   Upload,
   XCircle,
 } from "lucide-react";
+import { siInstagram } from "simple-icons";
 
+import { SimpleIcon } from "@/components/simple-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -351,7 +352,7 @@ export default function InstagramAccountsPage() {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
-                      <Instagram className="h-4 w-4 text-white" />
+                      <SimpleIcon icon={siInstagram} className="h-4 w-4 fill-white" />
                     </div>
                     <div>
                       <div className="font-medium flex items-center gap-1">

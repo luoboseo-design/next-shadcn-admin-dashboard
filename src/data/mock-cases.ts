@@ -21,7 +21,8 @@ export interface PlatformCaseData {
   cases: BacklinkCase[];
 }
 
-export const platformCases: Record<PlatformType, PlatformCaseData> = {
+// profile / custom 类型暂无公开案例，消费方已做存在性检查
+export const platformCases: Partial<Record<PlatformType, PlatformCaseData>> = {
   blog: {
     type: "blog",
     title: "博客外链案例展示",
