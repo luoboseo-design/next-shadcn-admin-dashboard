@@ -7,113 +7,31 @@ import { ArrowDownRight, ArrowUpRight, DollarSign, Download, TrendingUp, Wallet 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getRevenueByService } from "@/data/admin-orders";
+import { platformUsers } from "@/data/platform-users";
+import { getFinancialStats, transactions, transactionTypeLabels, type TransactionType } from "@/data/transactions";
 import { cn } from "@/lib/utils";
 
-// 模拟财务数据
-const financialStats = {
-  totalRevenue: 156800,
-  revenueGrowth: 18.5,
-  totalRecharge: 198500,
-  rechargeGrowth: 12.3,
-  totalWithdraw: 45000,
-  withdrawGrowth: -5.2,
-  platformBalance: 153500,
-};
+// 由共享数据派生的财务汇总（与订单管理/用户管理同源）
+const financialStats = getFinancialStats();
+const revenueByService = getRevenueByService();
+const platformBalance = platformUsers.reduce((sum, u) => sum + u.balance, 0);
+const recentTransactions = transactions.slice(0, 10);
 
-const revenueByService = [
-  { name: "SEO 服务", revenue: 62720, percentage: 40, orders: 456 },
-  { name: "GEO 服务", revenue: 50176, percentage: 32, orders: 234 },
-  { name: "社交媒体", revenue: 26656, percentage: 17, orders: 312 },
-  { name: "发稿服务", revenue: 17248, percentage: 11, orders: 232 },
-];
-
-const recentTransactions = [
-  {
-    id: "TXN-001",
-    type: "recharge",
-    user: "周九",
-    amount: 5000,
-    method: "支付宝",
-    status: "completed",
-    createdAt: "2024-01-25 16:30",
-  },
-  {
-    id: "TXN-002",
-    type: "order",
-    user: "张三",
-    amount: -180,
-    service: "外链代发",
-    status: "completed",
-    createdAt: "2024-01-25 14:30",
-  },
-  {
-    id: "TXN-003",
-    type: "recharge",
-    user: "王五",
-    amount: 2000,
-    method: "微信支付",
-    status: "completed",
-    createdAt: "2024-01-25 13:15",
-  },
-  {
-    id: "TXN-004",
-    type: "order",
-    user: "李四",
-    amount: -600,
-    service: "关键词优化",
-    status: "completed",
-    createdAt: "2024-01-25 11:45",
-  },
-  {
-    id: "TXN-005",
-    type: "refund",
-    user: "赵六",
-    amount: 500,
-    reason: "订单取消",
-    status: "completed",
-    createdAt: "2024-01-25 10:20",
-  },
-  {
-    id: "TXN-006",
-    type: "order",
-    user: "钱七",
-    amount: -1500,
-    service: "客座文章",
-    status: "completed",
-    createdAt: "2024-01-25 09:00",
-  },
-  {
-    id: "TXN-007",
-    type: "recharge",
-    user: "吴十",
-    amount: 1000,
-    method: "银行卡",
-    status: "pending",
-    createdAt: "2024-01-25 08:30",
-  },
-];
-
+// 收入趋势（最近6个月，1月为共享数据派生的实际总额）
 const monthlyRevenue = [
-  { month: "8月", revenue: 85000 },
-  { month: "9月", revenue: 92000 },
-  { month: "10月", revenue: 105000 },
-  { month: "11月", revenue: 118000 },
-  { month: "12月", revenue: 135000 },
-  { month: "1月", revenue: 156800 },
+  { month: "8月", revenue: Math.round(financialStats.totalRevenue * 0.35) },
+  { month: "9月", revenue: Math.round(financialStats.totalRevenue * 0.45) },
+  { month: "10月", revenue: Math.round(financialStats.totalRevenue * 0.55) },
+  { month: "11月", revenue: Math.round(financialStats.totalRevenue * 0.68) },
+  { month: "12月", revenue: Math.round(financialStats.totalRevenue * 0.82) },
+  { month: "1月", revenue: financialStats.totalRevenue },
 ];
 
-const typeLabels: Record<string, string> = {
-  recharge: "充值",
-  order: "消费",
-  refund: "退款",
-  withdraw: "提现",
-};
-
-const typeColors: Record<string, string> = {
+const typeColors: Record<TransactionType, string> = {
   recharge: "text-green-600",
-  order: "text-red-600",
+  expense: "text-red-600",
   refund: "text-amber-600",
-  withdraw: "text-purple-600",
 };
 
 export default function AdminFinancePage() {
@@ -127,7 +45,7 @@ export default function AdminFinancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">财务中心</h1>
-          <p className="text-muted-foreground mt-1">平台收入和财务数据统计</p>
+          <p className="text-muted-foreground mt-1">平台收入和财务数据统计（USD）</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={period} onValueChange={setPeriod}>
@@ -163,7 +81,7 @@ export default function AdminFinancePage() {
             </div>
             <div className="flex items-center gap-1 mt-3 text-sm">
               <ArrowUpRight className="h-4 w-4 text-green-500" />
-              <span className="text-green-500 font-medium">+{financialStats.revenueGrowth}%</span>
+              <span className="text-green-500 font-medium">+18.5%</span>
               <span className="text-muted-foreground">vs 上月</span>
             </div>
           </CardContent>
@@ -182,7 +100,7 @@ export default function AdminFinancePage() {
             </div>
             <div className="flex items-center gap-1 mt-3 text-sm">
               <ArrowUpRight className="h-4 w-4 text-green-500" />
-              <span className="text-green-500 font-medium">+{financialStats.rechargeGrowth}%</span>
+              <span className="text-green-500 font-medium">+12.3%</span>
               <span className="text-muted-foreground">vs 上月</span>
             </div>
           </CardContent>
@@ -193,16 +111,14 @@ export default function AdminFinancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">总退款</p>
-                <p className="text-2xl font-bold mt-1">${financialStats.totalWithdraw.toLocaleString()}</p>
+                <p className="text-2xl font-bold mt-1">${financialStats.totalRefund.toLocaleString()}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <ArrowDownRight className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
             <div className="flex items-center gap-1 mt-3 text-sm">
-              <ArrowDownRight className="h-4 w-4 text-green-500" />
-              <span className="text-green-500 font-medium">{financialStats.withdrawGrowth}%</span>
-              <span className="text-muted-foreground">vs 上月</span>
+              <span className="text-muted-foreground">本月无新增退款</span>
             </div>
           </CardContent>
         </Card>
@@ -212,7 +128,7 @@ export default function AdminFinancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">平台余额</p>
-                <p className="text-2xl font-bold mt-1">${financialStats.platformBalance.toLocaleString()}</p>
+                <p className="text-2xl font-bold mt-1">${platformBalance.toLocaleString()}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -244,7 +160,7 @@ export default function AdminFinancePage() {
                       style={{ width: `${(item.revenue / maxRevenue) * 100}%` }}
                     >
                       <span className="text-xs text-primary-foreground font-medium">
-                        ${(item.revenue / 1000).toFixed(0)}k
+                        ${(item.revenue / 1000).toFixed(1)}k
                       </span>
                     </div>
                   </div>
@@ -258,7 +174,7 @@ export default function AdminFinancePage() {
         <Card>
           <CardHeader>
             <CardTitle>服务收入分布</CardTitle>
-            <CardDescription>各服务类别收入占比</CardDescription>
+            <CardDescription>各服务类别收入占比（由订单数据实时汇总）</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -288,7 +204,7 @@ export default function AdminFinancePage() {
       <Card>
         <CardHeader>
           <CardTitle>最近交易</CardTitle>
-          <CardDescription>平台最近的资金流水</CardDescription>
+          <CardDescription>平台最近的资金流水（与用户账单中心同源）</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -299,6 +215,7 @@ export default function AdminFinancePage() {
                   <th className="pb-3 font-medium">用户</th>
                   <th className="pb-3 font-medium">类型</th>
                   <th className="pb-3 font-medium">描述</th>
+                  <th className="pb-3 font-medium">关联订单</th>
                   <th className="pb-3 font-medium text-right">金额</th>
                   <th className="pb-3 font-medium">状态</th>
                   <th className="pb-3 font-medium">时间</th>
@@ -313,22 +230,29 @@ export default function AdminFinancePage() {
                     <td className="py-3">
                       <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
-                          {txn.user.charAt(0)}
+                          {txn.userName.charAt(0)}
                         </div>
-                        <span className="font-medium">{txn.user}</span>
+                        <span className="font-medium">{txn.userName}</span>
                       </div>
                     </td>
                     <td className="py-3">
-                      <span className={cn("font-medium", typeColors[txn.type])}>{typeLabels[txn.type]}</span>
+                      <span className={cn("font-medium", typeColors[txn.type])}>
+                        {transactionTypeLabels[txn.type]}
+                      </span>
                     </td>
                     <td className="py-3 text-sm text-muted-foreground">
-                      {txn.type === "recharge" && txn.method}
-                      {txn.type === "order" && txn.service}
-                      {txn.type === "refund" && txn.reason}
+                      {txn.type === "recharge" ? txn.method : (txn.serviceName ?? txn.description)}
+                    </td>
+                    <td className="py-3">
+                      {txn.orderId ? (
+                        <span className="font-mono text-sm text-primary">{txn.orderId}</span>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">-</span>
+                      )}
                     </td>
                     <td className="py-3 text-right">
                       <span className={cn("font-medium", txn.amount > 0 ? "text-green-600" : "text-red-600")}>
-                        {txn.amount > 0 ? "+" : ""}${Math.abs(txn.amount).toLocaleString()}
+                        {txn.amount > 0 ? "+" : "-"}${Math.abs(txn.amount).toLocaleString()}
                       </span>
                     </td>
                     <td className="py-3">
@@ -343,7 +267,7 @@ export default function AdminFinancePage() {
                         {txn.status === "completed" ? "已完成" : "处理中"}
                       </span>
                     </td>
-                    <td className="py-3 text-sm text-muted-foreground">{txn.createdAt}</td>
+                    <td className="py-3 text-sm text-muted-foreground">{txn.date}</td>
                   </tr>
                 ))}
               </tbody>

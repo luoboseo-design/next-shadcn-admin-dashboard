@@ -43,129 +43,18 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-// 服务类型
-type ServiceCategory = "seo" | "geo" | "social" | "news";
+import { serviceCategoryConfig, type ServiceCategory } from "@/data/mock-tasks";
+import { DEMO_USER_ID, getUserById } from "@/data/platform-users";
+import { getTransactionsByUser } from "@/data/transactions";
 
-const serviceCategoryLabels: Record<ServiceCategory, string> = {
-  seo: "SEO 服务",
-  geo: "GEO 服务",
-  social: "社交媒体",
-  news: "发稿服务",
-};
+// 共享数据源：与 admin 财务中心 / 订单管理同源（订单号 = 任务中心的任务 ID）
+const serviceCategoryLabels: Record<ServiceCategory, string> = Object.fromEntries(
+  (Object.keys(serviceCategoryConfig) as ServiceCategory[]).map((key) => [key, serviceCategoryConfig[key].label]),
+) as Record<ServiceCategory, string>;
 
-// 消费记录
-interface Transaction {
-  id: string;
-  date: string;
-  serviceCategory: ServiceCategory;
-  serviceName: string;
-  description: string;
-  amount: number;
-  type: "expense" | "recharge";
-  status: "completed" | "pending" | "refunded";
-  orderId?: string;
-}
-
-// 模拟消费记录
-const transactions: Transaction[] = [
-  {
-    id: "TXN-001",
-    date: "2024-01-25",
-    serviceCategory: "seo",
-    serviceName: "外链代发",
-    description: "50条外链 - DA30+ 平台",
-    amount: -299,
-    type: "expense",
-    status: "completed",
-    orderId: "BL-20240125-001",
-  },
-  {
-    id: "TXN-002",
-    date: "2024-01-24",
-    serviceCategory: "geo",
-    serviceName: "关键词优化",
-    description: "3个关键词 x ChatGPT, Perplexity",
-    amount: -1200,
-    type: "expense",
-    status: "completed",
-    orderId: "GEO-20240124-001",
-  },
-  {
-    id: "TXN-003",
-    date: "2024-01-23",
-    serviceCategory: "social",
-    serviceName: "Reddit 发帖",
-    description: "10条帖子 - 优质账号",
-    amount: -500,
-    type: "expense",
-    status: "completed",
-    orderId: "SOC-20240123-001",
-  },
-  {
-    id: "TXN-004",
-    date: "2024-01-22",
-    serviceCategory: "news",
-    serviceName: "新闻稿发布",
-    description: "5家媒体 - 科技行业",
-    amount: -1500,
-    type: "expense",
-    status: "pending",
-    orderId: "NEWS-20240122-001",
-  },
-  {
-    id: "TXN-005",
-    date: "2024-01-20",
-    serviceCategory: "seo",
-    serviceName: "客座文章",
-    description: "3媒体套餐 - DA50+ 网站",
-    amount: -899,
-    type: "expense",
-    status: "completed",
-    orderId: "GA-20240120-001",
-  },
-  {
-    id: "TXN-006",
-    date: "2024-01-18",
-    serviceCategory: "geo",
-    serviceName: "权威建设",
-    description: "引用来源建设",
-    amount: -800,
-    type: "expense",
-    status: "completed",
-    orderId: "GEO-20240118-001",
-  },
-  {
-    id: "TXN-007",
-    date: "2024-01-15",
-    serviceCategory: "social",
-    serviceName: "Instagram 粉丝",
-    description: "1000粉丝 - 优质账号",
-    amount: -200,
-    type: "expense",
-    status: "refunded",
-    orderId: "SOC-20240115-001",
-  },
-  {
-    id: "RCH-001",
-    date: "2024-01-15",
-    serviceCategory: "seo",
-    serviceName: "账户充值",
-    description: "在线充值",
-    amount: 5000,
-    type: "recharge",
-    status: "completed",
-  },
-  {
-    id: "RCH-002",
-    date: "2024-01-01",
-    serviceCategory: "seo",
-    serviceName: "账户充值",
-    description: "在线充值",
-    amount: 3000,
-    type: "recharge",
-    status: "completed",
-  },
-];
+// 当前登录演示账户的流水
+const transactions = getTransactionsByUser(DEMO_USER_ID);
+const demoUser = getUserById(DEMO_USER_ID);
 
 // 充值套餐
 const rechargePacks = [
@@ -186,11 +75,8 @@ export default function BillingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  // 计算余额
-  const balance = transactions.reduce((sum, t) => {
-    if (t.status === "refunded") return sum;
-    return sum + t.amount;
-  }, 0);
+  // 账户余额（与 admin 用户管理页同源）
+  const balance = demoUser?.balance ?? 0;
 
   // 计算本月消费
   const currentMonth = new Date().toISOString().slice(0, 7);
@@ -209,7 +95,7 @@ export default function BillingPage() {
     if (filterType !== "all" && t.type !== filterType) return false;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      if (!t.serviceName.toLowerCase().includes(query) && 
+      if (!(t.serviceName?.toLowerCase().includes(query)) &&
           !t.description.toLowerCase().includes(query) &&
           !(t.orderId?.toLowerCase().includes(query))) {
         return false;
@@ -347,8 +233,10 @@ export default function BillingPage() {
                       <TableCell className="text-muted-foreground">{t.date}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">{t.serviceName}</span>
-                          {t.type === "expense" && (
+                          <span className="font-medium">
+                            {t.type === "recharge" ? "账户充值" : t.serviceName}
+                          </span>
+                          {t.type === "expense" && t.serviceCategory && (
                             <Badge variant="outline" className="text-xs">
                               {serviceCategoryLabels[t.serviceCategory]}
                             </Badge>

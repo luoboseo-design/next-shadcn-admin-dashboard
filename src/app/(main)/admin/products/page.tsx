@@ -64,6 +64,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { servicePackages } from "@/data/mock-tasks";
 import { cn } from "@/lib/utils";
 
 // 服务大类配置
@@ -100,12 +101,14 @@ const seoServices = [
     description: "通过高质量外链提升网站权重",
     pricingMode: "package" as PricingMode,
     status: "active",
-    packages: [
-      { id: "starter", name: "入门版", quantity: 10, unit: "条外链", price: 5 },
-      { id: "growth", name: "成长版", quantity: 50, unit: "条外链", price: 20 },
-      { id: "pro", name: "专业版", quantity: 100, unit: "条外链", price: 50 },
-      { id: "enterprise", name: "企业版", quantity: 500, unit: "条外链", price: 120 },
-    ],
+    // 与前端服务页共享的套餐数据（src/data/mock-tasks.ts 中的 servicePackages）
+    packages: servicePackages.map((pkg) => ({
+      id: pkg.id,
+      name: pkg.name,
+      quantity: pkg.quantity,
+      unit: "条外链",
+      price: pkg.totalPrice,
+    })),
     platformTypes: [
       { id: "blog", name: "博客", enabled: true, priceMultiplier: 1 },
       { id: "forum", name: "论坛", enabled: true, priceMultiplier: 0.8 },
