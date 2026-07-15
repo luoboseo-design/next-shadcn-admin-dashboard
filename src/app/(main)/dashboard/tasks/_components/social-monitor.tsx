@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   FileText,
   MessageSquare,
@@ -62,7 +63,7 @@ const publishPlatforms = [
 const tasks = [
   // 发帖任务
   {
-    id: "SM-001",
+    id: "SOC-001",
     name: "品牌软文推广",
     serviceType: "post",
     platform: "reddit", // 下单时选择的平台
@@ -83,7 +84,7 @@ const tasks = [
     ],
   },
   {
-    id: "SM-002",
+    id: "SOC-002",
     name: "新品发布宣传",
     serviceType: "post",
     platform: "instagram",
@@ -102,7 +103,7 @@ const tasks = [
   },
   // 评论任务
   {
-    id: "SM-003",
+    id: "SOC-003",
     name: "Reddit评论引流",
     serviceType: "comment",
     platform: "reddit",
@@ -121,7 +122,7 @@ const tasks = [
     ],
   },
   {
-    id: "SM-004",
+    id: "SOC-004",
     name: "Instagram评论互动",
     serviceType: "comment",
     platform: "instagram",
@@ -139,7 +140,7 @@ const tasks = [
   },
   // 点赞任务
   {
-    id: "SM-005",
+    id: "SOC-005",
     name: "X帖子点赞推广",
     serviceType: "like",
     platform: "twitter",
@@ -157,7 +158,7 @@ const tasks = [
     ],
   },
   {
-    id: "SM-006",
+    id: "SOC-006",
     name: "Reddit帖子点赞",
     serviceType: "like",
     platform: "reddit",
@@ -176,7 +177,7 @@ const tasks = [
   },
   // 粉丝增长任务
   {
-    id: "SM-007",
+    id: "SOC-007",
     name: "Instagram粉丝增长",
     serviceType: "follower",
     platform: "instagram",
@@ -189,7 +190,7 @@ const tasks = [
     status: "in_progress",
   },
   {
-    id: "SM-008",
+    id: "SOC-008",
     name: "X账号粉丝增长",
     serviceType: "follower",
     platform: "twitter",
@@ -383,7 +384,13 @@ export function SocialMonitorPanel() {
                   {/* 任务信息 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">{task.name}</span>
+                      <Link
+                        href={`/dashboard/tasks/${task.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="font-medium truncate hover:text-primary hover:underline underline-offset-4 transition-colors"
+                      >
+                        {task.name}
+                      </Link>
                       <Badge variant="outline" className="shrink-0 text-xs gap-1">
                         <ServiceIcon className="h-3 w-3" />
                         {serviceInfo.label}

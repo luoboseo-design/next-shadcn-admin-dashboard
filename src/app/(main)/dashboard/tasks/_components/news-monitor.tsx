@@ -40,7 +40,7 @@ import { cn } from "@/lib/utils";
 // 模拟发稿任务数据
 const newsOrders = [
   {
-    id: "NR-001",
+    id: "NEWS-001",
     name: "新品发布会报道",
     keywords: ["新品发布", "科技"],
     websiteUrl: "https://example.com/product",
@@ -64,7 +64,7 @@ const newsOrders = [
     ],
   },
   {
-    id: "NR-002",
+    id: "NEWS-002",
     name: "企业融资新闻",
     keywords: ["融资", "投资"],
     websiteUrl: "https://example.com/funding",
@@ -83,7 +83,7 @@ const newsOrders = [
     ],
   },
   {
-    id: "NR-003",
+    id: "NEWS-003",
     name: "品牌活动推广",
     keywords: ["品牌", "活动"],
     websiteUrl: "https://example.com/event",
@@ -102,7 +102,7 @@ const newsOrders = [
     ],
   },
   {
-    id: "NR-004",
+    id: "NEWS-004",
     name: "行业报告发布",
     keywords: ["行业报告", "市场分析"],
     websiteUrl: "https://example.com/report",
@@ -276,7 +276,13 @@ export function NewsMonitorPanel() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">{order.name}</span>
+                      <Link
+                        href={`/dashboard/tasks/${order.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="font-medium truncate hover:text-primary hover:underline underline-offset-4 transition-colors"
+                      >
+                        {order.name}
+                      </Link>
                       {isExpanded ? (
                         <ChevronUp className="h-4 w-4 text-muted-foreground" />
                       ) : (

@@ -57,17 +57,30 @@ export default function TaskDetailPage() {
     }
   };
 
+  const categoryConfig: Record<string, { tabLabel: string; typeLabel: string; serviceUrl: string }> = {
+    seo: {
+      tabLabel: "SEO 任务",
+      typeLabel: isGuestPost ? "客座文章" : "外链代发",
+      serviceUrl: "/dashboard/services/seo",
+    },
+    geo: { tabLabel: "GEO 监控", typeLabel: "GEO 优化", serviceUrl: "/dashboard/services/geo" },
+    social: { tabLabel: "社交媒体", typeLabel: "社交媒体推广", serviceUrl: "/dashboard/services/social" },
+    news: { tabLabel: "发稿任务", typeLabel: "新闻发稿", serviceUrl: "/dashboard/services/press-release" },
+  };
+  const category = task.serviceCategory ?? "seo";
+  const catConf = categoryConfig[category] ?? categoryConfig.seo;
+
   return (
     <div className="space-y-6">
       {/* 头部 */}
       <div className="flex items-start justify-between">
         <div>
           <Link
-            href="/dashboard/seo-monitor"
+            href={`/dashboard/tasks?tab=${category}`}
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            返回SEO任务
+            返回{catConf.tabLabel}
           </Link>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold">{task.name || task.targetUrl}</h1>
@@ -76,12 +89,12 @@ export default function TaskDetailPage() {
             </Badge>
           </div>
           <p className="text-muted-foreground font-mono text-sm">
-            {task.id} · {isGuestPost ? "客座文章" : "外链代发"}
+            {task.id} · {catConf.typeLabel}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Button asChild>
-            <Link href="/dashboard/services/seo">
+            <Link href={catConf.serviceUrl}>
               <Plus className="h-4 w-4 mr-2" />
               新建任务
             </Link>

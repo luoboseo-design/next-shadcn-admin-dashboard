@@ -206,9 +206,14 @@ export function GeoMonitorPanel() {
                 监控中
               </Badge>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              创建于 {selectedTask.createdAt}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                创建于 {selectedTask.createdAt}
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/dashboard/tasks/${selectedTask.id}`}>查看详情</Link>
+              </Button>
             </div>
           </div>
         </CardContent>

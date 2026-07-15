@@ -140,8 +140,47 @@ function generatePublishResults(count: number, taskId: string): PublishResult[] 
   return results;
 }
 
+type MockTask = BacklinkTask & { serviceCategory: ServiceCategory; serviceType: string };
+
+// 快速构建任务条目（用于与各监控 Tab 的任务 ID 对齐）
+function buildTask(
+  overrides: Partial<MockTask> & Pick<MockTask, "id" | "name" | "serviceCategory" | "serviceType">,
+): MockTask {
+  const quantity = overrides.quantity ?? 10;
+  const progress = overrides.progress ?? 50;
+  const completedPlatforms = Math.round((quantity * progress) / 100);
+  const status: MockTask["status"] = progress >= 100 ? "completed" : progress === 0 ? "pending" : "running";
+  return {
+    targetUrl: "https://example.com",
+    keywords: [],
+    anchorTexts: [],
+    quantity,
+    platformTypes: ["blog"],
+    status,
+    progress,
+    currentStep: status === "completed" ? "已完成" : status === "pending" ? "等待处理" : "运行中",
+    publishResults: generatePublishResults(Math.min(completedPlatforms, 20), overrides.id),
+    totalPlatforms: quantity,
+    completedPlatforms,
+    successRate: progress,
+    avgDa: 45,
+    taskType: "backlink",
+    pricing: {
+      packageName: "标准套餐",
+      quantity,
+      pricePerLink: 20,
+      totalPrice: quantity * 20,
+      currency: "USD",
+    },
+    createdAt: new Date("2024-01-20"),
+    updatedAt: new Date(),
+    ...(status === "completed" ? { completedAt: new Date("2024-01-25") } : {}),
+    ...overrides,
+  };
+}
+
 // 模拟任务数据
-export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serviceType: string })[] = [
+export const mockTasks: MockTask[] = [
   // SEO服务 - 外链代发
   {
     id: "BL-001",
@@ -280,7 +319,7 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
     keywords: ["ChatGPT推荐", "AI工具"],
     anchorTexts: ["AI工具推荐"],
     quantity: 3,
-    platformTypes: ["ai"],
+    platformTypes: ["custom"],
     status: "running",
     progress: 50,
     currentStep: "运行中",
@@ -309,7 +348,7 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
     keywords: ["行业专家", "权威来源"],
     anchorTexts: ["专业分析"],
     quantity: 1,
-    platformTypes: ["ai"],
+    platformTypes: ["custom"],
     status: "completed",
     progress: 100,
     currentStep: "已完成",
@@ -333,7 +372,7 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
   // 社交媒体
   {
     id: "SOC-001",
-    name: "Reddit 品牌推广",
+    name: "品牌软文推广",
     serviceCategory: "social",
     serviceType: "reddit",
     targetUrl: "https://example.com",
@@ -362,7 +401,7 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
   },
   {
     id: "SOC-002",
-    name: "Twitter/X 推广",
+    name: "新品发布宣传",
     serviceCategory: "social",
     serviceType: "twitter",
     targetUrl: "https://example.com",
@@ -392,11 +431,11 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
   },
   {
     id: "SOC-003",
-    name: "Instagram 粉丝增长",
+    name: "Reddit评论引流",
     serviceCategory: "social",
-    serviceType: "instagram",
-    targetUrl: "https://instagram.com/example",
-    keywords: ["粉丝增长", "互动提升"],
+    serviceType: "reddit",
+    targetUrl: "https://reddit.com/r/example",
+    keywords: ["评论引流", "互动提升"],
     anchorTexts: [],
     quantity: 1000,
     platformTypes: ["social"],
@@ -422,7 +461,7 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
   // 发稿服务
   {
     id: "NEWS-001",
-    name: "新品发布新闻稿",
+    name: "新品发布会报道",
     serviceCategory: "news",
     serviceType: "press_release",
     targetUrl: "https://example.com/new-product",
@@ -452,7 +491,7 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
   },
   {
     id: "NEWS-002",
-    name: "融资公告发布",
+    name: "企业融资新闻",
     serviceCategory: "news",
     serviceType: "press_release",
     targetUrl: "https://example.com/funding",
@@ -479,6 +518,146 @@ export const mockTasks: (BacklinkTask & { serviceCategory: ServiceCategory; serv
     createdAt: new Date("2024-01-22"),
     updatedAt: new Date(),
   },
+  // ===== 以下条目与各监控 Tab 的任务 ID 一一对应 =====
+  // SEO - 外链代发（对应 SEO 任务 Tab）
+  buildTask({
+    id: "BL-003",
+    name: "博客内容推广计划",
+    serviceCategory: "seo",
+    serviceType: "backlink",
+    targetUrl: "https://example.com/blog",
+    keywords: ["内容营销", "博客推广"],
+    anchorTexts: ["优质内容"],
+    quantity: 20,
+    progress: 25,
+    avgDa: 42,
+  }),
+  buildTask({
+    id: "BL-004",
+    name: "工具页 SEO 优化",
+    serviceCategory: "seo",
+    serviceType: "backlink",
+    targetUrl: "https://example.com/tools",
+    keywords: ["在线工具", "效率工具"],
+    anchorTexts: ["实用工具"],
+    quantity: 10,
+    progress: 0,
+    avgDa: 0,
+  }),
+  // SEO - 客座文章（对应 SEO 任务 Tab）
+  buildTask({
+    id: "GA-003",
+    name: "数字营销策略指南",
+    serviceCategory: "seo",
+    serviceType: "guest_post",
+    targetUrl: "https://example.com/marketing",
+    keywords: ["数字营销", "营销策略"],
+    anchorTexts: ["营销指南"],
+    quantity: 3,
+    progress: 33,
+    avgDa: 78,
+    taskType: "guest_post",
+    articleTitle: "2024数字营销完整指南",
+  }),
+  buildTask({
+    id: "GA-004",
+    name: "远程工作最佳实践",
+    serviceCategory: "seo",
+    serviceType: "guest_post",
+    targetUrl: "https://example.com/remote",
+    keywords: ["远程办公", "团队协作"],
+    anchorTexts: ["协作工具"],
+    quantity: 5,
+    progress: 0,
+    avgDa: 0,
+    taskType: "guest_post",
+  }),
+  // 社交媒体（对应社交媒体 Tab）
+  buildTask({
+    id: "SOC-004",
+    name: "Instagram评论互动",
+    serviceCategory: "social",
+    serviceType: "instagram",
+    targetUrl: "https://instagram.com/example",
+    keywords: ["评论互动"],
+    quantity: 50,
+    progress: 100,
+    platformTypes: ["social"],
+    avgDa: 0,
+  }),
+  buildTask({
+    id: "SOC-005",
+    name: "X帖子点赞推广",
+    serviceCategory: "social",
+    serviceType: "twitter",
+    targetUrl: "https://x.com/example/status/1",
+    keywords: ["点赞推广"],
+    quantity: 200,
+    progress: 80,
+    platformTypes: ["social"],
+    avgDa: 0,
+  }),
+  buildTask({
+    id: "SOC-006",
+    name: "Reddit帖子点赞",
+    serviceCategory: "social",
+    serviceType: "reddit",
+    targetUrl: "https://reddit.com/r/example",
+    keywords: ["Upvote"],
+    quantity: 100,
+    progress: 100,
+    platformTypes: ["social"],
+    avgDa: 0,
+  }),
+  buildTask({
+    id: "SOC-007",
+    name: "Instagram粉丝增长",
+    serviceCategory: "social",
+    serviceType: "instagram",
+    targetUrl: "https://instagram.com/example",
+    keywords: ["粉丝增长"],
+    quantity: 1000,
+    progress: 45,
+    platformTypes: ["social"],
+    avgDa: 0,
+  }),
+  buildTask({
+    id: "SOC-008",
+    name: "X账号粉丝增长",
+    serviceCategory: "social",
+    serviceType: "twitter",
+    targetUrl: "https://x.com/example",
+    keywords: ["粉丝增长"],
+    quantity: 500,
+    progress: 10,
+    platformTypes: ["social"],
+    avgDa: 0,
+  }),
+  // 发稿服务（对应发稿任务 Tab）
+  buildTask({
+    id: "NEWS-003",
+    name: "品牌活动推广",
+    serviceCategory: "news",
+    serviceType: "press_release",
+    targetUrl: "https://example.com/event",
+    keywords: ["品牌活动", "线下活动"],
+    quantity: 8,
+    progress: 75,
+    platformTypes: ["news"],
+    avgDa: 70,
+  }),
+  buildTask({
+    id: "NEWS-004",
+    name: "行业报告发布",
+    serviceCategory: "news",
+    serviceType: "press_release",
+    targetUrl: "https://example.com/report",
+    keywords: ["行业报告", "数据洞察"],
+    quantity: 12,
+    progress: 0,
+    platformTypes: ["news"],
+    avgDa: 0,
+  }),
 ];
 
 // 用户统计
@@ -492,7 +671,7 @@ export const mockUserStats: UserStats = {
 };
 
 // 辅助函数
-export function getTaskById(id: string): BacklinkTask | undefined {
+export function getTaskById(id: string): MockTask | undefined {
   return mockTasks.find((t) => t.id === id);
 }
 
