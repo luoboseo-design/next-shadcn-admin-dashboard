@@ -84,7 +84,7 @@ export function AuthDialog({ open, onOpenChange, reason, defaultMode = "login", 
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 px-6 py-6">
+        <div className="flex flex-col gap-5 px-6 py-6">
           {/* 演示环境提示 */}
           <div className="flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
             <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
@@ -95,8 +95,19 @@ export function AuthDialog({ open, onOpenChange, reason, defaultMode = "login", 
           </div>
 
           {/* Google 登录 */}
-          <Button variant="secondary" className="w-full" type="button" onClick={handleGoogleLogin} disabled={googleLoading}>
-            {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <SimpleIcon icon={siGoogle} className="size-4" />}
+          <Button
+            variant="secondary"
+            size="lg"
+            className="h-11 w-full"
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <SimpleIcon icon={siGoogle} className="size-4" />
+            )}
             使用 Google 继续
           </Button>
 
@@ -106,7 +117,11 @@ export function AuthDialog({ open, onOpenChange, reason, defaultMode = "login", 
             <span className="h-px flex-1 bg-border" />
           </div>
 
-          {mode === "login" ? <DialogLoginForm onSuccess={handleSuccess} /> : <DialogRegisterForm onSuccess={handleSuccess} />}
+          {mode === "login" ? (
+            <DialogLoginForm onSuccess={handleSuccess} />
+          ) : (
+            <DialogRegisterForm onSuccess={handleSuccess} />
+          )}
 
           {/* 模式切换 */}
           <p className="text-center text-sm text-muted-foreground">
@@ -149,7 +164,13 @@ function PasswordInput({
   return (
     <div className="relative">
       <Lock className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-      <Input {...props} id={id} type={visible ? "text" : "password"} autoComplete={autoComplete} className="px-9" />
+      <Input
+        {...props}
+        id={id}
+        type={visible ? "text" : "password"}
+        autoComplete={autoComplete}
+        className="h-11 px-9"
+      />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
@@ -177,13 +198,13 @@ function DialogLoginForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <FieldGroup className="gap-4">
+    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <FieldGroup className="gap-5">
         <Controller
           control={form.control}
           name="email"
           render={({ field, fieldState }) => (
-            <Field className="gap-1.5" data-invalid={fieldState.invalid}>
+            <Field className="gap-2" data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="auth-login-email">邮箱</FieldLabel>
               <div className="relative">
                 <Mail className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -193,7 +214,7 @@ function DialogLoginForm({ onSuccess }: { onSuccess: () => void }) {
                   type="email"
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="pl-9"
+                  className="h-11 pl-9"
                   aria-invalid={fieldState.invalid}
                 />
               </div>
@@ -205,10 +226,13 @@ function DialogLoginForm({ onSuccess }: { onSuccess: () => void }) {
           control={form.control}
           name="password"
           render={({ field, fieldState }) => (
-            <Field className="gap-1.5" data-invalid={fieldState.invalid}>
+            <Field className="gap-2" data-invalid={fieldState.invalid}>
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="auth-login-password">密码</FieldLabel>
-                <button type="button" className="text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline">
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+                >
                   忘记密码？
                 </button>
               </div>
@@ -243,7 +267,7 @@ function DialogLoginForm({ onSuccess }: { onSuccess: () => void }) {
           )}
         />
       </FieldGroup>
-      <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+      <Button size="lg" className="h-11 w-full text-base" type="submit" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
         {form.formState.isSubmitting ? "登录中..." : "登录"}
       </Button>
@@ -266,13 +290,13 @@ function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <FieldGroup className="gap-4">
+    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <FieldGroup className="gap-5">
         <Controller
           control={form.control}
           name="email"
           render={({ field, fieldState }) => (
-            <Field className="gap-1.5" data-invalid={fieldState.invalid}>
+            <Field className="gap-2" data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="auth-register-email">邮箱</FieldLabel>
               <div className="relative">
                 <Mail className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -282,7 +306,7 @@ function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
                   type="email"
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="pl-9"
+                  className="h-11 pl-9"
                   aria-invalid={fieldState.invalid}
                 />
               </div>
@@ -294,7 +318,7 @@ function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
           control={form.control}
           name="password"
           render={({ field, fieldState }) => (
-            <Field className="gap-1.5" data-invalid={fieldState.invalid}>
+            <Field className="gap-2" data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="auth-register-password">密码</FieldLabel>
               <PasswordInput
                 {...field}
@@ -311,7 +335,7 @@ function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
           control={form.control}
           name="confirmPassword"
           render={({ field, fieldState }) => (
-            <Field className="gap-1.5" data-invalid={fieldState.invalid}>
+            <Field className="gap-2" data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="auth-register-confirm">确认密码</FieldLabel>
               <PasswordInput
                 {...field}
@@ -353,7 +377,7 @@ function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
           )}
         />
       </FieldGroup>
-      <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+      <Button size="lg" className="h-11 w-full text-base" type="submit" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
         {form.formState.isSubmitting ? "注册中..." : "注册"}
       </Button>
