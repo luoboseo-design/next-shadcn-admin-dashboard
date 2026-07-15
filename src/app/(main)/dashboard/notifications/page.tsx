@@ -76,7 +76,7 @@ const initialNotifications: Notification[] = [
     content: "社交媒体发布服务已上线，支持 Reddit、Instagram、X 平台。",
     time: "3 天前",
     read: true,
-    link: "/dashboard/services/social",
+    link: "/services/social",
   },
 ];
 

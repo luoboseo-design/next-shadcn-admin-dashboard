@@ -34,7 +34,7 @@ export default function HomePage() {
 
     // 跳转到独立的报告页面
     // URL中包含域名信息，报告页面会解析并获取数据
-    router.push(`/dashboard/reports/${reportId}?url=${encodeURIComponent(url)}`);
+    router.push(`/reports/${reportId}?url=${encodeURIComponent(url)}`);
   };
 
   return (

@@ -49,7 +49,7 @@ const platformExamples = {
 };
 
 export function PlatformShowcase() {
-  const platforms: GuestPostPlatformType[] = ["tech", "business", "content"];
+  const platforms = ["tech", "business", "content"] as const satisfies readonly GuestPostPlatformType[];
 
   return (
     <div className="space-y-8">

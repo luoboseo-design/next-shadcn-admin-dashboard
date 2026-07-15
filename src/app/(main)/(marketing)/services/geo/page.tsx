@@ -289,9 +289,9 @@ export default function GeoOptimizationPage() {
               onClick={() => {
                 const url = diagnoseUrl.trim();
                 if (url) {
-                  router.push(`/dashboard/services/geo/diagnose?url=${encodeURIComponent(url)}`);
+                  router.push(`/services/geo/diagnose?url=${encodeURIComponent(url)}`);
                 } else {
-                  router.push('/dashboard/services/geo/diagnose');
+                  router.push('/services/geo/diagnose');
                 }
               }}
               className="h-11 px-6 gap-2"

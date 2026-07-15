@@ -61,11 +61,11 @@ export default function TaskDetailPage() {
     seo: {
       tabLabel: "SEO 任务",
       typeLabel: isGuestPost ? "客座文章" : "外链代发",
-      serviceUrl: "/dashboard/services/seo",
+      serviceUrl: "/services/seo",
     },
-    geo: { tabLabel: "GEO 监控", typeLabel: "GEO 优化", serviceUrl: "/dashboard/services/geo" },
-    social: { tabLabel: "社交媒体", typeLabel: "社交媒体推广", serviceUrl: "/dashboard/services/social" },
-    news: { tabLabel: "发稿任务", typeLabel: "新闻发稿", serviceUrl: "/dashboard/services/press-release" },
+    geo: { tabLabel: "GEO 监控", typeLabel: "GEO 优化", serviceUrl: "/services/geo" },
+    social: { tabLabel: "社交媒体", typeLabel: "社交媒体推广", serviceUrl: "/services/social" },
+    news: { tabLabel: "发稿任务", typeLabel: "新闻发稿", serviceUrl: "/services/press-release" },
   };
   const category = task.serviceCategory ?? "seo";
   const catConf = categoryConfig[category] ?? categoryConfig.seo;

@@ -9,7 +9,7 @@ import { generateMockDiagnosis } from "@/data/mock-diagnosis";
 import type { DiagnosisReport, DiagnosisMode } from "@/types/marketing";
 
 // 导入首页的诊断报告组件
-import { DiagnosisReportContent } from "@/app/(main)/dashboard/home/_components/diagnosis-report";
+import { DiagnosisReportContent } from "@/app/(main)/(marketing)/_components/diagnosis-report";
 
 interface ReportPageClientProps {
   reportId: string;
@@ -108,7 +108,7 @@ export function ReportPageClient({ reportId, initialData }: ReportPageClientProp
         <div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-4 md:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/home">
+              <Link href="/">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 返回首页
               </Link>

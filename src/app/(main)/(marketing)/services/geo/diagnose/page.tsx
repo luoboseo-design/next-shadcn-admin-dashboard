@@ -330,7 +330,7 @@ export default function DiagnosePage() {
       platforms: formData.recommendedPlatforms,
     };
     localStorage.setItem('geo_diagnosis_result', JSON.stringify(diagnosisResult));
-    router.push('/dashboard/services/geo');
+    router.push('/services/geo');
   };
 
   const canProceed = () => {

@@ -132,7 +132,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="返回用户端">
-              <Link href="/dashboard/home" className="text-muted-foreground hover:text-foreground">
+              <Link href="/" className="text-muted-foreground hover:text-foreground">
                 <ArrowLeft className="h-4 w-4" />
                 <span className="text-sm">返回用户端</span>
               </Link>

@@ -25,13 +25,13 @@ export default async function CasesPage({ params }: { params: Promise<{ type: st
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard/services/seo/backlinks" className="gap-2">
+            <Link href="/services/seo/backlinks" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               返回服务页
             </Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard/services/seo/backlinks">立即开始</Link>
+            <Link href="/services/seo/backlinks">立即开始</Link>
           </Button>
         </div>
       </header>
@@ -199,7 +199,7 @@ export default async function CasesPage({ params }: { params: Promise<{ type: st
             </CardHeader>
             <CardContent className="space-y-4">
               <Button size="lg" asChild>
-                <Link href="/dashboard/services/seo/backlinks" className="gap-2">
+                <Link href="/services/seo/backlinks" className="gap-2">
                   立即开始
                   <ArrowLeft className="h-4 w-4 rotate-180" />
                 </Link>

@@ -56,7 +56,7 @@ function TasksPageContent() {
                 筛选
               </Button>
               <Button size="sm" asChild>
-                <Link href="/dashboard/services/seo">
+                <Link href="/services/seo">
                   <Plus className="h-4 w-4 mr-1.5" />
                   新建订单
                 </Link>
@@ -70,7 +70,7 @@ function TasksPageContent() {
                 刷新数据
               </Button>
               <Button size="sm" asChild>
-                <Link href="/dashboard/services/geo">
+                <Link href="/services/geo">
                   <Globe className="h-4 w-4 mr-1.5" />
                   创建新任务
                 </Link>
@@ -90,7 +90,7 @@ function TasksPageContent() {
                 筛选
               </Button>
               <Button size="sm" asChild>
-                <Link href="/dashboard/services/press-release">
+                <Link href="/services/press-release">
                   <Plus className="h-4 w-4 mr-1.5" />
                   新建订单
                 </Link>

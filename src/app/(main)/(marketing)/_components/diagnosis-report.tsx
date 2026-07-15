@@ -117,7 +117,7 @@ export function DiagnosisReport({ report, onReset, reportId, onViewReport }: Dia
 
   const handleShare = async () => {
     if (reportId) {
-      const url = `${window.location.origin}/dashboard/reports/${reportId}`;
+      const url = `${window.location.origin}/reports/${reportId}`;
       if (navigator.share) {
         try {
           await navigator.share({
@@ -1085,7 +1085,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+200% AI 引用量",
       priority: "high" as const,
       available: true,
-      href: "/dashboard/services/geo",
+      href: "/services/geo",
     },
     {
       id: "social-distribution",
@@ -1094,7 +1094,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+150% 社交曝光",
       priority: "high" as const,
       available: false,
-      href: "/dashboard/services/social",
+      href: "/services/social",
     },
     {
       id: "content-publishing",
@@ -1103,7 +1103,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+300% 品牌曝光",
       priority: "high" as const,
       available: false,
-      href: "/dashboard/services/publishing",
+      href: "/services/publishing",
     },
     {
       id: "seo-backlink",
@@ -1112,7 +1112,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+40% 自然流量",
       priority: "medium" as const,
       available: true,
-      href: "/dashboard/services/seo/backlinks",
+      href: "/services/seo/backlinks",
     },
   ];
 
@@ -1125,7 +1125,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+40% 自然流量",
       priority: "high" as const,
       available: true,
-      href: "/dashboard/services/seo/backlinks",
+      href: "/services/seo/backlinks",
     },
     {
       id: "content-publishing",
@@ -1134,7 +1134,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+300% 品牌曝光",
       priority: "high" as const,
       available: false,
-      href: "/dashboard/services/publishing",
+      href: "/services/publishing",
     },
     {
       id: "geo-optimization",
@@ -1143,7 +1143,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+200% AI 引用量",
       priority: "medium" as const,
       available: true,
-      href: "/dashboard/services/geo",
+      href: "/services/geo",
     },
     {
       id: "social-distribution",
@@ -1152,7 +1152,7 @@ function RecommendedServices({ mode }: { mode: "seo" | "geo" }) {
       impact: "+150% 社交曝光",
       priority: "medium" as const,
       available: false,
-      href: "/dashboard/services/social",
+      href: "/services/social",
     },
   ];
 

@@ -410,7 +410,7 @@ export const seoDiagnosisSteps = [
   { id: 11, label: "生成 SEO 诊断报告", duration: 1000 },
 ];
 
-// GEO诊断步骤（与 /dashboard/services/geo/diagnose 页面流程一致）
+// GEO诊断步骤（与 /services/geo/diagnose 页面流程一致）
 export const geoDiagnosisSteps = [
   { id: 1, label: "连接网站", duration: 800 },
   { id: 2, label: "抓取网页内容", duration: 1000 },
