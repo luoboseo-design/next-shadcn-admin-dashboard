@@ -7,6 +7,7 @@ import {
   CreditCard,
   Database,
   FileText,
+  Gauge,
   Globe,
   Home,
   Key,
