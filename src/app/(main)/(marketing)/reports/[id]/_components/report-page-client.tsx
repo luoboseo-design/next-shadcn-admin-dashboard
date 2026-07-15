@@ -98,6 +98,7 @@ export function ReportPageClient({ reportId, initialData }: ReportPageClientProp
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Asia/Shanghai",
     });
   };
 
