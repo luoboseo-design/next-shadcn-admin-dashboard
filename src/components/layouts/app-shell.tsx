@@ -2,15 +2,14 @@ import type { ReactNode } from "react";
 
 import { cookies } from "next/headers";
 
-import { AccountSwitcher } from "@/app/(main)/dashboard/_components/sidebar/account-switcher";
-import { AuthDialogProvider } from "@/components/auth/auth-dialog-provider";
 import { AppSidebar } from "@/app/(main)/dashboard/_components/sidebar/app-sidebar";
 import { LanguageSwitcher } from "@/app/(main)/dashboard/_components/sidebar/language-switcher";
 import { SearchDialog } from "@/app/(main)/dashboard/_components/sidebar/search-dialog";
 import { ThemeSwitcher } from "@/app/(main)/dashboard/_components/sidebar/theme-switcher";
+import { AuthAvatar } from "@/components/auth/auth-avatar";
+import { AuthDialogProvider } from "@/components/auth/auth-dialog-provider";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { users } from "@/data/users";
 import { SIDEBAR_COLLAPSIBLE_VALUES, SIDEBAR_VARIANT_VALUES } from "@/lib/preferences/layout";
 import { cn } from "@/lib/utils";
 import { getPreference } from "@/server/server-actions";
@@ -67,7 +66,7 @@ export async function AppShell({ children }: Readonly<{ children: ReactNode }>) 
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
               <ThemeSwitcher />
-              <AccountSwitcher users={users} />
+              <AuthAvatar />
             </div>
           </div>
         </header>

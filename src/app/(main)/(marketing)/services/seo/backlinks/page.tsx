@@ -13,11 +13,13 @@ import { servicePackages } from "@/data/mock-tasks";
 import { platformTypeDetails } from "@/data/mock-platforms";
 import { cn } from "@/lib/utils";
 import { useAuthDialog } from "@/components/auth/auth-dialog-provider";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import type { PlatformType } from "@/types/marketing";
 
 export default function BacklinksServicePage() {
   const router = useRouter();
   const { openAuthDialog } = useAuthDialog();
+  const isAuthenticated = useIsAuthenticated();
   const [selectedPackageId, setSelectedPackageId] = useState<string>("growth");
   const [selectedPlatforms, setSelectedPlatforms] = useState<PlatformType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,7 +44,11 @@ export default function BacklinksServicePage() {
   };
 
   const handleCreateTask = () => {
-    // 创建任务属于后台操作，需要登录后才能执行
+    // 已登录直接提交；未登录先弹登录框，登录成功后自动提交
+    if (isAuthenticated) {
+      void submitTask();
+      return;
+    }
     openAuthDialog({
       reason: "创建任务前请先登录，登录后将自动为您提交任务",
       onSuccess: submitTask,

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Info, Loader2, Lock, Mail, Sparkles } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { siGoogle } from "simple-icons";
 import { toast } from "sonner";
@@ -15,6 +15,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { DEMO_USER, useAuthStore } from "@/stores/auth-store";
+
+/** 模拟网络延迟 */
+const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 800));
 
 type AuthMode = "login" | "register";
 
@@ -49,10 +53,21 @@ interface AuthDialogProps {
 
 export function AuthDialog({ open, onOpenChange, reason, defaultMode = "login", onSuccess }: AuthDialogProps) {
   const [mode, setMode] = useState<AuthMode>(defaultMode);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const login = useAuthStore((s) => s.login);
 
   const handleSuccess = () => {
     onOpenChange(false);
     onSuccess?.();
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    await mockDelay();
+    login({ email: DEMO_USER.email, name: DEMO_USER.name });
+    setGoogleLoading(false);
+    toast.success("登录成功", { description: `欢迎回来，${DEMO_USER.name}` });
+    handleSuccess();
   };
 
   return (
@@ -70,9 +85,18 @@ export function AuthDialog({ open, onOpenChange, reason, defaultMode = "login", 
         </DialogHeader>
 
         <div className="flex flex-col gap-4 px-6 py-6">
+          {/* 演示环境提示 */}
+          <div className="flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+            <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
+            <span>
+              演示环境：任意邮箱和密码均可{mode === "login" ? "登录" : "注册"}，例如{" "}
+              <span className="font-mono text-foreground">{DEMO_USER.email}</span>
+            </span>
+          </div>
+
           {/* Google 登录 */}
-          <Button variant="secondary" className="w-full" type="button">
-            <SimpleIcon icon={siGoogle} className="size-4" />
+          <Button variant="secondary" className="w-full" type="button" onClick={handleGoogleLogin} disabled={googleLoading}>
+            {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <SimpleIcon icon={siGoogle} className="size-4" />}
             使用 Google 继续
           </Button>
 
@@ -139,12 +163,15 @@ function PasswordInput({
 }
 
 function DialogLoginForm({ onSuccess }: { onSuccess: () => void }) {
+  const login = useAuthStore((s) => s.login);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "", remember: false },
   });
 
-  const onSubmit = (data: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+    await mockDelay();
+    login({ email: data.email });
     toast.success("登录成功", { description: `欢迎回来，${data.email}` });
     onSuccess();
   };
@@ -216,20 +243,24 @@ function DialogLoginForm({ onSuccess }: { onSuccess: () => void }) {
           )}
         />
       </FieldGroup>
-      <Button className="w-full" type="submit">
-        登录
+      <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+        {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+        {form.formState.isSubmitting ? "登录中..." : "登录"}
       </Button>
     </form>
   );
 }
 
 function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
+  const login = useAuthStore((s) => s.login);
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: { email: "", password: "", confirmPassword: "", agree: false },
   });
 
-  const onSubmit = (data: z.infer<typeof registerSchema>) => {
+  const onSubmit = async (data: z.infer<typeof registerSchema>) => {
+    await mockDelay();
+    login({ email: data.email });
     toast.success("注册成功", { description: `欢迎加入，${data.email}` });
     onSuccess();
   };
@@ -322,8 +353,9 @@ function DialogRegisterForm({ onSuccess }: { onSuccess: () => void }) {
           )}
         />
       </FieldGroup>
-      <Button className="w-full" type="submit">
-        注册
+      <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+        {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+        {form.formState.isSubmitting ? "注册中..." : "注册"}
       </Button>
     </form>
   );

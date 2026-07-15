@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_CONFIG } from "@/config/app-config";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
+import { useIsAuthenticated } from "@/stores/auth-store";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { NavMain } from "./nav-main";
@@ -30,10 +31,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     })),
   );
 
-  // TODO: 实际项目中从认证状态获取
-  // const { user } = useAuth(); // 或者从 session 获取
-  // const isAuthenticated = !!user;
-  const isAuthenticated = true; // 临时设置为已登录，实际开发时替换为真实认证状态
+  // 模拟认证状态：登录后侧边栏才展示"仪表盘"分组
+  const isAuthenticated = useIsAuthenticated();
 
   const variant = isSynced ? sidebarVariant : props.variant;
   const collapsible = isSynced ? sidebarCollapsible : props.collapsible;
