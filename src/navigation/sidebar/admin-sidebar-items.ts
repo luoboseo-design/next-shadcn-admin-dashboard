@@ -108,6 +108,11 @@ export const adminSidebarItems: AdminNavGroup[] = [
     label: "账号中心",
     items: [
       {
+        title: "产能中心",
+        url: "/admin/capacity",
+        icon: Gauge,
+      },
+      {
         title: "账号总览",
         url: "/admin/accounts",
         icon: UserCog,

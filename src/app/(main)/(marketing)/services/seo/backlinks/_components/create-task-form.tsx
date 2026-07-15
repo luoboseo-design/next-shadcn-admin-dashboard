@@ -1,18 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Link from "next/link";
 
-import { Check, Clock, ExternalLink, Globe, MessageSquare } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Gauge,
+  Globe,
+  Info,
+  MessageSquare,
+  XCircle,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { type PrecheckLevel, precheckLevelConfig, precheckTask } from "@/data/capacity-model";
 import { platformTypeDetails, platformTypeLabels } from "@/data/mock-platforms";
+import { servicePackages } from "@/data/mock-tasks";
 import type { CreateTaskFormData, PlatformType } from "@/types/marketing";
+
+const precheckStyles: Record<
+  PrecheckLevel,
+  { wrap: string; icon: typeof CheckCircle2; iconColor: string; badge: string }
+> = {
+  ok: {
+    wrap: "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30",
+    icon: CheckCircle2,
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
+  },
+  tight: {
+    wrap: "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30",
+    icon: AlertTriangle,
+    iconColor: "text-amber-600 dark:text-amber-400",
+    badge: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
+  },
+  insufficient: {
+    wrap: "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30",
+    icon: XCircle,
+    iconColor: "text-red-600 dark:text-red-400",
+    badge: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300",
+  },
+  manual: {
+    wrap: "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30",
+    icon: Info,
+    iconColor: "text-blue-600 dark:text-blue-400",
+    badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+  },
+};
 
 interface CreateTaskFormProps {
   selectedPackageId: string;
@@ -51,6 +94,18 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
   };
 
   const isCustomSelected = formData.platformTypes.includes("custom");
+
+  // 以选中套餐的外链数量作为预检需求量
+  const quantity = useMemo(
+    () => servicePackages.find((p) => p.id === selectedPackageId)?.quantity ?? formData.quantity,
+    [selectedPackageId, formData.quantity],
+  );
+
+  // 实时产能预检：随平台类型 / 数量变化重新计算
+  const precheck = useMemo(() => {
+    if (formData.platformTypes.length === 0) return null;
+    return precheckTask(formData.platformTypes, quantity);
+  }, [formData.platformTypes, quantity]);
 
   return (
     <div className="space-y-6">
@@ -208,6 +263,79 @@ export function CreateTaskForm({ selectedPackageId, onPlatformChange }: CreateTa
           </div>
         </div>
       )}
+
+      {/* 产能预检：实时评估资源能否承接该任务 */}
+      {precheck &&
+        (() => {
+          const style = precheckStyles[precheck.level];
+          const StatusIcon = style.icon;
+          return (
+            <div className={`rounded-lg border p-4 ${style.wrap}`}>
+              <div className="flex items-start gap-3">
+                <StatusIcon className={`mt-0.5 h-5 w-5 shrink-0 ${style.iconColor}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="flex items-center gap-1.5 font-semibold">
+                      <Gauge className="h-4 w-4" />
+                      资源预检
+                    </span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${style.badge}`}>
+                      {precheckLevelConfig[precheck.level].label}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-sm text-foreground/80">{precheck.message}</p>
+                  {precheck.suggestion && <p className="mt-1 text-sm text-muted-foreground">{precheck.suggestion}</p>}
+
+                  {/* 关键指标 */}
+                  {precheck.level !== "manual" && (
+                    <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground">日产能</p>
+                        <p className="text-sm font-semibold">{precheck.dailyCapacity} 条/天</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">今日可用</p>
+                        <p className="text-sm font-semibold">{precheck.availableToday} 条</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">现有积压</p>
+                        <p className="text-sm font-semibold">{precheck.backlog} 条</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">预计完成</p>
+                        <p className="text-sm font-semibold">{precheck.estDays} 天</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 分平台明细 */}
+                  {precheck.byType.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {precheck.byType.map((t) => (
+                        <span
+                          key={t.type}
+                          className="rounded-md bg-background/60 px-2 py-1 text-xs text-muted-foreground"
+                        >
+                          {t.label}：{t.healthyAccounts} 账号 · {t.dailyCapacity} 条/天
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 资源不足时引导补充账号 */}
+                  {precheck.level === "insufficient" && (
+                    <Button variant="outline" size="sm" className="mt-3 gap-1.5" asChild>
+                      <Link href="/admin/accounts/registration">
+                        前往注册队列补充账号
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
     </div>
   );
 }
