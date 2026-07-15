@@ -1,5 +1,4 @@
 import {
-  Activity,
   AtSign,
   BookOpen,
   Bot,
@@ -50,11 +49,6 @@ export const adminSidebarItems: AdminNavGroup[] = [
         title: "控制台",
         url: "/admin",
         icon: Home,
-      },
-      {
-        title: "系统监控",
-        url: "/admin/monitor",
-        icon: Activity,
       },
     ],
   },
